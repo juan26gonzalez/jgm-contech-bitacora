@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de Obra | Captura en Campo - JG ConTech</title>
+    
+    <!-- LIBRERÍA OFICIAL DE SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2b6cb0;
+            --success: #10b981;
+            --success-dark: #059669;
+            --surface: #ffffff;
+            --bg: #f1f5f9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --border-light: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 20px 15px 40px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* TARJETA PRINCIPAL */
+        .card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border-top: 6px solid var(--success);
+            margin-bottom: 25px;
+        }
+
+        /* HEADER */
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.45rem;
+            font-weight: 700;
+        }
+
+        .badges-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-cloud {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-bim {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .project-tag {
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .project-tag strong {
+            color: var(--primary);
+        }
+
+        /* FORMULARIO */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            color: var(--text-main);
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.15);
+        }
+
+        /* INFO BOX DE LA ACTIVIDAD SELECCIONADA */
+        .activity-meta-box {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            border-left: 4px solid var(--primary-light);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .activity-meta-box span {
+            margin-right: 15px;
+        }
+
+        /* CALCULADORA DIMENSIONAL DESPLEGABLE */
+        .calc-toggle-btn {
+            background: transparent;
+            border: 1px dashed var(--primary-light);
+            color: var(--primary-light);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .calc-toggle-btn:hover {
+            background: #eff6ff;
+        }
+
+        .calc-panel {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+
+        .calc-panel h4 {
+            font-size: 13px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* BOTÓN DE ENVÍO */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: var(--success);
+            color: white;
+            transition: all 0.2s;
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background-color: var(--success-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* TABLA DE REGISTROS */
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .table-header h2 {
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        .btn-refresh {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-refresh:hover {
+            background: #e2e8f0;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            background: #fff;
+        }
+
+        th, td {
+            padding: 11px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #fcfdfe;
+        }
+
+        .badge-status-ok {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 25px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="card">
+        
+        <!-- CABECERA -->
+        <div class="header-title">
+            <h1>🏗️ Bitácora Cloud de Obra</h1>
+            <div class="badges-bar">
+                <span class="badge badge-cloud">🟢 PostgreSQL Supabase</span>
+                <span class="badge badge-bim">🔷 Conexión BIM 4D/5D</span>
+            </div>
+        </div>
+
+        <div class="project-tag">
+            Proyecto: <strong>MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong> | Contratista: <strong>INGENDES S.A.S.</strong>
+        </div>
+
+        <!-- FORMULARIO DE CAPTURA EN CAMPO -->
+        <form id="formBitacora" onsubmit="event.preventDefault(); registrarAvanceCloud();">
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fecha">📅 Fecha de Ejecución:</label>
+                    <input type="date" id="fecha" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ubicacionFrente">📍 Nivel / Frente de Obra:</label>
+                    <select id="ubicacionFrente">
+                        <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
+                        <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
+                        <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
+                        <option value="3er Piso">3er Piso</option>
+                        <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
+                        <option value="General de Obra">General de Obra</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SELECTOR HOMOLOGADO 100% CON STREAMLIT (CONTROL 5D Y 4D) -->
+            <div class="form-group">
+                <label for="actividad">📋 Actividad de Obra (Alineada con MS Project y Revit):</label>
+                <select id="actividad" required onchange="actualizarInfoActividad()">
+                    <option value="" disabled selected>Seleccione una actividad de la obra...</option>
+
+                    <optgroup label="🏗️ CIMENTACIÓN Y ESTRUCTURA">
+                        <option value="Construcción de plantilla de concreto" data-unidad="m³" data-meta="15.00" data-desp="5">Construcción de plantilla de concreto (m³)</option>
+                        <option value="Concreto en zapatas y cimentación" data-unidad="m³" data-meta="3.50" data-desp="7">Concreto en zapatas y cimentación (m³)</option>
+                        <option value="Concreto en columnas estructurales" data-unidad="m³" data-meta="2.80" data-desp="7">Concreto en columnas estructurales (m³)</option>
+                        <option value="Concreto en vigas de amarre y aéreas" data-unidad="m³" data-meta="3.20" data-desp="7">Concreto en vigas de amarre y aéreas (m³)</option>
+                    </optgroup>
+
+                    <optgroup label="🧱 MAMPOSTERÍA Y CERRAMIENTOS">
+                        <option value="Muros en mampostería de bloques de concreto" data-unidad="m²" data-meta="120.00" data-desp="5">Muros en mampostería de bloques de concreto (m²)</option>
+                    </optgroup>
+
+                    <optgroup label="🎨 ACABADOS Y REVESTIMIENTOS">
+                        <option value="Pañete y mortero de revoco en muros" data-unidad="m²" data-meta="240.00" data-desp="7">Pañete y mortero de revoco en muros (m²)</option>
+                        <option value="Estuco y pintura vinílica en muros" data-unidad="m²" data-meta="240.00" data-desp="5">Estuco y pintura vinílica en muros (m²)</option>
+                        <option value="Instalación de piso cerámico / enchape" data-unidad="m²" data-meta="80.00" data-desp="7">Instalación de piso cerámico / enchape (m²)</option>
+                        <option value="Instalación de cielo raso" data-unidad="m²" data-meta="80.00" data-desp="5">Instalación de cielo raso (m²)</option>
+                        <option value="Instalación de guardaescobas" data-unidad="ml" data-meta="20.00" data-desp="5">Instalación de guardaescobas (ml)</option>
+                    </optgroup>
+
+                    <optgroup label="🏠 CUBIERTAS">
+                        <option value="Montaje de cubierta en Eternit" data-unidad="m²" data-meta="150.00" data-desp="5">Montaje de cubierta en Eternit (m²)</option>
+                    </optgroup>
+
+                    <optgroup label="🚪 CARPINTERÍA E INSTALACIONES">
+                        <option value="Instalación de puertas y ventanas" data-unidad="und" data-meta="10.00" data-desp="0">Instalación de puertas y ventanas (und)</option>
+                        <option value="Instalación de puertas interiores y baño" data-unidad="und" data-meta="4.00" data-desp="0">Instalación de puertas interiores y baño (und)</option>
+                        <option value="Instalación de aparatos sanitarios y lavaplatos" data-unidad="und" data-meta="3.00" data-desp="0">Instalación de aparatos sanitarios y lavaplatos (und)</option>
+                        <option value="Red de tubería hidrosanitaria PVC" data-unidad="ml" data-meta="18.00" data-desp="5">Red de tubería hidrosanitaria PVC (ml)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- INFO META CONTRATADA -->
+            <div id="metaBox" class="activity-meta-box">
+                <span>📏 Unidad: <strong id="lblUnidad">-</strong></span>
+                <span>🎯 Meta Contratada: <strong id="lblMeta">-</strong></span>
+                <span>💡 Desperdicio Sugerido: <strong id="lblDespSugerido">-</strong></span>
+            </div>
+
+            <!-- BOTÓN Y PANEL CALCULADORA DIMENSIONAL OPCIONAL -->
+            <button type="button" class="calc-toggle-btn" onclick="toggleCalculadora()">
+                📐 ¿Deseas calcular por dimensiones en campo? (Largo × Ancho × Alto)
+            </button>
+
+            <div id="panelCalc" class="calc-panel">
+                <h4>Calculadora Rápida de Campo</h4>
+                <div class="calc-grid">
+                    <div>
+                        <label for="calcLargo">Largo (m):</label>
+                        <input type="number" id="calcLargo" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
+                    </div>
+                    <div>
+                        <label for="calcAncho">Ancho (m):</label>
+                        <input type="number" id="calcAncho" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
+                    </div>
+                    <div>
+                        <label for="calcAlto">Alto/Espesor (m):</label>
+                        <input type="number" id="calcAlto" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
+                    </div>
+                    <div>
+                        <label for="calcPiezas">Nº Elementos:</label>
+                        <input type="number" id="calcPiezas" step="1" min="1" value="1" oninput="calcularDimensiones()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CANTIDAD Y DESPERDICIO -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="cantidad">⚡ Cantidad Neta Ejecutada Hoy:</label>
+                    <input type="number" id="cantidad" step="0.01" min="0.001" placeholder="Ej. 8.50" inputmode="decimal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="desperdicio">Desperdicio Estimado (%):</label>
+                    <input type="number" id="desperdicio" step="0.5" min="0" max="100" value="5" required>
+                </div>
+            </div>
+
+            <!-- BOTÓN ENVIAR A SUPABASE -->
+            <button type="submit" id="btnGuardar" class="btn-submit">
+                🚀 Enviar a Base de Datos (Supabase)
+            </button>
+        </form>
+
+    </div>
+
+    <!-- TARJETA HISTORIAL EN TIEMPO REAL -->
+    <div class="card">
+        <div class="table-header">
+            <h2>📋 Últimos Registros Sincronizados (<span id="totalRegistros">0</span>)</h2>
+            <button type="button" class="btn-refresh" onclick="cargarHistorialSupabase()">🔄 Recargar Nube</button>
+        </div>
+
+        <div class="table-responsive">
+            <table id="tablaBitacora">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Actividad de Obra</th>
+                        <th>Unidad</th>
+                        <th>Cant. Neta</th>
+                        <th>Desperdicio (%)</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                    <tr>
+                        <td colspan="6" class="loading-text">⏳ Consultando registros en PostgreSQL Supabase...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        JG ConTech • Sistema de Control de Obra Civil • Barranquilla, Colombia
+    </footer>
+
+</div>
+
+<script>
+    // =========================================================================
+    // CONFIGURACIÓN DE SUPABASE
+    // =========================================================================
+    const _supabaseUrl = "https://ktxbonxgrnpzearsgvtc.supabase.co";
+    const _supabaseAnonKey = "sb_publishable_VUiAXSbX0Snwe-jvO4yEgA_8WLCK0Do";
+    const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseAnonKey, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+        }
+    });
+
+    // Inicializar fecha actual en el selector
+    document.addEventListener("DOMContentLoaded", () => {
+        const fechaInput = document.getElementById("fecha");
+        const hoy = new Date().toISOString().split("T")[0];
+        fechaInput.value = hoy;
+        
+        cargarHistorialSupabase();
+    });
+
+    // Actualiza metadatos al seleccionar una actividad
+    function actualizarInfoActividad() {
+        const select = document.getElementById("actividad");
+        const opcion = select.options[select.selectedIndex];
+        
+        if (!opcion || !opcion.dataset.unidad) return;
+
+        const unidad = opcion.dataset.unidad;
+        const meta = opcion.dataset.meta;
+        const desp = opcion.dataset.desp;
+
+        document.getElementById("lblUnidad").textContent = unidad;
+        document.getElementById("lblMeta").textContent = `${meta} ${unidad}`;
+        document.getElementById("lblDespSugerido").textContent = `${desp}%`;
+        document.getElementById("desperdicio").value = desp;
+
+        document.getElementById("metaBox").style.display = "block";
+    }
+
+    // Toggle de la calculadora dimensional
+    function toggleCalculadora() {
+        const panel = document.getElementById("panelCalc");
+        panel.style.display = (panel.style.display === "block") ? "none" : "block";
+    }
+
+    // Cálculo dimensional en vivo
+    function calcularDimensiones() {
+        const l = parseFloat(document.getElementById("calcLargo").value) || 0;
+        const a = parseFloat(document.getElementById("calcAncho").value) || 0;
+        const h = parseFloat(document.getElementById("calcAlto").value) || 0;
+        const piezas = parseInt(document.getElementById("calcPiezas").value) || 1;
+
+        let total = 0;
+        if (l > 0 && a > 0 && h > 0) {
+            total = l * a * h * piezas; // Volumen m³
+        } else if (l > 0 && a > 0 && h === 0) {
+            total = l * a * piezas; // Área m²
+        } else if (l > 0 && a === 0 && h === 0) {
+            total = l * piezas; // Longitud ml
+        }
+
+        if (total > 0) {
+            document.getElementById("cantidad").value = total.toFixed(2);
+        }
+    }
+
+    // =========================================================================
+    // 1. CARGA INICIAL DESDE SUPABASE (SELECT)
+    // =========================================================================
+    async function cargarHistorialSupabase() {
+        const tbody = document.getElementById("cuerpoTabla");
+        tbody.innerHTML = `<tr><td colspan="6" class="loading-text">⏳ Consultando registros en PostgreSQL Supabase...</td></tr>`;
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('bitacora_obra')
+                .select('*')
+                .order('id', { ascending: false })
+                .limit(20);
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="loading-text">No hay registros en la base de datos aún.</td></tr>`;
+                document.getElementById("totalRegistros").textContent = "0";
+                return;
+            }
+
+            document.getElementById("totalRegistros").textContent = data.length;
+            tbody.innerHTML = "";
+
+            data.forEach(item => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td><strong>${item.fecha || '-'}</strong></td>
+                    <td>${item.actividad}</td>
+                    <td><span class="badge badge-bim">${item.unidad}</span></td>
+                    <td><strong>${Number(item.cantidad).toFixed(2)}</strong></td>
+                    <td>${item.desperdicio !== undefined ? item.desperdicio : '0'}%</td>
+                    <td><span class="badge-status-ok">✅ Nube OK</span></td>
+                `;
+                tbody.appendChild(fila);
+            });
+
+        } catch (err) {
+            console.error("Error al cargar historial:", err);
+            tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center; padding:15px;">❌ Error al conectar con Supabase: ${err.message}</td></tr>`;
+        }
+    }
+
+    // =========================================================================
+    // 2. REGISTRAR AVANCE EN SUPABASE (INSERT)
+    // =========================================================================
+    async function registrarAvanceCloud() {
+        const selectActividad = document.getElementById("actividad");
+        const inputCantidad = document.getElementById("cantidad");
+        const inputDesperdicio = document.getElementById("desperdicio");
+        const inputFecha = document.getElementById("fecha");
+        const btnGuardar = document.getElementById("btnGuardar");
+
+        const actividad = selectActividad.value;
+        const cantidad = parseFloat(inputCantidad.value);
+        const desperdicio = parseFloat(inputDesperdicio.value) || 0;
+        const fecha = inputFecha.value;
+
+        if (!actividad) {
+            alert("⚠️ Seleccione una actividad de obra.");
+            selectActividad.focus();
+            return;
+        }
+
+        if (isNaN(cantidad) || cantidad <= 0) {
+            alert("⚠️ Ingrese una cantidad válida mayor a cero.");
+            inputCantidad.focus();
+            return;
+        }
+
+        const opcionSeleccionada = selectActividad.options[selectActividad.selectedIndex];
+        const unidad = opcionSeleccionada.dataset.unidad || "und";
+
+        // Feedback de carga
+        btnGuardar.disabled = true;
+        btnGuardar.innerText = "⏳ Sincronizando con PostgreSQL Supabase...";
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('bitacora_obra')
+                .insert([
+                    {
+                        fecha: fecha,
+                        actividad: actividad,
+                        unidad: unidad,
+                        cantidad: cantidad,
+                        desperdicio: desperdicio
+                    }
+                ]);
+
+            if (error) throw error;
+
+            // Recargar tabla de historial automáticamente
+            await cargarHistorialSupabase();
+
+            // Limpiar campos de cantidad y dimensiones
+            inputCantidad.value = "";
+            document.getElementById("calcLargo").value = "";
+            document.getElementById("calcAncho").value = "";
+            document.getElementById("calcAlto").value = "";
+
+            alert(`✅ ¡Registro exitoso en Supabase!\n${actividad}: ${cantidad} ${unidad}`);
+
+        } catch (err) {
+            console.error("Error de Supabase:", err);
+            alert("❌ Error al enviar datos a la nube: " + err.message);
+        } finally {
+            btnGuardar.disabled = false;
+            btnGuardar.innerText = "🚀 Enviar a Base de Datos (Supabase)";
+        }
+    }
+</script>
+
+</body>
+</html>
