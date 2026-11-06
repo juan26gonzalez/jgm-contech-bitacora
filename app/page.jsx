@@ -27,10 +27,15 @@ import {
   ChevronDown,
   ChevronUp,
   CalendarDays,
-  Compass
+  Compass,
+  Camera,
+  Upload,
+  X
 } from 'lucide-react';
 import TabCronograma from '../components/TabCronograma';
 import TabPlanos from '../components/TabPlanos';
+import ModalEvidenciaFoto from '../components/ModalEvidenciaFoto';
+import ModalReporteEjecutivo from '../components/ModalReporteEjecutivo';
 
 // =============================================================================
 // CONFIGURACIÓN DE SUPABASE
@@ -112,6 +117,13 @@ export default function Home() {
   const [isOnline, setIsOnline] = useState(true);
   const [offlineQueue, setOfflineQueue] = useState([]);
 
+  // Evidencias Fotográficas y Reportes
+  const [fotoPreview, setFotoPreview] = useState(null);
+  const [fotoInfo, setFotoInfo] = useState(null);
+  const [evidenciasFotos, setEvidenciasFotos] = useState({});
+  const [selectedEvidencia, setSelectedEvidencia] = useState(null);
+  const [showReporteModal, setShowReporteModal] = useState(false);
+
   // ===========================================================================
   // EFECTOS INICIALES
   // ===========================================================================
@@ -144,6 +156,14 @@ export default function Home() {
     // Cargar cola offline almacenada
     const colaGuardada = JSON.parse(localStorage.getItem('jgm_offline_queue') || '[]');
     setOfflineQueue(colaGuardada);
+
+    // Cargar repositorio de evidencias fotográficas locales
+    try {
+      const fotosGuardadas = JSON.parse(localStorage.getItem('jgm_evidencias_fotos') || '{}');
+      setEvidenciasFotos(fotosGuardadas);
+    } catch (e) {
+      console.error('Error al cargar evidencias locales:', e);
+    }
 
     return () => {
       subscription.unsubscribe();
@@ -269,6 +289,53 @@ export default function Home() {
     }
   }, [calcLargo, calcAncho, calcAlto, calcPiezas]);
 
+  // Compresión y manejo de fotos en navegador (Canvas)
+  const handleFotoSeleccionada = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxWidth = 1024;
+        const maxHeight = 768;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Calidad 0.75 para compresión rápida y liviana (~40-70 KB)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        const approxKb = Math.round((dataUrl.length * 3) / 4 / 1024);
+
+        setFotoPreview(dataUrl);
+        setFotoInfo({
+          nombre: file.name,
+          kb: approxKb
+        });
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
   // ===========================================================================
   // ENVÍO DE DATOS (ONLINE / OFFLINE)
   // ===========================================================================
@@ -291,32 +358,69 @@ export default function Home() {
       desperdicio: parseFloat(desperdicio) || 0
     };
 
+    const evidenciaCompleta = {
+      fecha: payload.fecha,
+      actividad: payload.actividad,
+      unidad: payload.unidad,
+      cantidad: payload.cantidad,
+      desperdicio: payload.desperdicio,
+      ubicacion: ubicacionFrente,
+      clima: clima,
+      cuadrilla: cuadrilla,
+      observaciones: observaciones,
+      foto: fotoPreview
+    };
+
     // Modo Offline
     if (!navigator.onLine) {
-      const nuevaCola = [...offlineQueue, payload];
+      const offlineId = `off-${Date.now()}`;
+      const nuevaCola = [...offlineQueue, { ...payload, id: offlineId, ...evidenciaCompleta }];
       setOfflineQueue(nuevaCola);
       localStorage.setItem('jgm_offline_queue', JSON.stringify(nuevaCola));
+      
+      if (fotoPreview) {
+        const nuevasEvidencias = { ...evidenciasFotos, [offlineId]: evidenciaCompleta };
+        setEvidenciasFotos(nuevasEvidencias);
+        localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
+      }
+
       limpiarFormulario();
-      alert('📶 MODO OFFLINE: Se guardó en tu dispositivo. Se enviará a Supabase automáticamente al recuperar señal.');
+      alert('📶 MODO OFFLINE: Registro y foto guardados en tu dispositivo. Se sincronizarán al recuperar señal.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from('bitacora_obra').insert([payload]);
+      const { data, error } = await supabase.from('bitacora_obra').insert([payload]).select();
       if (error) throw error;
+
+      const recordId = data && data[0] ? data[0].id : Date.now();
+
+      // Guardar evidencia fotográfica y ficha técnica localmente indexada por ID
+      if (fotoPreview || observaciones || cuadrilla) {
+        const nuevasEvidencias = {
+          ...evidenciasFotos,
+          [recordId]: { ...evidenciaCompleta, id: recordId }
+        };
+        setEvidenciasFotos(nuevasEvidencias);
+        try {
+          localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
+        } catch (e) {
+          console.warn('Límite de almacenamiento alcanzado:', e);
+        }
+      }
 
       await cargarRegistros(true);
       limpiarFormulario();
-      alert(`✅ ¡Registro exitoso en Supabase!\n${payload.actividad}: ${payload.cantidad} ${payload.unidad}`);
+      alert(`✅ ¡Registro y evidencia guardados exitosamente!\n${payload.actividad}: ${payload.cantidad} ${payload.unidad}`);
     } catch (err) {
       console.error('Error al registrar:', err);
-      // Fallback a cola offline si hubo falla imprevista
-      const nuevaCola = [...offlineQueue, payload];
+      const offlineId = `off-${Date.now()}`;
+      const nuevaCola = [...offlineQueue, { ...payload, id: offlineId, ...evidenciaCompleta }];
       setOfflineQueue(nuevaCola);
       localStorage.setItem('jgm_offline_queue', JSON.stringify(nuevaCola));
       limpiarFormulario();
-      alert('⚠️ Conexión inestable: Se respaldó en cola local.');
+      alert('⚠️ Conexión inestable: Se respaldó en tu dispositivo con la foto adjunta.');
     } finally {
       setIsSubmitting(false);
     }
@@ -326,8 +430,17 @@ export default function Home() {
     const cola = JSON.parse(localStorage.getItem('jgm_offline_queue') || '[]');
     if (cola.length === 0) return;
 
+    // Extraer solo los campos compatibles con la tabla base de Supabase
+    const registrosCompatibles = cola.map(c => ({
+      fecha: c.fecha,
+      actividad: c.actividad,
+      unidad: c.unidad,
+      cantidad: c.cantidad,
+      desperdicio: c.desperdicio
+    }));
+
     try {
-      const { error } = await supabase.from('bitacora_obra').insert(cola);
+      const { error } = await supabase.from('bitacora_obra').insert(registrosCompatibles);
       if (!error) {
         localStorage.removeItem('jgm_offline_queue');
         setOfflineQueue([]);
@@ -345,6 +458,9 @@ export default function Home() {
     setCalcAncho('');
     setCalcAlto('');
     setObservaciones('');
+    setCuadrilla('');
+    setFotoPreview(null);
+    setFotoInfo(null);
   };
 
   // ===========================================================================
@@ -902,6 +1018,53 @@ export default function Home() {
             </div>
           </div>
 
+          {/* SECCIÓN DE REGISTRO FOTOGRÁFICO DE OBRA */}
+          <div className="rounded-xl border border-slate-200 p-4 bg-slate-50/50 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <Camera className="h-4 w-4 text-emerald-600" /> Registro Fotográfico de Evidencia en Campo
+              </h3>
+              <span className="text-[10px] text-slate-400 font-semibold">Opcional</span>
+            </div>
+
+            {!fotoPreview ? (
+              <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 rounded-xl bg-white hover:bg-slate-50 cursor-pointer transition group">
+                <Camera className="h-7 w-7 text-slate-400 group-hover:text-slate-600 mb-1.5" />
+                <span className="text-xs font-bold text-slate-700">Tomar foto o subir evidencia</span>
+                <span className="text-[10px] text-slate-400 mt-0.5">JPG, PNG optimizado automáticamente para celular</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFotoSeleccionada}
+                  className="hidden"
+                />
+              </label>
+            ) : (
+              <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200">
+                <div className="relative h-16 w-16 rounded-lg overflow-hidden border border-slate-300 shrink-0 bg-slate-900">
+                  <img src={fotoPreview} alt="Preview" className="h-full w-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0 text-xs">
+                  <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Foto lista para adjuntar
+                  </div>
+                  <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                    {fotoInfo?.nombre || 'Foto de campo'} • {fotoInfo?.kb || 50} KB (comprimida)
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setFotoPreview(null); setFotoInfo(null); }}
+                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 transition"
+                  title="Eliminar foto"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* BOTÓN ENVIAR */}
           <button
             type="submit"
@@ -934,6 +1097,12 @@ export default function Home() {
               <RefreshCw className="h-3.5 w-3.5" /> Recargar
             </button>
             <button
+              onClick={() => setShowReporteModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm"
+            >
+              <FileText className="h-3.5 w-3.5" /> Informe Ejecutivo (PDF)
+            </button>
+            <button
               onClick={exportarCSV}
               className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
             >
@@ -943,7 +1112,7 @@ export default function Home() {
               onClick={() => window.print()}
               className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition"
             >
-              <Printer className="h-3.5 w-3.5" /> Imprimir Acta PDF
+              <Printer className="h-3.5 w-3.5" /> Imprimir Acta
             </button>
           </div>
         </div>
@@ -988,19 +1157,20 @@ export default function Home() {
                 <th className="py-2.5 px-3">Unidad</th>
                 <th className="py-2.5 px-3 text-right">Cant. Neta</th>
                 <th className="py-2.5 px-3 text-center">Desp (%)</th>
+                <th className="py-2.5 px-3 text-center">📸 Evidencia</th>
                 <th className="py-2.5 px-3 text-center">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loadingRegistros ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                  <td colSpan={7} className="py-8 text-center text-slate-400">
                     Consultando registros en Supabase...
                   </td>
                 </tr>
               ) : registrosFiltrados.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                  <td colSpan={7} className="py-8 text-center text-slate-400">
                     No hay registros disponibles.
                   </td>
                 </tr>
@@ -1023,6 +1193,26 @@ export default function Home() {
                     </td>
                     <td className="py-2.5 px-3 text-center text-slate-500">
                       {item.desperdicio || 0}%
+                    </td>
+                    <td className="py-2.5 px-3 text-center">
+                      {(item.foto || evidenciasFotos[item.id]?.foto) ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const ev = evidenciasFotos[item.id] || item;
+                            setSelectedEvidencia({
+                              ...item,
+                              ...ev,
+                              foto: item.foto || ev.foto
+                            });
+                          }}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200 transition"
+                        >
+                          <Camera className="h-3 w-3" /> Ver Foto
+                        </button>
+                      ) : (
+                        <span className="text-slate-300 text-[10px]">-</span>
+                      )}
                     </td>
                     <td className="py-2.5 px-3 text-center">
                       {item.isOffline ? (
@@ -1066,6 +1256,23 @@ export default function Home() {
       {/* VISTA 3: PLANOS CONSTRUCTIVOS */}
       {activeTab === 'planos' && (
         <TabPlanos />
+      )}
+
+      {/* MODAL DE EVIDENCIA FOTOGRÁFICA */}
+      {selectedEvidencia && (
+        <ModalEvidenciaFoto
+          evidencia={selectedEvidencia}
+          onClose={() => setSelectedEvidencia(null)}
+        />
+      )}
+
+      {/* MODAL DE REPORTE EJECUTIVO Y ACTA OFICIAL (PDF) */}
+      {showReporteModal && (
+        <ModalReporteEjecutivo
+          registros={registrosFiltrados}
+          evidenciasFotos={evidenciasFotos}
+          onClose={() => setShowReporteModal(false)}
+        />
       )}
 
       <footer className="mt-8 text-center text-xs text-slate-400 no-print">
