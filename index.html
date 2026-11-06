@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitácora de Obra | Captura en Campo - JG ConTech</title>
+    <title>Bitácora de Obra | JG ConTech Pro</title>
     
     <!-- LIBRERÍA OFICIAL DE SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,6 +14,8 @@
             --primary-light: #2b6cb0;
             --success: #10b981;
             --success-dark: #059669;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --surface: #ffffff;
             --bg: #f1f5f9;
             --text-main: #1e293b;
@@ -32,13 +34,37 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
-            padding: 20px 15px 40px;
+            padding: 20px 15px 50px;
             line-height: 1.5;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
+        }
+
+        /* BANNER DE ESTADO DE CONECTIVIDAD */
+        .network-banner {
+            display: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13.5px;
+            font-weight: 600;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .network-offline {
+            display: flex;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .network-online {
+            display: flex;
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
         }
 
         /* TARJETA PRINCIPAL */
@@ -47,7 +73,7 @@
             padding: 24px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-            border-top: 6px solid var(--success);
+            border-top: 6px solid var(--primary);
             margin-bottom: 25px;
         }
 
@@ -63,7 +89,7 @@
 
         h1 {
             color: var(--primary);
-            font-size: 1.45rem;
+            font-size: 1.5rem;
             font-weight: 700;
         }
 
@@ -71,7 +97,6 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
         }
 
         .badge {
@@ -84,20 +109,14 @@
             font-weight: 600;
         }
 
-        .badge-cloud {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-bim {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
+        .badge-cloud { background: #dcfce7; color: #166534; }
+        .badge-bim { background: #e0f2fe; color: #0369a1; }
+        .badge-realtime { background: #fef3c7; color: #92400e; }
 
         .project-tag {
             background: #f8fafc;
             border: 1px solid var(--border-light);
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 8px;
             font-size: 13px;
             color: var(--text-muted);
@@ -111,7 +130,7 @@
         /* FORMULARIO */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
             margin-bottom: 16px;
         }
@@ -125,43 +144,86 @@
             font-weight: 600;
             margin-bottom: 6px;
             color: var(--text-main);
-            font-size: 14px;
+            font-size: 13.5px;
         }
 
-        select, input {
+        select, input, textarea {
             width: 100%;
             padding: 11px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
-            font-size: 15px;
+            font-size: 14.5px;
             color: var(--text-main);
             background: #fff;
             transition: all 0.2s;
+            font-family: inherit;
         }
 
-        select:focus, input:focus {
+        select:focus, input:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-light);
             box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.15);
         }
 
-        /* INFO BOX DE LA ACTIVIDAD SELECCIONADA */
-        .activity-meta-box {
+        /* 1. SEMÁFORO Y BARRA DE PROGRESO DE CONTROL DE SOBRECOSTO */
+        .progress-box {
             display: none;
             background: #f8fafc;
             border: 1px solid var(--border-light);
-            border-left: 4px solid var(--primary-light);
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 13px;
+            padding: 14px 16px;
+            border-radius: 8px;
             margin-bottom: 16px;
         }
 
-        .activity-meta-box span {
-            margin-right: 15px;
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
         }
 
-        /* CALCULADORA DIMENSIONAL DESPLEGABLE */
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--success);
+            border-radius: 6px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .alert-overcost {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .alert-safe {
+            display: none;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            margin-top: 8px;
+        }
+
+        /* CALCULADORA DIMENSIONAL */
         .calc-toggle-btn {
             background: transparent;
             border: 1px dashed var(--primary-light);
@@ -178,9 +240,7 @@
             transition: all 0.2s;
         }
 
-        .calc-toggle-btn:hover {
-            background: #eff6ff;
-        }
+        .calc-toggle-btn:hover { background: #eff6ff; }
 
         .calc-panel {
             display: none;
@@ -197,10 +257,20 @@
             gap: 10px;
         }
 
-        .calc-panel h4 {
-            font-size: 13px;
+        /* 2. CONDICIONES DE OBRA (CLIMA Y CUADRILLA) */
+        .site-conditions-panel {
+            background: #fdfefe;
+            border: 1px solid var(--border-light);
+            border-left: 4px solid var(--primary-light);
+            padding: 14px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        .site-conditions-panel h3 {
+            font-size: 13.5px;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -214,14 +284,14 @@
             font-weight: 700;
             font-size: 16px;
             cursor: pointer;
-            background-color: var(--success);
+            background-color: var(--primary);
             color: white;
             transition: all 0.2s;
-            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 3px 8px rgba(26, 54, 93, 0.25);
         }
 
         .btn-submit:hover:not(:disabled) {
-            background-color: var(--success-dark);
+            background-color: var(--primary-light);
             transform: translateY(-1px);
         }
 
@@ -231,34 +301,76 @@
             box-shadow: none;
         }
 
-        /* TABLA DE REGISTROS */
-        .table-header {
+        /* HISTORIAL Y FILTROS */
+        .table-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
             border-bottom: 2px solid var(--border-light);
         }
 
-        .table-header h2 {
+        .table-controls h2 {
             font-size: 1.15rem;
             color: var(--primary);
         }
 
-        .btn-refresh {
-            background: #f1f5f9;
+        .action-buttons-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: #fff;
             border: 1px solid var(--border);
             color: var(--text-main);
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+
+        .btn-action:hover { background: #f8fafc; border-color: var(--primary-light); }
+        .btn-action-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .btn-action-primary:hover { background: var(--primary-light); }
+
+        .search-filters-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 220px;
+            padding: 8px 12px;
+            font-size: 13.5px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+            font-size: 12.5px;
+            cursor: pointer;
             font-weight: 600;
         }
 
-        .btn-refresh:hover {
-            background: #e2e8f0;
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
         }
 
         .table-responsive {
@@ -275,7 +387,7 @@
         }
 
         th, td {
-            padding: 11px 12px;
+            padding: 10px 12px;
             text-align: left;
             border-bottom: 1px solid var(--border-light);
         }
@@ -284,26 +396,31 @@
             background-color: #f8fafc;
             color: var(--primary);
             font-weight: 700;
-            font-size: 12.5px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: #fcfdfe;
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #fcfdfe; }
 
         .badge-status-ok {
             display: inline-block;
             background: #dcfce7;
             color: #15803d;
-            padding: 3px 8px;
+            padding: 2px 7px;
             border-radius: 4px;
-            font-size: 11.5px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-status-offline {
+            display: inline-block;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 700;
         }
 
@@ -314,17 +431,35 @@
             font-size: 14px;
         }
 
-        footer {
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 25px;
+        /* ESTILOS PARA IMPRESIÓN (ACTA DE BITÁCORA OFICIAL) */
+        @media print {
+            body { background: #fff; padding: 0; color: #000; }
+            .card { box-shadow: none; border: none; padding: 0; }
+            form, .table-controls, .search-filters-bar, .network-banner, .calc-toggle-btn, footer { display: none !important; }
+            .print-only-header { display: block !important; margin-bottom: 20px; }
+            .print-signatures { display: flex !important; justify-content: space-between; margin-top: 60px; page-break-inside: avoid; }
+            th { background: #eee !important; color: #000 !important; }
         }
+
+        .print-only-header { display: none; }
+        .print-signatures { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
+
+    <!-- BANNER DE CONEXIÓN OFFLINE / ONLINE -->
+    <div id="offlineBanner" class="network-banner network-offline">
+        <span>⚠️ Modo Sin Conexión (Offline): Los registros se guardarán en tu celular y se subirán solos a Supabase al recuperar señal.</span>
+        <span id="offlineCountBadge" style="background:#b45309; color:#fff; padding:2px 8px; border-radius:12px; font-size:11px;">0 en cola</span>
+    </div>
+
+    <!-- ENCABEZADO EXCLUSIVO PARA IMPRESIÓN PDF -->
+    <div class="print-only-header">
+        <h2 style="text-align:center; margin-bottom:5px;">ACTA Y MEMORIA DE BITÁCORA DIARIA DE OBRA</h2>
+        <p style="text-align:center; font-size:12px; margin-bottom:15px;">PROYECTO: MEZZANINE 3 NIVELES SEDE ADMON • INGENDES S.A.S. / INTERVENTORÍA DOLMEN S.A.</p>
+    </div>
 
     <div class="card">
         
@@ -332,8 +467,9 @@
         <div class="header-title">
             <h1>🏗️ Bitácora Cloud de Obra</h1>
             <div class="badges-bar">
-                <span class="badge badge-cloud">🟢 PostgreSQL Supabase</span>
-                <span class="badge badge-bim">🔷 Conexión BIM 4D/5D</span>
+                <span class="badge badge-cloud">🟢 Supabase</span>
+                <span class="badge badge-bim">🔷 BIM 4D/5D</span>
+                <span class="badge badge-realtime" id="realtimeBadge">⚡ En Vivo</span>
             </div>
         </div>
 
@@ -342,7 +478,7 @@
         </div>
 
         <!-- FORMULARIO DE CAPTURA EN CAMPO -->
-        <form id="formBitacora" onsubmit="event.preventDefault(); registrarAvanceCloud();">
+        <form id="formBitacora" onsubmit="event.preventDefault(); registrarAvance();">
             
             <div class="form-grid">
                 <div class="form-group">
@@ -363,7 +499,7 @@
                 </div>
             </div>
 
-            <!-- SELECTOR HOMOLOGADO 100% CON STREAMLIT (CONTROL 5D Y 4D) -->
+            <!-- SELECTOR HOMOLOGADO CON STREAMLIT (CONTROL 5D Y 4D) -->
             <div class="form-group">
                 <label for="actividad">📋 Actividad de Obra (Alineada con MS Project y Revit):</label>
                 <select id="actividad" required onchange="actualizarInfoActividad()">
@@ -401,20 +537,32 @@
                 </select>
             </div>
 
-            <!-- INFO META CONTRATADA -->
-            <div id="metaBox" class="activity-meta-box">
-                <span>📏 Unidad: <strong id="lblUnidad">-</strong></span>
-                <span>🎯 Meta Contratada: <strong id="lblMeta">-</strong></span>
-                <span>💡 Desperdicio Sugerido: <strong id="lblDespSugerido">-</strong></span>
+            <!-- 1. SEMÁFORO EN VIVO Y BARRA DE CONTROL DE SOBRECOSTO / SOBREEJECUCIÓN -->
+            <div id="progressBox" class="progress-box">
+                <div class="progress-labels">
+                    <span>Avance Acumulado del Ítem: <strong id="lblEjecutadoAcum">0.00</strong> / <span id="lblMetaPresupuesto">0.00</span></span>
+                    <span id="lblPorcentajeAvance">0.0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="progressBarFill" class="progress-bar-fill"></div>
+                </div>
+                
+                <!-- ALERTA DE MAYOR CANTIDAD / SOBRECOSTO -->
+                <div id="alertOvercost" class="alert-overcost">
+                    ⚠️ <strong>ALERTA DE MAYOR CANTIDAD:</strong> Esta cantidad sobrepasará la meta contratada. Tramitar Acta de Mayor Cantidad con la Interventoría.
+                </div>
+                <div id="alertSafe" class="alert-safe">
+                    ✅ <strong>Dentro del Presupuesto:</strong> Quedarán <strong id="lblSaldoRestante">0.00</strong> por ejecutar de este ítem.
+                </div>
             </div>
 
-            <!-- BOTÓN Y PANEL CALCULADORA DIMENSIONAL OPCIONAL -->
+            <!-- CALCULADORA DIMENSIONAL OPCIONAL -->
             <button type="button" class="calc-toggle-btn" onclick="toggleCalculadora()">
                 📐 ¿Deseas calcular por dimensiones en campo? (Largo × Ancho × Alto)
             </button>
 
             <div id="panelCalc" class="calc-panel">
-                <h4>Calculadora Rápida de Campo</h4>
+                <h4 style="font-size:12px; color:var(--primary); margin-bottom:10px;">Calculadora Rápida de Campo</h4>
                 <div class="calc-grid">
                     <div>
                         <label for="calcLargo">Largo (m):</label>
@@ -439,7 +587,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="cantidad">⚡ Cantidad Neta Ejecutada Hoy:</label>
-                    <input type="number" id="cantidad" step="any" min="0.0001" placeholder="Ej. 8.50" inputmode="decimal" required>
+                    <input type="number" id="cantidad" step="any" min="0.0001" placeholder="Ej. 15.50" inputmode="decimal" required oninput="evaluarSobrecosto()">
                 </div>
 
                 <div class="form-group">
@@ -448,7 +596,31 @@
                 </div>
             </div>
 
-            <!-- BOTÓN ENVIAR A SUPABASE -->
+            <!-- 2. CONDICIONES DE OBRA (CLIMA Y CUADRILLA - DIARIO LEGAL) -->
+            <div class="site-conditions-panel">
+                <h3>☀️🌤️ Condiciones Diarias de Obra y Control de Calidad</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="clima">Clima de la Jornada:</label>
+                        <select id="clima">
+                            <option value="Soleado">☀️ Soleado (Jornada normal)</option>
+                            <option value="Nublado">⛅ Nublado</option>
+                            <option value="Lluvia Ligera">🌦️ Lluvia Ligera (Sin suspensión)</option>
+                            <option value="Lluvia Fuerte / Suspensión">🌧️ Lluvia Fuerte (Con suspensión)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cuadrilla">Personal en Frente (Oficiales / Ayudantes):</label>
+                        <input type="text" id="cuadrilla" placeholder="Ej. 1 Oficial + 2 Ayudantes">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="observaciones">Observaciones Técnicas / Control de Calidad:</label>
+                    <textarea id="observaciones" rows="2" placeholder="Ej. Slump 5 pulg, vaciado completado a las 3:30 PM sin novedades..."></textarea>
+                </div>
+            </div>
+
+            <!-- BOTÓN ENVIAR -->
             <button type="submit" id="btnGuardar" class="btn-submit">
                 🚀 Enviar a Base de Datos (Supabase)
             </button>
@@ -456,11 +628,23 @@
 
     </div>
 
-    <!-- TARJETA HISTORIAL EN TIEMPO REAL -->
+    <!-- TARJETA HISTORIAL EN TIEMPO REAL CON FILTROS Y EXPORTACIÓN -->
     <div class="card">
-        <div class="table-header">
-            <h2>📋 Últimos Registros Sincronizados (<span id="totalRegistros">0</span>)</h2>
-            <button type="button" class="btn-refresh" onclick="cargarHistorialSupabase()">🔄 Recargar Nube</button>
+        <div class="table-controls">
+            <h2>📋 Registros en la Nube (<span id="totalRegistros">0</span>)</h2>
+            <div class="action-buttons-bar">
+                <button type="button" class="btn-action" onclick="cargarHistorialSupabase()">🔄 Recargar</button>
+                <button type="button" class="btn-action" onclick="exportarCSV()">📥 Exportar CSV</button>
+                <button type="button" class="btn-action btn-action-primary" onclick="window.print()">🖨️ Imprimir Acta PDF</button>
+            </div>
+        </div>
+
+        <!-- 5. BUSCADOR Y FILTROS RÁPIDOS -->
+        <div class="search-filters-bar">
+            <input type="text" id="busquedaTabla" class="search-input" placeholder="🔍 Buscar por actividad o fecha..." oninput="filtrarTabla()">
+            <button type="button" class="filter-btn active" onclick="aplicarFiltroFecha('todos', this)">Todos</button>
+            <button type="button" class="filter-btn" onclick="aplicarFiltroFecha('hoy', this)">Hoy</button>
+            <button type="button" class="filter-btn" onclick="aplicarFiltroFecha('semana', this)">Esta Semana</button>
         </div>
 
         <div class="table-responsive">
@@ -471,7 +655,7 @@
                         <th>Actividad de Obra</th>
                         <th>Unidad</th>
                         <th>Cant. Neta</th>
-                        <th>Desperdicio (%)</th>
+                        <th>Desp (%)</th>
                         <th>Estado</th>
                     </tr>
                 </thead>
@@ -481,6 +665,18 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- FIRMAS PARA IMPRESIÓN OFICIAL -->
+        <div class="print-signatures">
+            <div style="text-align:center;">
+                <p>_____________________________________</p>
+                <p><strong>INGENDES S.A.S.</strong><br>Ingeniero Residente de Obra</p>
+            </div>
+            <div style="text-align:center;">
+                <p>_____________________________________</p>
+                <p><strong>DOLMEN S.A. E.S.P.</strong><br>Interventor / Supervisor Técnico</p>
+            </div>
         </div>
     </div>
 
@@ -504,41 +700,131 @@
         }
     });
 
-    // Inicializar fecha actual en el selector
+    let registrosGlobales = [];
+    let mapaAcumulados = {};
+    let filtroFechaActual = 'todos';
+
+    // Inicializar
     document.addEventListener("DOMContentLoaded", () => {
         const fechaInput = document.getElementById("fecha");
-        const hoy = new Date().toISOString().split("T")[0];
-        fechaInput.value = hoy;
-        
+        fechaInput.value = new Date().toISOString().split("T")[0];
+
+        // Verificar conectividad inicial
+        actualizarEstadoRed();
+        window.addEventListener('online', () => {
+            actualizarEstadoRed();
+            sincronizarColaOffline();
+        });
+        window.addEventListener('offline', actualizarEstadoRed);
+
         cargarHistorialSupabase();
+        iniciarRealtime();
+        sincronizarColaOffline();
     });
 
-    // Actualiza metadatos al seleccionar una actividad
+    // 4. SUSCRIPCIÓN EN TIEMPO REAL (WEBSOCKETS SUPABASE REALTIME)
+    function iniciarRealtime() {
+        try {
+            supabaseClient
+                .channel('bitacora_canal_vivo')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'bitacora_obra' }, (payload) => {
+                    console.log('⚡ Evento en vivo recibido de Supabase:', payload);
+                    cargarHistorialSupabase(true);
+                })
+                .subscribe();
+        } catch (e) {
+            console.warn("Realtime no disponible en este canal:", e);
+        }
+    }
+
+    // 3. CONTROL DE RED Y COLA OFFLINE
+    function actualizarEstadoRed() {
+        const banner = document.getElementById("offlineBanner");
+        const cola = JSON.parse(localStorage.getItem("bitacora_offline_queue") || "[]");
+        
+        if (!navigator.onLine) {
+            banner.className = "network-banner network-offline";
+            banner.style.display = "flex";
+            document.getElementById("offlineCountBadge").textContent = `${cola.length} en cola local`;
+        } else if (cola.length > 0) {
+            banner.className = "network-banner network-offline";
+            banner.style.display = "flex";
+            banner.innerHTML = `<span>📶 Conexión recuperada. Subiendo ${cola.length} registro(s) pendientes a Supabase...</span>`;
+        } else {
+            banner.style.display = "none";
+        }
+    }
+
+    // 1. SEMÁFORO Y CÁLCULO DE PROGRESO / SOBREEJECUCIÓN
     function actualizarInfoActividad() {
         const select = document.getElementById("actividad");
         const opcion = select.options[select.selectedIndex];
-        
         if (!opcion || !opcion.dataset.unidad) return;
 
+        const actividad = opcion.value;
         const unidad = opcion.dataset.unidad;
-        const meta = opcion.dataset.meta;
+        const meta = parseFloat(opcion.dataset.meta) || 0;
         const desp = opcion.dataset.desp;
 
-        document.getElementById("lblUnidad").textContent = unidad;
-        document.getElementById("lblMeta").textContent = `${meta} ${unidad}`;
-        document.getElementById("lblDespSugerido").textContent = `${desp}%`;
         document.getElementById("desperdicio").value = desp;
 
-        document.getElementById("metaBox").style.display = "block";
+        const ejecutadoActual = mapaAcumulados[actividad] || 0;
+        const pctActual = meta > 0 ? (ejecutadoActual / meta) * 100 : 0;
+
+        document.getElementById("lblEjecutadoAcum").textContent = `${ejecutadoActual.toFixed(2)} ${unidad}`;
+        document.getElementById("lblMetaPresupuesto").textContent = `${meta.toFixed(2)} ${unidad}`;
+        document.getElementById("lblPorcentajeAvance").textContent = `${pctActual.toFixed(1)}%`;
+
+        const barFill = document.getElementById("progressBarFill");
+        barFill.style.width = `${Math.min(pctActual, 100)}%`;
+
+        if (pctActual > 100) {
+            barFill.style.backgroundColor = "var(--danger)";
+        } else if (pctActual >= 85) {
+            barFill.style.backgroundColor = "var(--warning)";
+        } else {
+            barFill.style.backgroundColor = "var(--success)";
+        }
+
+        document.getElementById("progressBox").style.display = "block";
+        evaluarSobrecosto();
     }
 
-    // Toggle de la calculadora dimensional
+    function evaluarSobrecosto() {
+        const select = document.getElementById("actividad");
+        const opcion = select.options[select.selectedIndex];
+        if (!opcion || !opcion.dataset.meta) return;
+
+        const actividad = opcion.value;
+        const meta = parseFloat(opcion.dataset.meta) || 0;
+        const unidad = opcion.dataset.unidad;
+        const cantidadNueva = parseFloat(document.getElementById("cantidad").value) || 0;
+        const ejecutadoActual = mapaAcumulados[actividad] || 0;
+
+        const totalProyectado = ejecutadoActual + cantidadNueva;
+        const alertOver = document.getElementById("alertOvercost");
+        const alertSafe = document.getElementById("alertSafe");
+
+        if (totalProyectado > meta) {
+            const exceso = totalProyectado - meta;
+            const pct = ((totalProyectado / meta) * 100).toFixed(1);
+            alertOver.innerHTML = `⚠️ <strong>ALERTA DE MAYOR CANTIDAD:</strong> Totalizará <strong>${totalProyectado.toFixed(2)} ${unidad} (${pct}%)</strong>. Supera la meta en <strong>+${exceso.toFixed(2)} ${unidad}</strong>. Requiere Acta de Mayor Cantidad con Interventoría.`;
+            alertOver.style.display = "block";
+            alertSafe.style.display = "none";
+        } else {
+            const saldo = meta - totalProyectado;
+            document.getElementById("lblSaldoRestante").textContent = `${saldo.toFixed(2)} ${unidad}`;
+            alertOver.style.display = "none";
+            alertSafe.style.display = "block";
+        }
+    }
+
+    // CALCULADORA DIMENSIONAL
     function toggleCalculadora() {
         const panel = document.getElementById("panelCalc");
         panel.style.display = (panel.style.display === "block") ? "none" : "block";
     }
 
-    // Cálculo dimensional en vivo
     function calcularDimensiones() {
         const l = parseFloat(document.getElementById("calcLargo").value) || 0;
         const a = parseFloat(document.getElementById("calcAncho").value) || 0;
@@ -546,67 +832,124 @@
         const piezas = parseInt(document.getElementById("calcPiezas").value) || 1;
 
         let total = 0;
-        if (l > 0 && a > 0 && h > 0) {
-            total = l * a * h * piezas; // Volumen m³
-        } else if (l > 0 && a > 0 && h === 0) {
-            total = l * a * piezas; // Área m²
-        } else if (l > 0 && a === 0 && h === 0) {
-            total = l * piezas; // Longitud ml
-        }
+        if (l > 0 && a > 0 && h > 0) total = l * a * h * piezas;
+        else if (l > 0 && a > 0 && h === 0) total = l * a * piezas;
+        else if (l > 0 && a === 0 && h === 0) total = l * piezas;
 
         if (total > 0) {
             document.getElementById("cantidad").value = total.toFixed(2);
+            evaluarSobrecosto();
         }
     }
 
     // =========================================================================
-    // 1. CARGA INICIAL DESDE SUPABASE (SELECT)
+    // CONSULTA Y CARGA DE REGISTROS (SUPABASE)
     // =========================================================================
-    async function cargarHistorialSupabase() {
+    async function cargarHistorialSupabase(silencioso = false) {
         const tbody = document.getElementById("cuerpoTabla");
-        tbody.innerHTML = `<tr><td colspan="6" class="loading-text">⏳ Consultando registros en PostgreSQL Supabase...</td></tr>`;
+        if (!silencioso) {
+            tbody.innerHTML = `<tr><td colspan="6" class="loading-text">⏳ Consultando registros en PostgreSQL Supabase...</td></tr>`;
+        }
 
         try {
             const { data, error } = await supabaseClient
                 .from('bitacora_obra')
                 .select('*')
-                .order('id', { ascending: false })
-                .limit(20);
+                .order('id', { ascending: false });
 
             if (error) throw error;
 
-            if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="loading-text">No hay registros en la base de datos aún.</td></tr>`;
-                document.getElementById("totalRegistros").textContent = "0";
-                return;
-            }
+            registrosGlobales = data || [];
+            recalcularAcumulados();
+            renderizarTabla();
 
-            document.getElementById("totalRegistros").textContent = data.length;
-            tbody.innerHTML = "";
-
-            data.forEach(item => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td><strong>${item.fecha || '-'}</strong></td>
-                    <td>${item.actividad}</td>
-                    <td><span class="badge badge-bim">${item.unidad}</span></td>
-                    <td><strong>${Number(item.cantidad).toFixed(2)}</strong></td>
-                    <td>${item.desperdicio !== undefined ? item.desperdicio : '0'}%</td>
-                    <td><span class="badge-status-ok">✅ Nube OK</span></td>
-                `;
-                tbody.appendChild(fila);
-            });
+            // Si hay una actividad seleccionada, actualizar su progreso
+            actualizarInfoActividad();
 
         } catch (err) {
             console.error("Error al cargar historial:", err);
-            tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center; padding:15px;">❌ Error al conectar con Supabase: ${err.message}</td></tr>`;
+            if (!silencioso) {
+                tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center; padding:15px;">❌ Error al conectar con Supabase: ${err.message}</td></tr>`;
+            }
         }
     }
 
+    function recalcularAcumulados() {
+        mapaAcumulados = {};
+        registrosGlobales.forEach(r => {
+            const cant = parseFloat(r.cantidad) || 0;
+            mapaAcumulados[r.actividad] = (mapaAcumulados[r.actividad] || 0) + cant;
+        });
+    }
+
+    // RENDERIZAR TABLA CON FILTROS
+    function renderizarTabla() {
+        const tbody = document.getElementById("cuerpoTabla");
+        const busqueda = (document.getElementById("busquedaTabla").value || "").toLowerCase();
+        const hoyStr = new Date().toISOString().split("T")[0];
+
+        // Incluir pendientes offline
+        const colaOffline = JSON.parse(localStorage.getItem("bitacora_offline_queue") || "[]");
+        const todos = [
+            ...colaOffline.map(c => ({ ...c, offline: true })),
+            ...registrosGlobales
+        ];
+
+        const filtrados = todos.filter(item => {
+            // Filtro de texto
+            const coincideTexto = (item.actividad || "").toLowerCase().includes(busqueda) || 
+                                  (item.fecha || "").toLowerCase().includes(busqueda);
+            if (!coincideTexto) return false;
+
+            // Filtro de fecha
+            if (filtroFechaActual === 'hoy') {
+                return (item.fecha === hoyStr);
+            } else if (filtroFechaActual === 'semana') {
+                const diffDias = (new Date() - new Date(item.fecha)) / (1000 * 60 * 60 * 24);
+                return diffDias <= 7;
+            }
+            return true;
+        });
+
+        document.getElementById("totalRegistros").textContent = filtrados.length;
+
+        if (filtrados.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="loading-text">No hay registros que coincidan con los filtros.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        filtrados.forEach(item => {
+            const fila = document.createElement("tr");
+            const estadoBadge = item.offline 
+                ? `<span class="badge-status-offline">🟡 Pendiente Offline</span>`
+                : `<span class="badge-status-ok">✅ Nube OK</span>`;
+
+            fila.innerHTML = `
+                <td><strong>${item.fecha || '-'}</strong></td>
+                <td>${item.actividad}</td>
+                <td><span class="badge badge-bim">${item.unidad}</span></td>
+                <td><strong>${Number(item.cantidad).toFixed(2)}</strong></td>
+                <td>${item.desperdicio !== undefined ? item.desperdicio : '0'}%</td>
+                <td>${estadoBadge}</td>
+            `;
+            tbody.appendChild(fila);
+        });
+    }
+
+    function filtrarTabla() { renderizarTabla(); }
+
+    function aplicarFiltroFecha(tipo, btn) {
+        filtroFechaActual = tipo;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderizarTabla();
+    }
+
     // =========================================================================
-    // 2. REGISTRAR AVANCE EN SUPABASE (INSERT)
+    // REGISTRAR AVANCE (ONLINE / OFFLINE)
     // =========================================================================
-    async function registrarAvanceCloud() {
+    async function registrarAvance() {
         const selectActividad = document.getElementById("actividad");
         const inputCantidad = document.getElementById("cantidad");
         const inputDesperdicio = document.getElementById("desperdicio");
@@ -617,59 +960,103 @@
         const cantidad = parseFloat(inputCantidad.value);
         const desperdicio = parseFloat(inputDesperdicio.value) || 0;
         const fecha = inputFecha.value;
+        const opcion = selectActividad.options[selectActividad.selectedIndex];
+        const unidad = opcion.dataset.unidad || "und";
 
-        if (!actividad) {
-            alert("⚠️ Seleccione una actividad de obra.");
-            selectActividad.focus();
+        if (!actividad) { alert("⚠️ Seleccione una actividad."); return; }
+        if (isNaN(cantidad) || cantidad <= 0) { alert("⚠️ Ingrese una cantidad válida mayor a cero."); return; }
+
+        const nuevoRegistro = {
+            fecha: fecha,
+            actividad: actividad,
+            unidad: unidad,
+            cantidad: cantidad,
+            desperdicio: desperdicio
+        };
+
+        // SI ESTÁ OFFLINE
+        if (!navigator.onLine) {
+            guardarEnColaOffline(nuevoRegistro);
+            limpiarFormulario();
+            alert(`📶 MODO OFFLINE: Se guardó en tu celular.\nSe subirá automáticamente cuando vuelvas a tener señal.`);
             return;
         }
 
-        if (isNaN(cantidad) || cantidad <= 0) {
-            alert("⚠️ Ingrese una cantidad válida mayor a cero.");
-            inputCantidad.focus();
-            return;
-        }
-
-        const opcionSeleccionada = selectActividad.options[selectActividad.selectedIndex];
-        const unidad = opcionSeleccionada.dataset.unidad || "und";
-
-        // Feedback de carga
+        // SI ESTÁ ONLINE
         btnGuardar.disabled = true;
-        btnGuardar.innerText = "⏳ Sincronizando con PostgreSQL Supabase...";
+        btnGuardar.innerText = "⏳ Sincronizando con Supabase...";
 
         try {
-            const { data, error } = await supabaseClient
+            const { error } = await supabaseClient
                 .from('bitacora_obra')
-                .insert([
-                    {
-                        fecha: fecha,
-                        actividad: actividad,
-                        unidad: unidad,
-                        cantidad: cantidad,
-                        desperdicio: desperdicio
-                    }
-                ]);
+                .insert([nuevoRegistro]);
 
             if (error) throw error;
 
-            // Recargar tabla de historial automáticamente
-            await cargarHistorialSupabase();
-
-            // Limpiar campos de cantidad y dimensiones
-            inputCantidad.value = "";
-            document.getElementById("calcLargo").value = "";
-            document.getElementById("calcAncho").value = "";
-            document.getElementById("calcAlto").value = "";
-
+            await cargarHistorialSupabase(true);
+            limpiarFormulario();
             alert(`✅ ¡Registro exitoso en Supabase!\n${actividad}: ${cantidad} ${unidad}`);
 
         } catch (err) {
-            console.error("Error de Supabase:", err);
-            alert("❌ Error al enviar datos a la nube: " + err.message);
+            console.error("Error al enviar:", err);
+            // Si falló por red inesperada, respaldar en offline
+            guardarEnColaOffline(nuevoRegistro);
+            limpiarFormulario();
+            alert(`⚠️ Error de conexión: Guardado en cola offline del celular para no perder el dato.`);
         } finally {
             btnGuardar.disabled = false;
             btnGuardar.innerText = "🚀 Enviar a Base de Datos (Supabase)";
         }
+    }
+
+    function guardarEnColaOffline(reg) {
+        const cola = JSON.parse(localStorage.getItem("bitacora_offline_queue") || "[]");
+        cola.push(reg);
+        localStorage.setItem("bitacora_offline_queue", JSON.stringify(cola));
+        actualizarEstadoRed();
+        renderizarTabla();
+    }
+
+    async function sincronizarColaOffline() {
+        if (!navigator.onLine) return;
+        const cola = JSON.parse(localStorage.getItem("bitacora_offline_queue") || "[]");
+        if (cola.length === 0) return;
+
+        try {
+            const { error } = await supabaseClient.from('bitacora_obra').insert(cola);
+            if (!error) {
+                localStorage.removeItem("bitacora_offline_queue");
+                actualizarEstadoRed();
+                await cargarHistorialSupabase(true);
+                alert(`✅ ¡Sincronizados con éxito ${cola.length} registro(s) que estaban pendientes sin señal!`);
+            }
+        } catch (e) {
+            console.error("Error al sincronizar cola offline:", e);
+        }
+    }
+
+    function limpiarFormulario() {
+        document.getElementById("cantidad").value = "";
+        document.getElementById("calcLargo").value = "";
+        document.getElementById("calcAncho").value = "";
+        document.getElementById("calcAlto").value = "";
+        document.getElementById("observaciones").value = "";
+        document.getElementById("alertOvercost").style.display = "none";
+        document.getElementById("alertSafe").style.display = "none";
+    }
+
+    // 5. EXPORTACIÓN CSV
+    function exportarCSV() {
+        if (registrosGlobales.length === 0) { alert("No hay datos para exportar."); return; }
+        let csv = "\uFEFFFecha,Actividad,Unidad,Cantidad Neta,Desperdicio (%)\n";
+        registrosGlobales.forEach(r => {
+            csv += `"${r.fecha}","${r.actividad}","${r.unidad}",${r.cantidad},${r.desperdicio || 0}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Bitacora_JGConTech_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
     }
 </script>
 
