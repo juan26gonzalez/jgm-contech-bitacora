@@ -25,8 +25,12 @@ import {
   Lock,
   WifiOff,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  CalendarDays,
+  Compass
 } from 'lucide-react';
+import TabCronograma from '../components/TabCronograma';
+import TabPlanos from '../components/TabPlanos';
 
 // =============================================================================
 // CONFIGURACIÓN DE SUPABASE
@@ -69,6 +73,9 @@ const ACTIVIDADES_CATALOGO = [
 ];
 
 export default function Home() {
+  // Pestaña Activa ('bitacora', 'cronograma', 'planos')
+  const [activeTab, setActiveTab] = useState('bitacora');
+
   // Estado de Autenticación
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -492,18 +499,18 @@ export default function Home() {
         </p>
       </div>
 
-      {/* TARJETA PRINCIPAL DEL FORMULARIO */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 border-t-8 border-t-slate-900 mb-6 no-print">
+      {/* TARJETA DE CABECERA Y ESTADO DEL PROYECTO */}
+      <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-200 border-t-8 border-t-slate-900 mb-5 no-print">
         
         {/* BARRA SUPERIOR DE ESTADO Y USUARIO */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-lg bg-slate-900 text-white">
               <HardHat className="h-6 w-6" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900 leading-tight">JGM ConTech</h1>
-              <p className="text-xs font-medium text-slate-500">Bitácora Cloud de Captura en Campo</p>
+              <p className="text-xs font-medium text-slate-500">Gestión de Obra Civil & Captura en Campo</p>
             </div>
           </div>
 
@@ -527,15 +534,88 @@ export default function Home() {
         </div>
 
         {/* ETIQUETA DEL PROYECTO */}
-        <div className="mb-6 rounded-xl bg-slate-50 p-3.5 text-xs text-slate-600 border border-slate-200/80">
-          Proyecto: <strong className="text-slate-900">MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong> | Contratista:{' '}
-          <strong className="text-slate-900">INGENDES S.A.S.</strong>
+        <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600 border border-slate-200/80 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            Proyecto: <strong className="text-slate-900">MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong>
+          </div>
+          <div className="text-slate-500">
+            Contratista: <strong className="text-slate-900">INGENDES S.A.S.</strong> | Interventoría: <strong className="text-slate-900">DOLMEN S.A.</strong>
+          </div>
         </div>
+      </div>
 
-        {/* FORMULARIO REACT */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* PESTAÑAS PRINCIPALES DE NAVEGACIÓN */}
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3 overflow-x-auto no-print">
+        <button
+          type="button"
+          onClick={() => setActiveTab('bitacora')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'bitacora'
+              ? 'bg-slate-900 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <FileText className="h-4 w-4" />
+          <span>📝 Bitácora de Campo</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+            activeTab === 'bitacora' ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-600'
+          }`}>
+            {registros.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('cronograma')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'cronograma'
+              ? 'bg-slate-900 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <CalendarDays className="h-4 w-4 text-emerald-400" />
+          <span>📅 Cronograma de Obra (4D)</span>
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700">
+            Ruta Crítica
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('planos')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'planos'
+              ? 'bg-slate-900 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <Compass className="h-4 w-4 text-cyan-400" />
+          <span>📐 Planos Constructivos</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+            activeTab === 'planos' ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-600'
+          }`}>
+            7 Aprobados
+          </span>
+        </button>
+      </div>
+
+      {/* VISTA 1: BITÁCORA DE CAPTURA */}
+      {activeTab === 'bitacora' && (
+        <>
+          {/* TARJETA PRINCIPAL DEL FORMULARIO */}
+          <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 mb-6 no-print">
+            
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+              <FileText className="h-5 w-5 text-slate-800" />
+              <h2 className="text-base font-bold text-slate-900">
+                Captura Diaria de Avance en Campo
+              </h2>
+            </div>
+
+            {/* FORMULARIO REACT */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                 📅 Fecha de Ejecución
@@ -975,6 +1055,18 @@ export default function Home() {
         </div>
 
       </div>
+      </>
+      )}
+
+      {/* VISTA 2: CRONOGRAMA DE OBRA (4D) */}
+      {activeTab === 'cronograma' && (
+        <TabCronograma registros={registros} />
+      )}
+
+      {/* VISTA 3: PLANOS CONSTRUCTIVOS */}
+      {activeTab === 'planos' && (
+        <TabPlanos />
+      )}
 
       <footer className="mt-8 text-center text-xs text-slate-400 no-print">
         JGM ConTech • Sistema de Control de Obra Civil • Barranquilla, Colombia
