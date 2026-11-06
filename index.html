@@ -36,11 +36,26 @@
             color: var(--text-main);
             padding: 20px 15px 50px;
             line-height: 1.5;
+            min-height: 100vh;
         }
 
         .container {
             max-width: 950px;
             margin: 0 auto;
+        }
+
+        /* VISTA DE LOGIN */
+        .login-wrapper {
+            max-width: 440px;
+            margin: 60px auto;
+        }
+
+        .login-card {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-top: 6px solid var(--primary);
         }
 
         /* BANNER DE ESTADO DE CONECTIVIDAD */
@@ -97,6 +112,7 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .badge {
@@ -112,6 +128,24 @@
         .badge-cloud { background: #dcfce7; color: #166534; }
         .badge-bim { background: #e0f2fe; color: #0369a1; }
         .badge-realtime { background: #fef3c7; color: #92400e; }
+
+        .btn-logout {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #fee2e2;
+            color: var(--danger);
+            border-color: #fca5a5;
+        }
 
         .project-tag {
             background: #f8fafc;
@@ -165,7 +199,7 @@
             box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.15);
         }
 
-        /* 1. SEMÁFORO Y BARRA DE PROGRESO DE CONTROL DE SOBRECOSTO */
+        /* SEMÁFORO Y BARRA DE PROGRESO DE CONTROL DE SOBRECOSTO */
         .progress-box {
             display: none;
             background: #f8fafc;
@@ -257,7 +291,7 @@
             gap: 10px;
         }
 
-        /* 2. CONDICIONES DE OBRA (CLIMA Y CUADRILLA) */
+        /* CONDICIONES DE OBRA (CLIMA Y CUADRILLA) */
         .site-conditions-panel {
             background: #fdfefe;
             border: 1px solid var(--border-light);
@@ -431,11 +465,11 @@
             font-size: 14px;
         }
 
-        /* ESTILOS PARA IMPRESIÓN (ACTA DE BITÁCORA OFICIAL) */
+        /* ESTILOS PARA IMPRESIÓN */
         @media print {
             body { background: #fff; padding: 0; color: #000; }
             .card { box-shadow: none; border: none; padding: 0; }
-            form, .table-controls, .search-filters-bar, .network-banner, .calc-toggle-btn, footer { display: none !important; }
+            form, .table-controls, .search-filters-bar, .network-banner, .calc-toggle-btn, footer, .btn-logout, #userBadgeEmail { display: none !important; }
             .print-only-header { display: block !important; margin-bottom: 20px; }
             .print-signatures { display: flex !important; justify-content: space-between; margin-top: 60px; page-break-inside: avoid; }
             th { background: #eee !important; color: #000 !important; }
@@ -447,256 +481,285 @@
 </head>
 <body>
 
-<div class="container">
-
-    <!-- BANNER DE CONEXIÓN OFFLINE / ONLINE -->
-    <div id="offlineBanner" class="network-banner network-offline">
-        <span>⚠️ Modo Sin Conexión (Offline): Los registros se guardarán en tu celular y se subirán solos a Supabase al recuperar señal.</span>
-        <span id="offlineCountBadge" style="background:#b45309; color:#fff; padding:2px 8px; border-radius:12px; font-size:11px;">0 en cola</span>
-    </div>
-
-    <!-- ENCABEZADO EXCLUSIVO PARA IMPRESIÓN PDF -->
-    <div class="print-only-header">
-        <h2 style="text-align:center; margin-bottom:5px;">ACTA Y MEMORIA DE BITÁCORA DIARIA DE OBRA</h2>
-        <p style="text-align:center; font-size:12px; margin-bottom:15px;">PROYECTO: MEZZANINE 3 NIVELES SEDE ADMON • INGENDES S.A.S. / INTERVENTORÍA DOLMEN S.A.</p>
-    </div>
-
-    <div class="card">
-        
-        <!-- CABECERA -->
-        <div class="header-title">
-            <h1>🏗️ Bitácora Cloud de Obra</h1>
-            <div class="badges-bar">
-                <span class="badge badge-cloud">🟢 Supabase</span>
-                <span class="badge badge-bim">🔷 BIM 4D/5D</span>
-                <span class="badge badge-realtime" id="realtimeBadge">⚡ En Vivo</span>
+    <!-- 1. PANTALLA DE INICIO DE SESIÓN (LOGIN SEGURO) -->
+    <div id="loginContainer" class="container login-wrapper">
+        <div class="card login-card">
+            <div style="text-align:center; margin-bottom: 22px;">
+                <span style="font-size: 44px;">🏗️</span>
+                <h2 style="color: var(--primary); margin-top: 8px; font-size: 20px;">Acceso Seguro JG ConTech</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Control y Gestión de Obra Civil • Ing. Juan González</p>
             </div>
-        </div>
-
-        <div class="project-tag">
-            Proyecto: <strong>MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong> | Contratista: <strong>INGENDES S.A.S.</strong>
-        </div>
-
-        <!-- FORMULARIO DE CAPTURA EN CAMPO -->
-        <form id="formBitacora" onsubmit="event.preventDefault(); registrarAvance();">
             
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="fecha">📅 Fecha de Ejecución:</label>
-                    <input type="date" id="fecha" required>
-                </div>
+            <div id="loginAlert" style="display:none; padding:10px 14px; border-radius:6px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:13px; font-weight:600; margin-bottom:16px;"></div>
 
+            <form onsubmit="event.preventDefault(); procesarLogin();">
                 <div class="form-group">
-                    <label for="ubicacionFrente">📍 Nivel / Frente de Obra:</label>
-                    <select id="ubicacionFrente">
-                        <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
-                        <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
-                        <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
-                        <option value="3er Piso">3er Piso</option>
-                        <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
-                        <option value="General de Obra">General de Obra</option>
-                    </select>
+                    <label for="loginEmail">Correo Electrónico:</label>
+                    <input type="email" id="loginEmail" placeholder="juanandresgm12@gmail.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña:</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" id="btnLogin" class="btn-submit" style="margin-top: 10px;">
+                    🔒 Iniciar Sesión en Bitácora
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. APLICACIÓN PRINCIPAL (PROTEGIDA TRAS LOGIN) -->
+    <div id="appContainer" class="container" style="display: none;">
+
+        <!-- BANNER DE CONEXIÓN OFFLINE / ONLINE -->
+        <div id="offlineBanner" class="network-banner network-offline">
+            <span>⚠️ Modo Sin Conexión (Offline): Los registros se guardarán en tu celular y se subirán solos a Supabase al recuperar señal.</span>
+            <span id="offlineCountBadge" style="background:#b45309; color:#fff; padding:2px 8px; border-radius:12px; font-size:11px;">0 en cola</span>
+        </div>
+
+        <!-- ENCABEZADO EXCLUSIVO PARA IMPRESIÓN PDF -->
+        <div class="print-only-header">
+            <h2 style="text-align:center; margin-bottom:5px;">ACTA Y MEMORIA DE BITÁCORA DIARIA DE OBRA</h2>
+            <p style="text-align:center; font-size:12px; margin-bottom:15px;">PROYECTO: MEZZANINE 3 NIVELES SEDE ADMON • INGENDES S.A.S. / INTERVENTORÍA DOLMEN S.A.</p>
+        </div>
+
+        <div class="card">
+            
+            <!-- CABECERA -->
+            <div class="header-title">
+                <h1>🏗️ Bitácora Cloud de Obra</h1>
+                <div class="badges-bar">
+                    <span id="userBadgeEmail" class="badge" style="background:#f1f5f9; color:var(--primary); border:1px solid var(--border);">👤 Usuario</span>
+                    <span class="badge badge-cloud">🟢 Supabase</span>
+                    <span class="badge badge-bim">🔷 BIM 4D/5D</span>
+                    <span class="badge badge-realtime" id="realtimeBadge">⚡ En Vivo</span>
+                    <button type="button" class="btn-logout" onclick="cerrarSesion()">🚪 Salir</button>
                 </div>
             </div>
 
-            <!-- SELECTOR HOMOLOGADO CON STREAMLIT (CONTROL 5D Y 4D) -->
-            <div class="form-group">
-                <label for="actividad">📋 Actividad de Obra (Alineada con MS Project y Revit):</label>
-                <select id="actividad" required onchange="actualizarInfoActividad()">
-                    <option value="" disabled selected>Seleccione una actividad de la obra...</option>
-
-                    <optgroup label="🏗️ CIMENTACIÓN Y ESTRUCTURA">
-                        <option value="Construcción de plantilla de concreto" data-unidad="m³" data-meta="15.00" data-desp="5">Construcción de plantilla de concreto (m³)</option>
-                        <option value="Concreto en zapatas y cimentación" data-unidad="m³" data-meta="3.50" data-desp="7">Concreto en zapatas y cimentación (m³)</option>
-                        <option value="Concreto en columnas estructurales" data-unidad="m³" data-meta="2.80" data-desp="7">Concreto en columnas estructurales (m³)</option>
-                        <option value="Concreto en vigas de amarre y aéreas" data-unidad="m³" data-meta="3.20" data-desp="7">Concreto en vigas de amarre y aéreas (m³)</option>
-                    </optgroup>
-
-                    <optgroup label="🧱 MAMPOSTERÍA Y CERRAMIENTOS">
-                        <option value="Muros en mampostería de bloques de concreto" data-unidad="m²" data-meta="120.00" data-desp="5">Muros en mampostería de bloques de concreto (m²)</option>
-                    </optgroup>
-
-                    <optgroup label="🎨 ACABADOS Y REVESTIMIENTOS">
-                        <option value="Pañete y mortero de revoco en muros" data-unidad="m²" data-meta="240.00" data-desp="7">Pañete y mortero de revoco en muros (m²)</option>
-                        <option value="Estuco y pintura vinílica en muros" data-unidad="m²" data-meta="240.00" data-desp="5">Estuco y pintura vinílica en muros (m²)</option>
-                        <option value="Instalación de piso cerámico / enchape" data-unidad="m²" data-meta="80.00" data-desp="7">Instalación de piso cerámico / enchape (m²)</option>
-                        <option value="Instalación de cielo raso" data-unidad="m²" data-meta="80.00" data-desp="5">Instalación de cielo raso (m²)</option>
-                        <option value="Instalación de guardaescobas" data-unidad="ml" data-meta="20.00" data-desp="5">Instalación de guardaescobas (ml)</option>
-                    </optgroup>
-
-                    <optgroup label="🏠 CUBIERTAS">
-                        <option value="Montaje de cubierta en Eternit" data-unidad="m²" data-meta="150.00" data-desp="5">Montaje de cubierta en Eternit (m²)</option>
-                    </optgroup>
-
-                    <optgroup label="🚪 CARPINTERÍA E INSTALACIONES">
-                        <option value="Instalación de puertas y ventanas" data-unidad="und" data-meta="10.00" data-desp="0">Instalación de puertas y ventanas (und)</option>
-                        <option value="Instalación de puertas interiores y baño" data-unidad="und" data-meta="4.00" data-desp="0">Instalación de puertas interiores y baño (und)</option>
-                        <option value="Instalación de aparatos sanitarios y lavaplatos" data-unidad="und" data-meta="3.00" data-desp="0">Instalación de aparatos sanitarios y lavaplatos (und)</option>
-                        <option value="Red de tubería hidrosanitaria PVC" data-unidad="ml" data-meta="18.00" data-desp="5">Red de tubería hidrosanitaria PVC (ml)</option>
-                    </optgroup>
-                </select>
+            <div class="project-tag">
+                Proyecto: <strong>MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong> | Contratista: <strong>INGENDES S.A.S.</strong>
             </div>
 
-            <!-- 1. SEMÁFORO EN VIVO Y BARRA DE CONTROL DE SOBRECOSTO / SOBREEJECUCIÓN -->
-            <div id="progressBox" class="progress-box">
-                <div class="progress-labels">
-                    <span>Avance Acumulado del Ítem: <strong id="lblEjecutadoAcum">0.00</strong> / <span id="lblMetaPresupuesto">0.00</span></span>
-                    <span id="lblPorcentajeAvance">0.0%</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div id="progressBarFill" class="progress-bar-fill"></div>
-                </div>
+            <!-- FORMULARIO DE CAPTURA EN CAMPO -->
+            <form id="formBitacora" onsubmit="event.preventDefault(); registrarAvance();">
                 
-                <!-- ALERTA DE MAYOR CANTIDAD / SOBRECOSTO -->
-                <div id="alertOvercost" class="alert-overcost">
-                    ⚠️ <strong>ALERTA DE MAYOR CANTIDAD:</strong> Esta cantidad sobrepasará la meta contratada. Tramitar Acta de Mayor Cantidad con la Interventoría.
-                </div>
-                <div id="alertSafe" class="alert-safe">
-                    ✅ <strong>Dentro del Presupuesto:</strong> Quedarán <strong id="lblSaldoRestante">0.00</strong> por ejecutar de este ítem.
-                </div>
-            </div>
-
-            <!-- CALCULADORA DIMENSIONAL OPCIONAL -->
-            <button type="button" class="calc-toggle-btn" onclick="toggleCalculadora()">
-                📐 ¿Deseas calcular por dimensiones en campo? (Largo × Ancho × Alto)
-            </button>
-
-            <div id="panelCalc" class="calc-panel">
-                <h4 style="font-size:12px; color:var(--primary); margin-bottom:10px;">Calculadora Rápida de Campo</h4>
-                <div class="calc-grid">
-                    <div>
-                        <label for="calcLargo">Largo (m):</label>
-                        <input type="number" id="calcLargo" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
-                    </div>
-                    <div>
-                        <label for="calcAncho">Ancho (m):</label>
-                        <input type="number" id="calcAncho" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
-                    </div>
-                    <div>
-                        <label for="calcAlto">Alto/Espesor (m):</label>
-                        <input type="number" id="calcAlto" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
-                    </div>
-                    <div>
-                        <label for="calcPiezas">Nº Elementos:</label>
-                        <input type="number" id="calcPiezas" step="1" min="1" value="1" oninput="calcularDimensiones()">
-                    </div>
-                </div>
-            </div>
-
-            <!-- CANTIDAD Y DESPERDICIO -->
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="cantidad">⚡ Cantidad Neta Ejecutada Hoy:</label>
-                    <input type="number" id="cantidad" step="any" min="0.0001" placeholder="Ej. 15.50" inputmode="decimal" required oninput="evaluarSobrecosto()">
-                </div>
-
-                <div class="form-group">
-                    <label for="desperdicio">Desperdicio Estimado (%):</label>
-                    <input type="number" id="desperdicio" step="any" min="0" max="100" value="5" required>
-                </div>
-            </div>
-
-            <!-- 2. CONDICIONES DE OBRA (CLIMA Y CUADRILLA - DIARIO LEGAL) -->
-            <div class="site-conditions-panel">
-                <h3>☀️🌤️ Condiciones Diarias de Obra y Control de Calidad</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="clima">Clima de la Jornada:</label>
-                        <select id="clima">
-                            <option value="Soleado">☀️ Soleado (Jornada normal)</option>
-                            <option value="Nublado">⛅ Nublado</option>
-                            <option value="Lluvia Ligera">🌦️ Lluvia Ligera (Sin suspensión)</option>
-                            <option value="Lluvia Fuerte / Suspensión">🌧️ Lluvia Fuerte (Con suspensión)</option>
+                        <label for="fecha">📅 Fecha de Ejecución:</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ubicacionFrente">📍 Nivel / Frente de Obra:</label>
+                        <select id="ubicacionFrente">
+                            <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
+                            <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
+                            <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
+                            <option value="3er Piso">3er Piso</option>
+                            <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
+                            <option value="General de Obra">General de Obra</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="cuadrilla">Personal en Frente (Oficiales / Ayudantes):</label>
-                        <input type="text" id="cuadrilla" placeholder="Ej. 1 Oficial + 2 Ayudantes">
+                </div>
+
+                <!-- SELECTOR HOMOLOGADO CON STREAMLIT (CONTROL 5D Y 4D) -->
+                <div class="form-group">
+                    <label for="actividad">📋 Actividad de Obra (Alineada con MS Project y Revit):</label>
+                    <select id="actividad" required onchange="actualizarInfoActividad()">
+                        <option value="" disabled selected>Seleccione una actividad de la obra...</option>
+
+                        <optgroup label="🏗️ CIMENTACIÓN Y ESTRUCTURA">
+                            <option value="Construcción de plantilla de concreto" data-unidad="m³" data-meta="15.00" data-desp="5">Construcción de plantilla de concreto (m³)</option>
+                            <option value="Concreto en zapatas y cimentación" data-unidad="m³" data-meta="3.50" data-desp="7">Concreto en zapatas y cimentación (m³)</option>
+                            <option value="Concreto en columnas estructurales" data-unidad="m³" data-meta="2.80" data-desp="7">Concreto en columnas estructurales (m³)</option>
+                            <option value="Concreto en vigas de amarre y aéreas" data-unidad="m³" data-meta="3.20" data-desp="7">Concreto en vigas de amarre y aéreas (m³)</option>
+                        </optgroup>
+
+                        <optgroup label="🧱 MAMPOSTERÍA Y CERRAMIENTOS">
+                            <option value="Muros en mampostería de bloques de concreto" data-unidad="m²" data-meta="120.00" data-desp="5">Muros en mampostería de bloques de concreto (m²)</option>
+                        </optgroup>
+
+                        <optgroup label="🎨 ACABADOS Y REVESTIMIENTOS">
+                            <option value="Pañete y mortero de revoco en muros" data-unidad="m²" data-meta="240.00" data-desp="7">Pañete y mortero de revoco en muros (m²)</option>
+                            <option value="Estuco y pintura vinílica en muros" data-unidad="m²" data-meta="240.00" data-desp="5">Estuco y pintura vinílica en muros (m²)</option>
+                            <option value="Instalación de piso cerámico / enchape" data-unidad="m²" data-meta="80.00" data-desp="7">Instalación de piso cerámico / enchape (m²)</option>
+                            <option value="Instalación de cielo raso" data-unidad="m²" data-meta="80.00" data-desp="5">Instalación de cielo raso (m²)</option>
+                            <option value="Instalación de guardaescobas" data-unidad="ml" data-meta="20.00" data-desp="5">Instalación de guardaescobas (ml)</option>
+                        </optgroup>
+
+                        <optgroup label="🏠 CUBIERTAS">
+                            <option value="Montaje de cubierta en Eternit" data-unidad="m²" data-meta="150.00" data-desp="5">Montaje de cubierta en Eternit (m²)</option>
+                        </optgroup>
+
+                        <optgroup label="🚪 CARPINTERÍA E INSTALACIONES">
+                            <option value="Instalación de puertas y ventanas" data-unidad="und" data-meta="10.00" data-desp="0">Instalación de puertas y ventanas (und)</option>
+                            <option value="Instalación de puertas interiores y baño" data-unidad="und" data-meta="4.00" data-desp="0">Instalación de puertas interiores y baño (und)</option>
+                            <option value="Instalación de aparatos sanitarios y lavaplatos" data-unidad="und" data-meta="3.00" data-desp="0">Instalación de aparatos sanitarios y lavaplatos (und)</option>
+                            <option value="Red de tubería hidrosanitaria PVC" data-unidad="ml" data-meta="18.00" data-desp="5">Red de tubería hidrosanitaria PVC (ml)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- SEMÁFORO EN VIVO Y BARRA DE CONTROL DE SOBRECOSTO / SOBREEJECUCIÓN -->
+                <div id="progressBox" class="progress-box">
+                    <div class="progress-labels">
+                        <span>Avance Acumulado del Ítem: <strong id="lblEjecutadoAcum">0.00</strong> / <span id="lblMetaPresupuesto">0.00</span></span>
+                        <span id="lblPorcentajeAvance">0.0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="progressBarFill" class="progress-bar-fill"></div>
+                    </div>
+                    
+                    <div id="alertOvercost" class="alert-overcost">
+                        ⚠️ <strong>ALERTA DE MAYOR CANTIDAD:</strong> Esta cantidad sobrepasará la meta contratada. Tramitar Acta de Mayor Cantidad con la Interventoría.
+                    </div>
+                    <div id="alertSafe" class="alert-safe">
+                        ✅ <strong>Dentro del Presupuesto:</strong> Quedarán <strong id="lblSaldoRestante">0.00</strong> por ejecutar de este ítem.
                     </div>
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label for="observaciones">Observaciones Técnicas / Control de Calidad:</label>
-                    <textarea id="observaciones" rows="2" placeholder="Ej. Slump 5 pulg, vaciado completado a las 3:30 PM sin novedades..."></textarea>
+
+                <!-- CALCULADORA DIMENSIONAL OPCIONAL -->
+                <button type="button" class="calc-toggle-btn" onclick="toggleCalculadora()">
+                    📐 ¿Deseas calcular por dimensiones en campo? (Largo × Ancho × Alto)
+                </button>
+
+                <div id="panelCalc" class="calc-panel">
+                    <h4 style="font-size:12px; color:var(--primary); margin-bottom:10px;">Calculadora Rápida de Campo</h4>
+                    <div class="calc-grid">
+                        <div>
+                            <label for="calcLargo">Largo (m):</label>
+                            <input type="number" id="calcLargo" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
+                        </div>
+                        <div>
+                            <label for="calcAncho">Ancho (m):</label>
+                            <input type="number" id="calcAncho" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
+                        </div>
+                        <div>
+                            <label for="calcAlto">Alto/Espesor (m):</label>
+                            <input type="number" id="calcAlto" step="any" min="0" placeholder="0.00" oninput="calcularDimensiones()">
+                        </div>
+                        <div>
+                            <label for="calcPiezas">Nº Elementos:</label>
+                            <input type="number" id="calcPiezas" step="1" min="1" value="1" oninput="calcularDimensiones()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CANTIDAD Y DESPERDICIO -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cantidad">⚡ Cantidad Neta Ejecutada Hoy:</label>
+                        <input type="number" id="cantidad" step="any" min="0.0001" placeholder="Ej. 15.50" inputmode="decimal" required oninput="evaluarSobrecosto()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="desperdicio">Desperdicio Estimado (%):</label>
+                        <input type="number" id="desperdicio" step="any" min="0" max="100" value="5" required>
+                    </div>
+                </div>
+
+                <!-- CONDICIONES DE OBRA (CLIMA Y CUADRILLA - DIARIO LEGAL) -->
+                <div class="site-conditions-panel">
+                    <h3>☀️🌤️ Condiciones Diarias de Obra y Control de Calidad</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="clima">Clima de la Jornada:</label>
+                            <select id="clima">
+                                <option value="Soleado">☀️ Soleado (Jornada normal)</option>
+                                <option value="Nublado">⛅ Nublado</option>
+                                <option value="Lluvia Ligera">🌦️ Lluvia Ligera (Sin suspensión)</option>
+                                <option value="Lluvia Fuerte / Suspensión">🌧️ Lluvia Fuerte (Con suspensión)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cuadrilla">Personal en Frente (Oficiales / Ayudantes):</label>
+                            <input type="text" id="cuadrilla" placeholder="Ej. 1 Oficial + 2 Ayudantes">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="observaciones">Observaciones Técnicas / Control de Calidad:</label>
+                        <textarea id="observaciones" rows="2" placeholder="Ej. Slump 5 pulg, vaciado completado a las 3:30 PM sin novedades..."></textarea>
+                    </div>
+                </div>
+
+                <!-- BOTÓN ENVIAR -->
+                <button type="submit" id="btnGuardar" class="btn-submit">
+                    🚀 Enviar a Base de Datos (Supabase)
+                </button>
+            </form>
+
+        </div>
+
+        <!-- TARJETA HISTORIAL EN TIEMPO REAL CON FILTROS Y EXPORTACIÓN -->
+        <div class="card">
+            <div class="table-controls">
+                <h2>📋 Registros en la Nube (<span id="totalRegistros">0</span>)</h2>
+                <div class="action-buttons-bar">
+                    <button type="button" class="btn-action" onclick="cargarHistorialSupabase()">🔄 Recargar</button>
+                    <button type="button" class="btn-action" onclick="exportarCSV()">📥 Exportar CSV</button>
+                    <button type="button" class="btn-action btn-action-primary" onclick="window.print()">🖨️ Imprimir Acta PDF</button>
                 </div>
             </div>
 
-            <!-- BOTÓN ENVIAR -->
-            <button type="submit" id="btnGuardar" class="btn-submit">
-                🚀 Enviar a Base de Datos (Supabase)
-            </button>
-        </form>
+            <!-- BUSCADOR Y FILTROS RÁPIDOS -->
+            <div class="search-filters-bar">
+                <input type="text" id="busquedaTabla" class="search-input" placeholder="🔍 Buscar por actividad o fecha..." oninput="filtrarTabla()">
+                <button type="button" class="filter-btn active" onclick="aplicarFiltroFecha('todos', this)">Todos</button>
+                <button type="button" class="filter-btn" onclick="aplicarFiltroFecha('hoy', this)">Hoy</button>
+                <button type="button" class="filter-btn" onclick="aplicarFiltroFecha('semana', this)">Esta Semana</button>
+            </div>
+
+            <div class="table-responsive">
+                <table id="tablaBitacora">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Actividad de Obra</th>
+                            <th>Unidad</th>
+                            <th>Cant. Neta</th>
+                            <th>Desp (%)</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla">
+                        <tr>
+                            <td colspan="6" class="loading-text">⏳ Consultando registros en PostgreSQL Supabase...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- FIRMAS PARA IMPRESIÓN OFICIAL -->
+            <div class="print-signatures">
+                <div style="text-align:center;">
+                    <p>_____________________________________</p>
+                    <p><strong>INGENDES S.A.S.</strong><br>Ingeniero Residente de Obra</p>
+                </div>
+                <div style="text-align:center;">
+                    <p>_____________________________________</p>
+                    <p><strong>DOLMEN S.A. E.S.P.</strong><br>Interventor / Supervisor Técnico</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            JG ConTech • Sistema de Control de Obra Civil • Barranquilla, Colombia
+        </footer>
 
     </div>
-
-    <!-- TARJETA HISTORIAL EN TIEMPO REAL CON FILTROS Y EXPORTACIÓN -->
-    <div class="card">
-        <div class="table-controls">
-            <h2>📋 Registros en la Nube (<span id="totalRegistros">0</span>)</h2>
-            <div class="action-buttons-bar">
-                <button type="button" class="btn-action" onclick="cargarHistorialSupabase()">🔄 Recargar</button>
-                <button type="button" class="btn-action" onclick="exportarCSV()">📥 Exportar CSV</button>
-                <button type="button" class="btn-action btn-action-primary" onclick="window.print()">🖨️ Imprimir Acta PDF</button>
-            </div>
-        </div>
-
-        <!-- 5. BUSCADOR Y FILTROS RÁPIDOS -->
-        <div class="search-filters-bar">
-            <input type="text" id="busquedaTabla" class="search-input" placeholder="🔍 Buscar por actividad o fecha..." oninput="filtrarTabla()">
-            <button type="button" class="filter-btn active" onclick="aplicarFiltroFecha('todos', this)">Todos</button>
-            <button type="button" class="filter-btn" onclick="aplicarFiltroFecha('hoy', this)">Hoy</button>
-            <button type="button" class="filter-btn" onclick="aplicarFiltroFecha('semana', this)">Esta Semana</button>
-        </div>
-
-        <div class="table-responsive">
-            <table id="tablaBitacora">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Actividad de Obra</th>
-                        <th>Unidad</th>
-                        <th>Cant. Neta</th>
-                        <th>Desp (%)</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="cuerpoTabla">
-                    <tr>
-                        <td colspan="6" class="loading-text">⏳ Consultando registros en PostgreSQL Supabase...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- FIRMAS PARA IMPRESIÓN OFICIAL -->
-        <div class="print-signatures">
-            <div style="text-align:center;">
-                <p>_____________________________________</p>
-                <p><strong>INGENDES S.A.S.</strong><br>Ingeniero Residente de Obra</p>
-            </div>
-            <div style="text-align:center;">
-                <p>_____________________________________</p>
-                <p><strong>DOLMEN S.A. E.S.P.</strong><br>Interventor / Supervisor Técnico</p>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        JG ConTech • Sistema de Control de Obra Civil • Barranquilla, Colombia
-    </footer>
-
-</div>
 
 <script>
     // =========================================================================
-    // CONFIGURACIÓN DE SUPABASE
+    // CONFIGURACIÓN DE SUPABASE (CON PERSISTENCIA DE SESIÓN PARA AUTH)
     // =========================================================================
     const _supabaseUrl = "https://ktxbonxgrnpzearsgvtc.supabase.co";
     const _supabaseAnonKey = "sb_publishable_VUiAXSbX0Snwe-jvO4yEgA_8WLCK0Do";
     const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseAnonKey, {
         auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
         }
     });
 
@@ -704,31 +767,98 @@
     let mapaAcumulados = {};
     let filtroFechaActual = 'todos';
 
-    // Inicializar
+    // =========================================================================
+    // CONTROL DE AUTENTICACIÓN Y SESIÓN
+    // =========================================================================
     document.addEventListener("DOMContentLoaded", () => {
         const fechaInput = document.getElementById("fecha");
-        fechaInput.value = new Date().toISOString().split("T")[0];
+        if (fechaInput) fechaInput.value = new Date().toISOString().split("T")[0];
 
-        // Verificar conectividad inicial
+        // Escuchar cambios de autenticación
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            actualizarVistaAuth(session?.user);
+        });
+
+        // Verificar sesión activa inicial
+        verificarSesionInicial();
+
+        // Control de conectividad
         actualizarEstadoRed();
         window.addEventListener('online', () => {
             actualizarEstadoRed();
             sincronizarColaOffline();
         });
         window.addEventListener('offline', actualizarEstadoRed);
-
-        cargarHistorialSupabase();
-        iniciarRealtime();
-        sincronizarColaOffline();
     });
 
-    // 4. SUSCRIPCIÓN EN TIEMPO REAL (WEBSOCKETS SUPABASE REALTIME)
+    async function verificarSesionInicial() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            actualizarVistaAuth(session?.user);
+        } catch (e) {
+            actualizarVistaAuth(null);
+        }
+    }
+
+    function actualizarVistaAuth(user) {
+        const loginContainer = document.getElementById("loginContainer");
+        const appContainer = document.getElementById("appContainer");
+
+        if (user) {
+            loginContainer.style.display = "none";
+            appContainer.style.display = "block";
+            document.getElementById("userBadgeEmail").textContent = `👤 ${user.email}`;
+            
+            cargarHistorialSupabase();
+            iniciarRealtime();
+            sincronizarColaOffline();
+        } else {
+            loginContainer.style.display = "block";
+            appContainer.style.display = "none";
+        }
+    }
+
+    async function procesarLogin() {
+        const email = document.getElementById("loginEmail").value.trim();
+        const password = document.getElementById("loginPassword").value;
+        const btn = document.getElementById("btnLogin");
+        const alertBox = document.getElementById("loginAlert");
+
+        btn.disabled = true;
+        btn.innerText = "⏳ Verificando credenciales...";
+        alertBox.style.display = "none";
+
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) throw error;
+            // onAuthStateChange se encargará de cambiar la vista automáticamente
+        } catch (err) {
+            alertBox.textContent = `❌ ${err.message || 'Error al iniciar sesión'}`;
+            alertBox.style.display = "block";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "🔒 Iniciar Sesión en Bitácora";
+        }
+    }
+
+    async function cerrarSesion() {
+        if (confirm("¿Estás seguro de que deseas cerrar tu sesión?")) {
+            await supabaseClient.auth.signOut();
+        }
+    }
+
+    // =========================================================================
+    // SUSCRIPCIÓN EN TIEMPO REAL (WEBSOCKETS SUPABASE REALTIME)
+    // =========================================================================
     function iniciarRealtime() {
         try {
             supabaseClient
                 .channel('bitacora_canal_vivo')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'bitacora_obra' }, (payload) => {
-                    console.log('⚡ Evento en vivo recibido de Supabase:', payload);
                     cargarHistorialSupabase(true);
                 })
                 .subscribe();
@@ -737,7 +867,9 @@
         }
     }
 
-    // 3. CONTROL DE RED Y COLA OFFLINE
+    // =========================================================================
+    // CONTROL DE RED Y COLA OFFLINE
+    // =========================================================================
     function actualizarEstadoRed() {
         const banner = document.getElementById("offlineBanner");
         const cola = JSON.parse(localStorage.getItem("bitacora_offline_queue") || "[]");
@@ -755,7 +887,9 @@
         }
     }
 
-    // 1. SEMÁFORO Y CÁLCULO DE PROGRESO / SOBREEJECUCIÓN
+    // =========================================================================
+    // SEMÁFORO Y CÁLCULO DE PROGRESO / SOBREEJECUCIÓN
+    // =========================================================================
     function actualizarInfoActividad() {
         const select = document.getElementById("actividad");
         const opcion = select.options[select.selectedIndex];
@@ -862,8 +996,6 @@
             registrosGlobales = data || [];
             recalcularAcumulados();
             renderizarTabla();
-
-            // Si hay una actividad seleccionada, actualizar su progreso
             actualizarInfoActividad();
 
         } catch (err) {
@@ -888,7 +1020,6 @@
         const busqueda = (document.getElementById("busquedaTabla").value || "").toLowerCase();
         const hoyStr = new Date().toISOString().split("T")[0];
 
-        // Incluir pendientes offline
         const colaOffline = JSON.parse(localStorage.getItem("bitacora_offline_queue") || "[]");
         const todos = [
             ...colaOffline.map(c => ({ ...c, offline: true })),
@@ -896,12 +1027,10 @@
         ];
 
         const filtrados = todos.filter(item => {
-            // Filtro de texto
             const coincideTexto = (item.actividad || "").toLowerCase().includes(busqueda) || 
                                   (item.fecha || "").toLowerCase().includes(busqueda);
             if (!coincideTexto) return false;
 
-            // Filtro de fecha
             if (filtroFechaActual === 'hoy') {
                 return (item.fecha === hoyStr);
             } else if (filtroFechaActual === 'semana') {
@@ -974,7 +1103,6 @@
             desperdicio: desperdicio
         };
 
-        // SI ESTÁ OFFLINE
         if (!navigator.onLine) {
             guardarEnColaOffline(nuevoRegistro);
             limpiarFormulario();
@@ -982,7 +1110,6 @@
             return;
         }
 
-        // SI ESTÁ ONLINE
         btnGuardar.disabled = true;
         btnGuardar.innerText = "⏳ Sincronizando con Supabase...";
 
@@ -999,7 +1126,6 @@
 
         } catch (err) {
             console.error("Error al enviar:", err);
-            // Si falló por red inesperada, respaldar en offline
             guardarEnColaOffline(nuevoRegistro);
             limpiarFormulario();
             alert(`⚠️ Error de conexión: Guardado en cola offline del celular para no perder el dato.`);
@@ -1045,7 +1171,7 @@
         document.getElementById("alertSafe").style.display = "none";
     }
 
-    // 5. EXPORTACIÓN CSV
+    // EXPORTACIÓN CSV
     function exportarCSV() {
         if (registrosGlobales.length === 0) { alert("No hay datos para exportar."); return; }
         let csv = "\uFEFFFecha,Actividad,Unidad,Cantidad Neta,Desperdicio (%)\n";
