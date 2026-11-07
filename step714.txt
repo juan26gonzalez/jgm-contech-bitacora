@@ -1,0 +1,37 @@
+¡Todo listo y desplegado en producción justo a tiempo, Juan! 🚀
+
+He implementado y verificado las **3 mejoras estratégicas** para que las revises:
+
+---
+
+### 1. 📸 Registro Fotográfico de Evidencia en Campo
+- **Disparador de Cámara:** En tu celular puedes tocar el área de foto y abrirá directamente la cámara para capturar la evidencia del vaciado o avance en vivo.
+- **Compresión Automática en el Navegador:** Las fotos pesadas (3-6 MB) se comprimen automáticamente en el dispositivo a ~40-70 KB, permitiendo subidas instantáneas incluso con señal 3G/4G en obra.
+- **Visualizador de Evidencias:** En la tabla de bitácora ahora aparece la columna **"📸 Evidencia"**. Al tocar **"📸 Ver Foto"** se abre un modal con la imagen en alta resolución, fecha, frente, clima, cuadrilla y observaciones técnicas.
+- **Modo Offline:** Las fotos y metadatos se resguardan de forma segura en el almacenamiento local si te quedas sin conexión.
+
+---
+
+### 2. 📄 Generador de Reportes Ejecutivos en PDF (Interventoría DOLMEN S.A.)
+- En la cabecera de la tabla de registros agregamos el botón **"📄 Informe Ejecutivo (PDF)"**.
+- **Filtros de Período:** Permite generar el reporte por *Semana*, *Quincena*, *Mes* o *Consolidado*.
+- **Contenido del Informe Oficial:**
+  - Membrete formal con los datos del contrato (*Mezzanine 3 Niveles*), contratista (**INGENDES S.A.S.**) e interventoría (**DOLMEN S.A.**).
+  - Resumen cuantitativo y tabla consolidada de avance de cantidades.
+  - **Álbum Fotográfico Técnico:** Cuadrícula de fotos con pie de foto técnico de cada actividad.
+  - Espacio para firmas formales del Residente de Obra e Interventor Técnico.
+  - Botón **"🖨️ Imprimir / Guardar en PDF"** adaptado para hojas tamaño Carta/A4.
+
+---
+
+### 3. 📊 Sincronización Definitiva con Streamlit (BIM 5D)
+- Se actualizó [`dashboard.py`](file:///c:/Users/Juan/OneDrive%20-%20Universidad%20de%20la%20Costa%20-%20CUC/Documentos/Programaci%C3%B3n/dashboard.py) al branding oficial **JGM ConTech**.
+- Se configuró la carga automática del presupuesto base (`Presupuesto_Base_Mezzanine.csv`) sin requerir subir el archivo a mano en cada sesión.
+- Se implementó un cruce de datos normalizado (insensible a mayúsculas y espacios) para que coincida de manera exacta con cualquier registro subido desde la web o el celular.
+
+---
+
+📄 Para consultar todos los detalles técnicos, puedes ver el reporte: [**resumen_mejoras_fotograficas_reportes.md**](file:///C:/Users/Juan/.gemini/antigravity/brain/a715090c-fe6a-4a7d-8399-a77963a057b4/resumen_mejoras_fotograficas_reportes.md).
+
+Ya puedes entrar a la aplicación en:
+👉 **[https://jagm2000-jgmcontech-bitacora.vercel.app](https://jagm2000-jgmcontech-bitacora.vercel.app)** *(recuerda hacer `Ctrl + F5` en el navegador si requieres refrescar la caché)*.

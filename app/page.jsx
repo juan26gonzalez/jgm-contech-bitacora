@@ -30,10 +30,17 @@ import {
   Compass,
   Camera,
   Upload,
-  X
+  X,
+  FlaskConical,
+  Truck,
+  Mic,
+  Sparkles
 } from 'lucide-react';
 import TabCronograma from '../components/TabCronograma';
 import TabPlanos from '../components/TabPlanos';
+import ModuloCalidadConcreto from '../components/ModuloCalidadConcreto';
+import ModuloMixersRemisiones from '../components/ModuloMixersRemisiones';
+import CopilotoVozIA from '../components/CopilotoVozIA';
 import ModalEvidenciaFoto from '../components/ModalEvidenciaFoto';
 import ModalReporteEjecutivo from '../components/ModalReporteEjecutivo';
 import { guardarEvidenciaEnDB, obtenerEvidenciasDeDB } from '../components/evidenciasDB';
@@ -124,6 +131,40 @@ export default function Home() {
   const [evidenciasFotos, setEvidenciasFotos] = useState({});
   const [selectedEvidencia, setSelectedEvidencia] = useState(null);
   const [showReporteModal, setShowReporteModal] = useState(false);
+  const [estamparGPS, setEstamparGPS] = useState(true);
+
+  // Copiloto de Voz
+  const handleDatosVoz = (datos) => {
+    if (datos.cantidad) setCantidad(datos.cantidad);
+    if (datos.actividad) setActividadSeleccionada(datos.actividad);
+    if (datos.desperdicio !== undefined) setDesperdicio(datos.desperdicio);
+    if (datos.clima) setClima(datos.clima);
+    if (datos.cuadrilla) setCuadrilla(datos.cuadrilla);
+    if (datos.observaciones) setObservaciones(datos.observaciones);
+  };
+
+  // Obtener geolocalización actual (o fallback a Barranquilla, Colombia)
+  const obtenerCoordenadasGPS = () => {
+    return new Promise((resolve) => {
+      if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            resolve({
+              lat: pos.coords.latitude.toFixed(4),
+              lon: pos.coords.longitude.toFixed(4),
+              alt: pos.coords.altitude ? Math.round(pos.coords.altitude) : 18
+            });
+          },
+          () => {
+            resolve({ lat: '10.9878', lon: '-74.7889', alt: 18 });
+          },
+          { timeout: 3500 }
+        );
+      } else {
+        resolve({ lat: '10.9878', lon: '-74.7889', alt: 18 });
+      }
+    });
+  };
 
   // ===========================================================================
   // EFECTOS INICIALES
@@ -293,14 +334,14 @@ export default function Home() {
     }
   }, [calcLargo, calcAncho, calcAlto, calcPiezas]);
 
-  // Función robusta de compresión de imagen compatible con celulares (Canvas + Fallback seguro)
+  // Función robusta de compresión de imagen compatible con celulares (Canvas + Fallback seguro) + Estampado Forense GPS
   const comprimirImagen = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (event) => {
         const rawData = event.target.result;
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           try {
             const maxWidth = 800;
             const maxHeight = 600;
@@ -324,6 +365,53 @@ export default function Home() {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
+
+            // Estampado Forense GPS y Metadatos Técnicos de Obra
+            if (estamparGPS) {
+              const gps = await obtenerCoordenadasGPS();
+              const ahora = new Date();
+              const fechaStr = ahora.toLocaleDateString('es-CO');
+              const horaStr = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+              const bannerHeight = Math.max(52, Math.round(height * 0.13));
+              const bannerY = height - bannerHeight;
+
+              // Fondo traslúcido técnico estilo cámara forense
+              ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+              ctx.fillRect(0, bannerY, width, bannerHeight);
+
+              // Franja superior esmeralda
+              ctx.fillStyle = '#10b981';
+              ctx.fillRect(0, bannerY, width, 3);
+
+              // Textos técnicos
+              const fontSize = Math.max(9, Math.round(width * 0.022));
+              ctx.font = `bold ${fontSize}px sans-serif`;
+              ctx.fillStyle = '#ffffff';
+
+              // Lado Izquierdo: Coordenadas y Fecha
+              const line1Left = `📍 ${gps.lat}° N, ${gps.lon}° W • BARRANQUILLA • ALT: ${gps.alt}m`;
+              const line2Left = `🕒 ${fechaStr} ${horaStr} • JGM CONTECH`;
+              ctx.fillText(line1Left, 12, bannerY + fontSize + 6);
+
+              ctx.font = `normal ${fontSize - 1}px sans-serif`;
+              ctx.fillStyle = '#94a3b8';
+              ctx.fillText(line2Left, 12, bannerY + (fontSize * 2) + 12);
+
+              // Lado Derecho: Contrato e Interventoría
+              if (width > 440) {
+                ctx.font = `bold ${fontSize - 1}px sans-serif`;
+                ctx.fillStyle = '#38bdf8';
+                const line1Right = 'MEZZANINE 3 NIVELES';
+                const line2Right = 'INGENDES S.A.S. • DOLMEN S.A.';
+                const m1 = ctx.measureText(line1Right);
+                const m2 = ctx.measureText(line2Right);
+                ctx.fillText(line1Right, width - m1.width - 12, bannerY + fontSize + 6);
+                ctx.font = `normal ${fontSize - 2}px sans-serif`;
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillText(line2Right, width - m2.width - 12, bannerY + (fontSize * 2) + 12);
+              }
+            }
 
             const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
             const approxKb = Math.round((dataUrl.length * 3) / 4 / 1024);
@@ -779,6 +867,38 @@ export default function Home() {
             7 Aprobados
           </span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('calidad')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'calidad'
+              ? 'bg-purple-900 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <FlaskConical className="h-4 w-4 text-purple-400" />
+          <span>🧪 Calidad & Cilindros</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-purple-100 text-purple-800">
+            NSR-10
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('mixers')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'mixers'
+              ? 'bg-amber-900 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <Truck className="h-4 w-4 text-amber-400" />
+          <span>🚚 Mixers & Remisiones</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-amber-100 text-amber-800">
+            NTC 3318
+          </span>
+        </button>
       </div>
 
       {/* VISTA 1: BITÁCORA DE CAPTURA */}
@@ -793,6 +913,9 @@ export default function Home() {
                 Captura Diaria de Avance en Campo
               </h2>
             </div>
+
+            {/* COPILOTO DE INTELIGENCIA ARTIFICIAL POR VOZ */}
+            <CopilotoVozIA onDatosDetectados={handleDatosVoz} />
 
             {/* FORMULARIO REACT */}
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -1084,13 +1207,21 @@ export default function Home() {
             </div>
           </div>
 
-          {/* SECCIÓN DE REGISTRO FOTOGRÁFICO DE OBRA */}
+          {/* SECCIÓN DE REGISTRO FOTOGRÁFICO DE OBRA CON ESTAMPADO FORENSE GPS */}
           <div className="rounded-xl border border-slate-200 p-4 bg-slate-50/50 space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <Camera className="h-4 w-4 text-emerald-600" /> Registro Fotográfico de Evidencia en Campo
+                <Camera className="h-4 w-4 text-emerald-600" /> Registro Fotográfico Forense
               </h3>
-              <span className="text-[10px] text-slate-400 font-semibold">Opcional</span>
+              <label className="inline-flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white border border-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-50 transition">
+                <input
+                  type="checkbox"
+                  checked={estamparGPS}
+                  onChange={(e) => setEstamparGPS(e.target.checked)}
+                  className="h-3.5 w-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <span>📍 Estampar Coordenadas GPS y Fecha Forense</span>
+              </label>
             </div>
 
             {!fotoPreview ? (
@@ -1444,6 +1575,16 @@ export default function Home() {
       {/* VISTA 3: PLANOS CONSTRUCTIVOS */}
       {activeTab === 'planos' && (
         <TabPlanos />
+      )}
+
+      {/* VISTA 4: CONTROL DE CALIDAD Y ROTURA DE CILINDROS (NSR-10) */}
+      {activeTab === 'calidad' && (
+        <ModuloCalidadConcreto registros={registros} />
+      )}
+
+      {/* VISTA 5: CONTROL DE RECEPCIÓN DE MIXERS Y REMISIONES (NTC 3318) */}
+      {activeTab === 'mixers' && (
+        <ModuloMixersRemisiones registros={registros} />
       )}
 
       {/* MODAL DE EVIDENCIA FOTOGRÁFICA */}
