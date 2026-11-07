@@ -36,6 +36,7 @@ import TabCronograma from '../components/TabCronograma';
 import TabPlanos from '../components/TabPlanos';
 import ModalEvidenciaFoto from '../components/ModalEvidenciaFoto';
 import ModalReporteEjecutivo from '../components/ModalReporteEjecutivo';
+import { guardarEvidenciaEnDB, obtenerEvidenciasDeDB } from '../components/evidenciasDB';
 
 // =============================================================================
 // CONFIGURACIÓN DE SUPABASE
@@ -157,13 +158,16 @@ export default function Home() {
     const colaGuardada = JSON.parse(localStorage.getItem('jgm_offline_queue') || '[]');
     setOfflineQueue(colaGuardada);
 
-    // Cargar repositorio de evidencias fotográficas locales
-    try {
-      const fotosGuardadas = JSON.parse(localStorage.getItem('jgm_evidencias_fotos') || '{}');
-      setEvidenciasFotos(fotosGuardadas);
-    } catch (e) {
-      console.error('Error al cargar evidencias locales:', e);
-    }
+    // Cargar repositorio de evidencias fotográficas (IndexedDB + localStorage)
+    obtenerEvidenciasDeDB().then((dbEvidencias) => {
+      try {
+        const localFotos = JSON.parse(localStorage.getItem('jgm_evidencias_fotos') || '{}');
+        const combinadas = { ...localFotos, ...dbEvidencias };
+        setEvidenciasFotos(combinadas);
+      } catch (e) {
+        setEvidenciasFotos(dbEvidencias || {});
+      }
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -289,51 +293,106 @@ export default function Home() {
     }
   }, [calcLargo, calcAncho, calcAlto, calcPiezas]);
 
-  // Compresión y manejo de fotos en navegador (Canvas)
-  const handleFotoSeleccionada = (e) => {
+  // Función robusta de compresión de imagen compatible con celulares (Canvas + Fallback seguro)
+  const comprimirImagen = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const rawData = event.target.result;
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const maxWidth = 800;
+            const maxHeight = 600;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+            const approxKb = Math.round((dataUrl.length * 3) / 4 / 1024);
+            resolve({ dataUrl, kb: approxKb });
+          } catch (e) {
+            console.warn('Canvas compresión omitida, usando raw:', e);
+            resolve({ dataUrl: rawData, kb: Math.round(file.size / 1024) });
+          }
+        };
+        img.onerror = () => {
+          // En caso de formatos especiales de celular, usar dataUrl directo
+          resolve({ dataUrl: rawData, kb: Math.round(file.size / 1024) });
+        };
+        img.src = rawData;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Compresión y manejo de fotos en el formulario
+  const handleFotoSeleccionada = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxWidth = 1024;
-        const maxHeight = 768;
-        let width = img.width;
-        let height = img.height;
+    const res = await comprimirImagen(file);
+    if (res && res.dataUrl) {
+      setFotoPreview(res.dataUrl);
+      setFotoInfo({
+        nombre: file.name,
+        kb: res.kb
+      });
+    }
+  };
 
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
+  // Adjuntar foto a un registro ya existente en la base de datos
+  const handleAdjuntarFotoARegistroExistente = async (recordId, file) => {
+    if (!file) return;
+    const res = await comprimirImagen(file);
+    if (!res || !res.dataUrl) return;
 
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Calidad 0.75 para compresión rápida y liviana (~40-70 KB)
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-        const approxKb = Math.round((dataUrl.length * 3) / 4 / 1024);
-
-        setFotoPreview(dataUrl);
-        setFotoInfo({
-          nombre: file.name,
-          kb: approxKb
-        });
-      };
-      img.src = event.target.result;
+    const reg = registros.find(r => r.id === recordId) || {};
+    const evidenciaActualizada = {
+      id: recordId,
+      fecha: reg.fecha || new Date().toISOString().split('T')[0],
+      actividad: reg.actividad || 'Actividad de Obra',
+      unidad: reg.unidad || 'und',
+      cantidad: reg.cantidad || 0,
+      desperdicio: reg.desperdicio || 0,
+      ubicacion: reg.ubicacion || 'Frente Principal',
+      foto: res.dataUrl
     };
-    reader.readAsDataURL(file);
+
+    const nuevasEvidencias = {
+      ...evidenciasFotos,
+      [recordId]: evidenciaActualizada,
+      [String(recordId)]: evidenciaActualizada
+    };
+    setEvidenciasFotos(nuevasEvidencias);
+
+    // Guardar en almacenamiento permanente IndexedDB y LocalStorage
+    await guardarEvidenciaEnDB(evidenciaActualizada);
+    try {
+      localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
+    } catch (e) {
+      console.warn('Límite en localStorage:', e);
+    }
+
+    alert('📸 ¡Fotografía vinculada exitosamente a la actividad!');
   };
 
   // ===========================================================================
@@ -379,9 +438,13 @@ export default function Home() {
       localStorage.setItem('jgm_offline_queue', JSON.stringify(nuevaCola));
       
       if (fotoPreview) {
-        const nuevasEvidencias = { ...evidenciasFotos, [offlineId]: evidenciaCompleta };
+        const itemEv = { ...evidenciaCompleta, id: offlineId };
+        const nuevasEvidencias = { ...evidenciasFotos, [offlineId]: itemEv };
         setEvidenciasFotos(nuevasEvidencias);
-        localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
+        await guardarEvidenciaEnDB(itemEv);
+        try {
+          localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
+        } catch (e) {}
       }
 
       limpiarFormulario();
@@ -395,14 +458,17 @@ export default function Home() {
       if (error) throw error;
 
       const recordId = data && data[0] ? data[0].id : Date.now();
+      const itemEv = { ...evidenciaCompleta, id: recordId };
 
-      // Guardar evidencia fotográfica y ficha técnica localmente indexada por ID
+      // Guardar evidencia fotográfica en IndexedDB y localStorage
       if (fotoPreview || observaciones || cuadrilla) {
         const nuevasEvidencias = {
           ...evidenciasFotos,
-          [recordId]: { ...evidenciaCompleta, id: recordId }
+          [recordId]: itemEv,
+          [String(recordId)]: itemEv
         };
         setEvidenciasFotos(nuevasEvidencias);
+        await guardarEvidenciaEnDB(itemEv);
         try {
           localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
         } catch (e) {
@@ -1147,8 +1213,116 @@ export default function Home() {
           </div>
         </div>
 
-        {/* TABLA DE REGISTROS */}
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
+        {/* 1. VISTA MÓVIL: TARJETAS RESPONSIVAS DE REGISTRO (CELULAR) */}
+        <div className="block md:hidden space-y-3">
+          {loadingRegistros ? (
+            <div className="p-8 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
+              Consultando registros en Supabase...
+            </div>
+          ) : registrosFiltrados.length === 0 ? (
+            <div className="p-8 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
+              No hay registros disponibles con el filtro actual.
+            </div>
+          ) : (
+            registrosFiltrados.map((item) => {
+              const ev = evidenciasFotos[item.id] || evidenciasFotos[String(item.id)] || evidenciasFotos[item.created_at];
+              const tieneFoto = Boolean(item.foto || ev?.foto || ev?.fotoSrc);
+              const fotoUrl = item.foto || ev?.foto || ev?.fotoSrc;
+
+              return (
+                <div 
+                  key={item.id} 
+                  className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm space-y-2.5"
+                >
+                  {/* Cabecera Tarjeta Móvil */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                      {item.fecha || '-'}
+                    </span>
+
+                    {item.isOffline ? (
+                      <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                        🟡 Offline
+                      </span>
+                    ) : (
+                      <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                        ✅ Nube OK
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Actividad */}
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 leading-snug">
+                      {item.actividad}
+                    </h3>
+                  </div>
+
+                  {/* Métricas: Cantidad y Desperdicio */}
+                  <div className="flex items-center justify-between bg-slate-50 p-2 rounded-lg text-xs border border-slate-100">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block uppercase font-bold">Ejecutado</span>
+                      <strong className="text-slate-900 font-black">
+                        {Number(item.cantidad).toFixed(2)} {item.unidad}
+                      </strong>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-400 block uppercase font-bold">Desperdicio</span>
+                      <span className="text-slate-700 font-semibold">{item.desperdicio || 0}%</span>
+                    </div>
+                  </div>
+
+                  {/* Evidencia Fotográfica en Móvil */}
+                  <div className="pt-1 flex items-center justify-between border-t border-slate-100">
+                    {tieneFoto ? (
+                      <div className="flex items-center gap-2">
+                        <img 
+                          src={fotoUrl} 
+                          alt="Miniatura" 
+                          className="h-10 w-10 rounded-lg object-cover border border-slate-300 shrink-0" 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedEvidencia({
+                              ...item,
+                              ...ev,
+                              foto: fotoUrl
+                            });
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-200 transition"
+                        >
+                          <Camera className="h-3.5 w-3.5" /> Ver Evidencia
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-dashed border-slate-300 text-slate-600 hover:bg-slate-50 font-bold text-xs cursor-pointer transition">
+                        <Camera className="h-3.5 w-3.5 text-slate-400" />
+                        <span>+ Adjuntar Foto</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          onChange={(e) => handleAdjuntarFotoARegistroExistente(item.id, e.target.files[0])}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+
+                    <span className="text-[10px] text-slate-400">
+                      ID #{item.id}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* 2. VISTA ESCRITORIO: TABLA COMPLETA (MD EN ADELANTE) */}
+        <div className="hidden md:block overflow-x-auto rounded-xl border border-slate-200">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-700 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
               <tr>
@@ -1175,58 +1349,72 @@ export default function Home() {
                   </td>
                 </tr>
               ) : (
-                registrosFiltrados.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/70 transition">
-                    <td className="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">
-                      {item.fecha || '-'}
-                    </td>
-                    <td className="py-2.5 px-3 text-slate-800 font-medium">
-                      {item.actividad}
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <span className="rounded bg-sky-50 px-1.5 py-0.5 font-bold text-sky-700 text-[10px]">
-                        {item.unidad}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-black text-slate-900">
-                      {Number(item.cantidad).toFixed(2)}
-                    </td>
-                    <td className="py-2.5 px-3 text-center text-slate-500">
-                      {item.desperdicio || 0}%
-                    </td>
-                    <td className="py-2.5 px-3 text-center">
-                      {(item.foto || evidenciasFotos[item.id]?.foto) ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const ev = evidenciasFotos[item.id] || item;
-                            setSelectedEvidencia({
-                              ...item,
-                              ...ev,
-                              foto: item.foto || ev.foto
-                            });
-                          }}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200 transition"
-                        >
-                          <Camera className="h-3 w-3" /> Ver Foto
-                        </button>
-                      ) : (
-                        <span className="text-slate-300 text-[10px]">-</span>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 text-center">
-                      {item.isOffline ? (
-                        <span className="inline-flex rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                          🟡 Offline
+                registrosFiltrados.map((item) => {
+                  const ev = evidenciasFotos[item.id] || evidenciasFotos[String(item.id)] || evidenciasFotos[item.created_at];
+                  const tieneFoto = Boolean(item.foto || ev?.foto || ev?.fotoSrc);
+                  const fotoUrl = item.foto || ev?.foto || ev?.fotoSrc;
+
+                  return (
+                    <tr key={item.id} className="hover:bg-slate-50/70 transition">
+                      <td className="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">
+                        {item.fecha || '-'}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-800 font-medium">
+                        {item.actividad}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="rounded bg-sky-50 px-1.5 py-0.5 font-bold text-sky-700 text-[10px]">
+                          {item.unidad}
                         </span>
-                      ) : (
-                        <span className="inline-flex rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                          ✅ Nube OK
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-black text-slate-900">
+                        {Number(item.cantidad).toFixed(2)}
+                      </td>
+                      <td className="py-2.5 px-3 text-center text-slate-500">
+                        {item.desperdicio || 0}%
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {tieneFoto ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedEvidencia({
+                                ...item,
+                                ...ev,
+                                foto: fotoUrl
+                              });
+                            }}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200 transition"
+                          >
+                            <Camera className="h-3 w-3" /> Ver Foto
+                          </button>
+                        ) : (
+                          <label className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-dashed border-slate-300 hover:bg-slate-50 text-slate-500 font-semibold text-[10px] cursor-pointer transition">
+                            <Camera className="h-3 w-3" /> + Foto
+                            <input
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              onChange={(e) => handleAdjuntarFotoARegistroExistente(item.id, e.target.files[0])}
+                              className="hidden"
+                            />
+                          </label>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {item.isOffline ? (
+                          <span className="inline-flex rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                            🟡 Offline
+                          </span>
+                        ) : (
+                          <span className="inline-flex rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                            ✅ Nube OK
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
