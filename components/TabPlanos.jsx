@@ -17,112 +17,178 @@ import {
   Compass, 
   Layers, 
   CheckCircle2, 
-  AlertCircle,
+  AlertTriangle,
   FileCheck,
   Calendar,
-  Building2
+  Building2,
+  FolderDown,
+  Info
 } from 'lucide-react';
 
 // =============================================================================
 // REPOSITORIO DE PLANOS OFICIALES (MEZZANINE 3 NIVELES - BARRANQUILLA)
-// Aprobados para Construcción por Interventoría DOLMEN S.A.
+// Aprobados para Construcción por Interventoría DOLMEN S.A. & INGENDES S.A.S.
 // =============================================================================
-const PLANOS_INICIALES = [
+const PLANOS_OFICIALES = [
   {
-    id: "PL-01",
-    codigo: "EST-01",
-    titulo: "Planta de Cimentación, Zapatas y Vigas de Amarre",
+    id: "PL-E01",
+    codigo: "E-01",
+    titulo: "Planta de Cimentación, Zapatas, Pedestales y Cortes Generales",
     disciplina: "Estructural",
     icono: "🏗️",
-    revision: "Rev. 03 (Aprobado)",
+    revision: "Rev. 03 (Oficial)",
     escala: "1:50",
-    fecha: "2026-10-10",
-    responsable: "Ing. Calculista Estructural",
-    descripcion: "Geometría de zapatas Z1 (1.80x1.80), Z2 (2.20x2.20), foso de ascensor y vigas de cimentación VC-01 y VC-02.",
-    tipo: "vector_cimentacion"
+    fecha: "16/01/2025",
+    responsable: "Ing. Osnaider Paternina / Julio Alandete",
+    descripcion: "Distribución de zapatas aisladas, pedestales de 0.65x0.65m, foso, vigas de cimentación y notas de concreto f'c = 24.5 MPa (NSR-10).",
+    archivoImg: "/planos/E-01-cimentacion-cortes.webp",
+    archivoThumb: "/planos/E-01-cimentacion-cortes_thumb.webp",
+    archivoPdf: "/planos/E-01-cimentacion-cortes.pdf",
+    esModificado: false
   },
   {
-    id: "PL-02",
-    codigo: "EST-02",
-    titulo: "Planta de Estructura Metálica y Losa Metaldeck",
+    id: "PL-E02",
+    codigo: "E-02",
+    titulo: "Detalles Estructurales 2 - Cortes de Zapatas y Vigas de Enlace",
     disciplina: "Estructural",
     icono: "🏗️",
-    revision: "Rev. 03 (Aprobado)",
-    escala: "1:50",
-    fecha: "2026-10-12",
-    responsable: "Ing. Calculista Estructural",
-    descripcion: "Disposición de columnas HEA 320, vigas principales IPE 300, vigas secundarias IPE 180 y lámina colaborante e=11cm.",
-    tipo: "vector_metaldeck"
+    revision: "Rev. 03 (Oficial)",
+    escala: "1:20 / 1:50",
+    fecha: "16/01/2025",
+    responsable: "Ing. Osnaider Paternina / Julio Alandete",
+    descripcion: "Corte Zapata 1-1, Corte b Zapata 1-1, armado longitudinal y estribos de confinamiento en vigas de enlace perimetrales.",
+    archivoImg: "/planos/E-02-detalles-estructurales-2.webp",
+    archivoThumb: "/planos/E-02-detalles-estructurales-2_thumb.webp",
+    archivoPdf: "/planos/E-02-detalles-estructurales-2.pdf",
+    esModificado: false
   },
   {
-    id: "PL-03",
+    id: "PL-E03",
+    codigo: "E-03",
+    titulo: "Detalles Estructurales 1 - Planta General y Despiece de Pedestales",
+    disciplina: "Estructural",
+    icono: "🏗️",
+    revision: "Rev. 03 (Oficial)",
+    escala: "1:10 / 1:50",
+    fecha: "16/01/2025",
+    responsable: "Ing. Osnaider Paternina / Julio Alandete",
+    descripcion: "Planta general de pedestales, despiece de armadura de acero corrugado, corte de zapatas 2-2 y 3-3, arranques de columnas.",
+    archivoImg: "/planos/E-03-detalles-estructurales-1.webp",
+    archivoThumb: "/planos/E-03-detalles-estructurales-1_thumb.webp",
+    archivoPdf: "/planos/E-03-detalles-estructurales-1.pdf",
+    esModificado: false
+  },
+  {
+    id: "PL-E04",
+    codigo: "E-04",
+    titulo: "Plantas Estructurales - Entrepiso Nivel +3.00 y Nivel +6.30 (Mezzanine)",
+    disciplina: "Estructural",
+    icono: "🏢",
+    revision: "Rev. 03 (Oficial)",
+    escala: "1:50",
+    fecha: "16/01/2025",
+    responsable: "Ing. Osnaider Paternina / Julio Alandete",
+    descripcion: "Vigas principales de acero IPE 300, columnas metálicas HEA 320, viguetas de entrepiso y disposición de lámina colaborante losa metaldeck.",
+    archivoImg: "/planos/E-04-plantas-estructurales-nivel-3-6.webp",
+    archivoThumb: "/planos/E-04-plantas-estructurales-nivel-3-6_thumb.webp",
+    archivoPdf: "/planos/E-04-plantas-estructurales-nivel-3-6.pdf",
+    esModificado: false
+  },
+  {
+    id: "PL-E05",
+    codigo: "E-05",
+    titulo: "Plantas Estructurales - Cubierta y Arriostramientos Superiores",
+    disciplina: "Estructural",
+    icono: "🏠",
+    revision: "Rev. 03 (Oficial)",
+    escala: "1:50",
+    fecha: "16/01/2025",
+    responsable: "Ing. Osnaider Paternina / Julio Alandete",
+    descripcion: "Planta de estructura de cubierta, correas en perfiles C, cerchas de amarre y losa metaldeck superior.",
+    archivoImg: "/planos/E-05-plantas-estructurales-cubierta.webp",
+    archivoThumb: "/planos/E-05-plantas-estructurales-cubierta_thumb.webp",
+    archivoPdf: "/planos/E-05-plantas-estructurales-cubierta.pdf",
+    esModificado: false
+  },
+  {
+    id: "PL-E06",
+    codigo: "E-06",
+    titulo: "Detalles de Conexión - Uniones Viga-Columna, Pernos y Placas Base",
+    disciplina: "Estructural",
+    icono: "⚙️",
+    revision: "Rev. 03 (Oficial)",
+    escala: "1:10 / 1:20",
+    fecha: "16/01/2025",
+    responsable: "Ing. Osnaider Paternina / Julio Alandete",
+    descripcion: "Cartelas de rigidización, pernos ASTM A325, placas base de acero de 1 pulgada, soldadura AWS D1.1 y pintura Superprotec.",
+    archivoImg: "/planos/E-06-detalles-conexion-metalica.webp",
+    archivoThumb: "/planos/E-06-detalles-conexion-metalica_thumb.webp",
+    archivoPdf: "/planos/E-06-detalles-conexion-metalica.pdf",
+    esModificado: false
+  },
+  {
+    id: "PL-E07",
+    codigo: "E-07",
+    titulo: "Detalles de Escalera [MODIFICADO EN OBRA - NO APLICAR]",
+    disciplina: "Estructural",
+    icono: "⚠️",
+    revision: "Modificado en Obra",
+    escala: "1:25",
+    fecha: "16/01/2025",
+    responsable: "Diseño Inicial (Modificado en Ejecución)",
+    descripcion: "⚠️ NOTA DEL RESIDENTE: Este plano no se ejecutó conforme al diseño original. La escalera física fue modificada y ejecutada con un diseño alternativo en obra.",
+    archivoImg: "/planos/E-07-escalera-modificada.webp",
+    archivoThumb: "/planos/E-07-escalera-modificada_thumb.webp",
+    archivoPdf: "/planos/E-07-escalera-modificada.pdf",
+    esModificado: true,
+    alertaTexto: "Plano modificado en campo: la escalera se ejecutó con un diseño alternativo."
+  },
+  {
+    id: "PL-ARQ01",
     codigo: "ARQ-01",
-    titulo: "Planta Arquitectónica General - Niveles 1 y 2",
+    titulo: "Planta Arquitectónica General - Mezzanine y Oficinas",
     disciplina: "Arquitectónico",
     icono: "🏛️",
     revision: "Rev. 02 (Aprobado)",
     escala: "1:75",
-    fecha: "2026-10-14",
+    fecha: "14/10/2026",
     responsable: "Arq. Diseñador Principal",
-    descripcion: "Distribución de áreas administrativas, sala de juntas, recepción, batería de baños y escalera de circulación.",
-    tipo: "vector_arquitectura"
+    descripcion: "Distribución de áreas administrativas, sala de juntas, recepción, batería de baños y circulación general.",
+    tipo: "vector_arquitectura",
+    esModificado: false
   },
   {
-    id: "PL-04",
-    codigo: "ARQ-02",
-    titulo: "Cortes Transversales y Fachadas de Cerramiento",
-    disciplina: "Arquitectónico",
-    icono: "🏛️",
-    revision: "Rev. 02 (Aprobado)",
-    escala: "1:75",
-    fecha: "2026-10-15",
-    responsable: "Arq. Diseñador Principal",
-    descripcion: "Alturas libres de entrepiso (3.20m), detalles de mampostería en bloque No. 12, vigas cinta y alfajías de remate.",
-    tipo: "vector_cortes"
-  },
-  {
-    id: "PL-05",
+    id: "PL-HID01",
     codigo: "HID-01",
     titulo: "Redes Hidrosanitarias y Desagües de Aguas Lluvias",
     disciplina: "Hidrosanitario",
     icono: "💧",
     revision: "Rev. 01 (Vigente)",
     escala: "1:50",
-    fecha: "2026-10-18",
+    fecha: "18/10/2026",
     responsable: "Ing. Hidráulico Sanitario",
     descripcion: "Trazado de tuberías PVC Sanitaria 3\" y 4\", ventilación hidrostática, bajantes pluviales y trampa de grasas.",
-    tipo: "vector_hidrosanitario"
+    tipo: "vector_hidrosanitario",
+    esModificado: false
   },
   {
-    id: "PL-06",
+    id: "PL-ELE01",
     codigo: "ELE-01",
     titulo: "Redes Eléctricas, Iluminación LED y Tomas de Fuerza",
     disciplina: "Eléctrico",
     icono: "⚡",
     revision: "Rev. 01 (Vigente)",
     escala: "1:50",
-    fecha: "2026-10-20",
+    fecha: "20/10/2026",
     responsable: "Ing. Electricista",
-    descripcion: "Alimentadores principales, tablero TD-MZ, circuitos de tomas normales y reguladas, luminarias tipo panel 60x60.",
-    tipo: "vector_electrico"
-  },
-  {
-    id: "PL-07",
-    codigo: "ACA-01",
-    titulo: "Cuadro de Acabados, Cielo Raso y Carpinterías",
-    disciplina: "Acabados",
-    icono: "🎨",
-    revision: "Rev. 01 (Vigente)",
-    escala: "1:50",
-    fecha: "2026-10-22",
-    responsable: "Residencia e Interventoría",
-    descripcion: "Especificaciones de piso porcelanato 60x60, cielo raso en drywall junta perdida, pintura lavable y ventanería de aluminio.",
-    tipo: "vector_acabados"
+    descripcion: "Alimentadores principales, tablero TD-MZ, circuitos de tomas normales y reguladas, luminarias panel 60x60.",
+    tipo: "vector_electrico",
+    esModificado: false
   }
 ];
 
 export default function TabPlanos() {
-  const [planos, setPlanos] = useState(PLANOS_INICIALES);
+  const [planos, setPlanos] = useState(PLANOS_OFICIALES);
   const [filtroTexto, setFiltroTexto] = useState('');
   const [disciplinaActiva, setDisciplinaActiva] = useState('Todas');
   
@@ -145,7 +211,7 @@ export default function TabPlanos() {
   // Cargar planos personalizados de localStorage si existen
   useEffect(() => {
     try {
-      const guardados = localStorage.getItem('jgm_planos_constructivos');
+      const guardados = localStorage.getItem('jgm_planos_constructivos_v2');
       if (guardados) {
         const parsed = JSON.parse(guardados);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -157,32 +223,32 @@ export default function TabPlanos() {
     }
   }, []);
 
-  // Guardar en localStorage cuando se modifiquen
   const guardarPlanosStorage = (nuevosPlanos) => {
     setPlanos(nuevosPlanos);
     try {
-      localStorage.setItem('jgm_planos_constructivos', JSON.stringify(nuevosPlanos));
+      localStorage.setItem('jgm_planos_constructivos_v2', JSON.stringify(nuevosPlanos));
     } catch (e) {
-      console.error('Error guardando planos:', e);
+      console.warn('Límite en localStorage al guardar planos:', e);
     }
   };
 
-  // Manejador de subida de archivo local
-  const handleArchivoChange = (e) => {
+  const handleArchivoSeleccionado = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setArchivoPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setArchivoPreview(event.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
-  // Guardar nuevo plano
   const handleGuardarNuevoPlano = (e) => {
     e.preventDefault();
-    if (!nuevoCodigo.trim() || !nuevoTitulo.trim()) return;
+    if (!nuevoCodigo.trim() || !nuevoTitulo.trim()) {
+      alert('Por favor complete los campos obligatorios: Código y Título.');
+      return;
+    }
 
     const iconoMap = {
       'Estructural': '🏗️',
@@ -200,22 +266,24 @@ export default function TabPlanos() {
       icono: iconoMap[nuevaDisciplina] || '📐',
       revision: nuevaRevision.trim(),
       escala: nuevaEscala.trim(),
-      fecha: new Date().toISOString().split('T')[0],
+      fecha: new Date().toLocaleDateString('es-CO'),
       responsable: nuevoResponsable.trim(),
       descripcion: nuevaDescripcion.trim() || 'Plano constructivo incorporado por el residente en campo.',
+      archivoImg: archivoPreview,
+      archivoThumb: archivoPreview,
       archivoUrl: archivoPreview,
-      tipo: archivoPreview ? 'archivo_cargado' : 'vector_arquitectura'
+      esModificado: false
     };
 
     const actualizados = [nuevoPlano, ...planos];
     guardarPlanosStorage(actualizados);
 
-    // Reset formulario y cerrar modal
     setNuevoCodigo('');
     setNuevoTitulo('');
     setNuevaDescripcion('');
     setArchivoPreview(null);
     setShowModalSubir(false);
+    alert('📐 ¡Nuevo plano agregado exitosamente al repositorio!');
   };
 
   // Filtrado de planos
@@ -229,224 +297,46 @@ export default function TabPlanos() {
     });
   }, [planos, disciplinaActiva, filtroTexto]);
 
-  // Contador por disciplina
-  const disciplinas = ['Todas', 'Estructural', 'Arquitectónico', 'Hidrosanitario', 'Eléctrico', 'Acabados'];
-
-  // Renderizador de vector arquitectónico según el plano
-  const renderPlanoContenido = (plano) => {
-    if (plano.archivoUrl) {
-      return (
-        <div className="flex items-center justify-center p-4 min-h-[480px]">
-          <img 
-            src={plano.archivoUrl} 
-            alt={plano.titulo} 
-            className="max-h-[70vh] object-contain rounded-lg shadow-lg border border-slate-700" 
-          />
-        </div>
-      );
-    }
-
-    // Planos vectoriales paramétricos de alta resolución estilo CAD / Revit
-    return (
-      <div className="bg-[#0b1329] p-6 rounded-xl border border-slate-700 text-cyan-400 font-mono shadow-inner select-none overflow-hidden">
-        {/* RÓTULO DE PLANO SUPERIOR */}
-        <div className="flex justify-between items-center pb-3 border-b border-cyan-800/80 mb-4 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-cyan-900/60 text-cyan-300 font-bold border border-cyan-700">
-              {plano.codigo}
-            </span>
-            <span className="text-white font-bold">{plano.titulo}</span>
-          </div>
-          <div className="text-[11px] text-cyan-300/80">
-            Escala {plano.escala} • {plano.revision}
-          </div>
-        </div>
-
-        {/* DIBUJO CAD VECTORIAL DINÁMICO */}
-        <div className="relative w-full h-[460px] bg-[#070c18] border border-cyan-950 rounded-lg flex items-center justify-center p-4">
-          {/* Cuadrícula milimétrica de fondo */}
-          <div 
-            className="absolute inset-0 opacity-15"
-            style={{
-              backgroundImage: 'radial-gradient(circle, #06b6d4 1px, transparent 1px)',
-              backgroundSize: '24px 24px'
-            }}
-          />
-
-          {plano.tipo === 'vector_cimentacion' && (
-            <svg viewBox="0 0 600 380" className="w-full h-full text-cyan-400">
-              {/* Ejes Estructurales */}
-              <line x1="60" y1="50" x2="540" y2="50" stroke="#0ea5e9" strokeWidth="1.5" strokeDasharray="6,4" />
-              <line x1="60" y1="190" x2="540" y2="190" stroke="#0ea5e9" strokeWidth="1.5" strokeDasharray="6,4" />
-              <line x1="60" y1="330" x2="540" y2="330" stroke="#0ea5e9" strokeWidth="1.5" strokeDasharray="6,4" />
-              
-              <line x1="100" y1="30" x2="100" y2="350" stroke="#0ea5e9" strokeWidth="1.5" strokeDasharray="6,4" />
-              <line x1="300" y1="30" x2="300" y2="350" stroke="#0ea5e9" strokeWidth="1.5" strokeDasharray="6,4" />
-              <line x1="500" y1="30" x2="500" y2="350" stroke="#0ea5e9" strokeWidth="1.5" strokeDasharray="6,4" />
-
-              {/* Burbujas de Ejes */}
-              <circle cx="100" cy="20" r="12" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.5"/>
-              <text x="100" y="24" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">A</text>
-              <circle cx="300" cy="20" r="12" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.5"/>
-              <text x="300" y="24" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">B</text>
-              <circle cx="500" cy="20" r="12" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.5"/>
-              <text x="500" y="24" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">C</text>
-
-              <circle cx="40" cy="50" r="12" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.5"/>
-              <text x="40" y="54" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">1</text>
-              <circle cx="40" cy="190" r="12" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.5"/>
-              <text x="40" y="194" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">2</text>
-              <circle cx="40" cy="330" r="12" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.5"/>
-              <text x="40" y="334" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">3</text>
-
-              {/* Zapatas Aisladas (Z1) */}
-              {[
-                {cx: 100, cy: 50, tag: "Z1 (1.80x1.80)"},
-                {cx: 300, cy: 50, tag: "Z1 (1.80x1.80)"},
-                {cx: 500, cy: 50, tag: "Z1 (1.80x1.80)"},
-                {cx: 100, cy: 330, tag: "Z1 (1.80x1.80)"},
-                {cx: 500, cy: 330, tag: "Z1 (1.80x1.80)"}
-              ].map((z, idx) => (
-                <g key={idx}>
-                  <rect x={z.cx - 35} y={z.cy - 35} width="70" height="70" fill="#0369a1" fillOpacity="0.25" stroke="#38bdf8" strokeWidth="2" />
-                  <rect x={z.cx - 12} y={z.cy - 12} width="24" height="24" fill="#f8fafc" stroke="#0284c7" strokeWidth="2" />
-                  <text x={z.cx} y={z.cy + 48} textAnchor="middle" fill="#93c5fd" fontSize="9">{z.tag}</text>
-                </g>
-              ))}
-
-              {/* Foso Ascensor en Eje B-2 */}
-              <rect x="250" y="145" width="100" height="90" fill="#dc2626" fillOpacity="0.2" stroke="#ef4444" strokeWidth="2.5" />
-              <rect x="265" y="160" width="70" height="60" fill="none" stroke="#f87171" strokeWidth="1.5" strokeDasharray="4,3" />
-              <text x="300" y="195" textAnchor="middle" fill="#fca5a5" fontSize="11" fontWeight="bold">FOSO ASCENSOR</text>
-              <text x="300" y="210" textAnchor="middle" fill="#fca5a5" fontSize="9">Nivel -1.60 m</text>
-
-              {/* Vigas de Amarre VC-01 (0.30 x 0.35) */}
-              <rect x="100" y="44" width="400" height="12" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
-              <rect x="100" y="324" width="400" height="12" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
-              <rect x="94" y="50" width="12" height="280" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
-              <rect x="494" y="50" width="12" height="280" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
-
-              {/* Cotas */}
-              <line x1="100" y1="365" x2="300" y2="365" stroke="#fbbf24" strokeWidth="1" markerEnd="url(#arrow)" />
-              <text x="200" y="360" textAnchor="middle" fill="#fbbf24" fontSize="10">6.00 m</text>
-              <line x1="300" y1="365" x2="500" y2="365" stroke="#fbbf24" strokeWidth="1" />
-              <text x="400" y="360" textAnchor="middle" fill="#fbbf24" fontSize="10">6.00 m</text>
-            </svg>
-          )}
-
-          {plano.tipo === 'vector_metaldeck' && (
-            <svg viewBox="0 0 600 380" className="w-full h-full">
-              {/* Losa de Metaldeck e=11cm */}
-              <rect x="70" y="40" width="460" height="300" fill="#0f172a" stroke="#64748b" strokeWidth="2" />
-              
-              {/* Patrón de Lámina Colaborante */}
-              {[80, 110, 140, 170, 200, 230, 260, 290, 320].map((y, idx) => (
-                <line key={idx} x1="70" y1={y} x2="530" y2={y} stroke="#334155" strokeWidth="1" strokeDasharray="3,3" />
-              ))}
-
-              {/* Vigas IPE 300 Principales */}
-              <rect x="70" y="40" width="460" height="18" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="2" />
-              <rect x="70" y="180" width="460" height="18" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="2" />
-              <rect x="70" y="322" width="460" height="18" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="2" />
-              <text x="300" y="54" textAnchor="middle" fill="#93c5fd" fontSize="10" fontWeight="bold">VIGA PRINCIPAL IPE 300</text>
-              <text x="300" y="194" textAnchor="middle" fill="#93c5fd" fontSize="10" fontWeight="bold">VIGA PRINCIPAL IPE 300</text>
-
-              {/* Columnas HEA 320 en Intersecciones */}
-              {[
-                {x: 70, y: 40}, {x: 300, y: 40}, {x: 530, y: 40},
-                {x: 70, y: 180}, {x: 530, y: 180},
-                {x: 70, y: 322}, {x: 300, y: 322}, {x: 530, y: 322}
-              ].map((c, i) => (
-                <g key={i}>
-                  <rect x={c.x - 14} y={c.y - 6} width="28" height="30" fill="#fbbf24" stroke="#d97706" strokeWidth="2" />
-                  <text x={c.x} y={c.y + 14} textAnchor="middle" fill="#78350f" fontSize="8" fontWeight="bold">HEA</text>
-                </g>
-              ))}
-
-              {/* Detalle Conectores de Cortante */}
-              <text x="300" y="120" textAnchor="middle" fill="#10b981" fontSize="13" fontWeight="bold">
-                LÁMINA METALDECK CALIBRE 22 • MALLA ELECTROSOLDADA 15x15
-              </text>
-              <text x="300" y="140" textAnchor="middle" fill="#a7f3d0" fontSize="11">
-                Concreto Fc=21 MPa (3000 PSI) Espesor 11 cm
-              </text>
-            </svg>
-          )}
-
-          {plano.tipo === 'vector_arquitectura' && (
-            <svg viewBox="0 0 600 380" className="w-full h-full">
-              {/* Contorno de Oficinas y Muros No. 12 */}
-              <rect x="80" y="50" width="440" height="280" fill="#0f172a" stroke="#f8fafc" strokeWidth="3" />
-              
-              {/* Divisiones Interiores */}
-              <line x1="280" y1="50" x2="280" y2="330" stroke="#f8fafc" strokeWidth="2.5" />
-              <line x1="80" y1="190" x2="280" y2="190" stroke="#f8fafc" strokeWidth="2.5" />
-              
-              {/* Puertas con arco */}
-              <path d="M 280 110 A 35 35 0 0 0 315 145" fill="none" stroke="#fbbf24" strokeWidth="1.5" />
-              <path d="M 280 250 A 35 35 0 0 0 315 285" fill="none" stroke="#fbbf24" strokeWidth="1.5" />
-
-              {/* Letreros de Ambientes */}
-              <text x="180" y="125" textAnchor="middle" fill="#f8fafc" fontSize="13" fontWeight="bold">OFICINA RESIDENCIA</text>
-              <text x="180" y="142" textAnchor="middle" fill="#94a3b8" fontSize="10">Área: 18.50 m² • N+3.50</text>
-
-              <text x="180" y="260" textAnchor="middle" fill="#f8fafc" fontSize="13" fontWeight="bold">SALA DE JUNTAS</text>
-              <text x="180" y="277" textAnchor="middle" fill="#94a3b8" fontSize="10">Área: 22.00 m² • N+3.50</text>
-
-              <text x="400" y="180" textAnchor="middle" fill="#f8fafc" fontSize="14" fontWeight="bold">ÁREA OPERATIVA MEZZANINE</text>
-              <text x="400" y="200" textAnchor="middle" fill="#94a3b8" fontSize="11">Capacidad: 16 Puestos de Trabajo</text>
-              <text x="400" y="220" textAnchor="middle" fill="#38bdf8" fontSize="10">Piso Porcelanato 60x60 Antideslizante</text>
-            </svg>
-          )}
-
-          {plano.tipo !== 'vector_cimentacion' && plano.tipo !== 'vector_metaldeck' && plano.tipo !== 'vector_arquitectura' && (
-            <div className="text-center">
-              <Compass className="h-16 w-16 text-cyan-400 mx-auto mb-3 animate-spin-slow opacity-80" />
-              <h4 className="text-lg font-bold text-white mb-1">{plano.titulo}</h4>
-              <p className="text-xs text-cyan-300/80 max-w-md mx-auto">{plano.descripcion}</p>
-              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded bg-cyan-950 border border-cyan-800 text-xs text-cyan-400">
-                <span>Rótulo Oficial: {plano.codigo}</span> • <span>{plano.escala}</span> • <span>{plano.revision}</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* PIE DE PLANO Y RÓTULO TÉCNICO */}
-        <div className="mt-4 pt-3 border-t border-slate-700/80 flex flex-wrap justify-between items-center text-[11px] text-slate-400">
-          <div>
-            Proyecto: <strong className="text-white">MEZZANINE 3 NIVELES - BARRANQUILLA</strong> | Contratista: <strong className="text-white">INGENDES S.A.S.</strong>
-          </div>
-          <div>
-            Aprobación: <strong className="text-emerald-400">INTERVENTORÍA DOLMEN S.A.</strong> | Fecha: <strong className="text-white">{plano.fecha}</strong>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const disciplinas = ['Todas', 'Estructural', 'Arquitectónico', 'Hidrosanitario', 'Eléctrico'];
 
   return (
     <div className="space-y-6">
+      
       {/* 1. CABECERA DEL REPOSITORIO DE PLANOS */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
-              <span className="p-2 rounded-lg bg-slate-900 text-white">
+              <span className="p-2.5 rounded-xl bg-slate-900 text-white shadow-md">
                 <Compass className="h-5 w-5" />
               </span>
-              <h2 className="text-xl font-bold text-slate-900">Planos Constructivos de Obra</h2>
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
+                  Planos Constructivos Oficiales (Proyecto Dolmen)
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Oficina 3 Niveles - Sede Administrativa • Interventoría DOLMEN S.A. & INGENDES S.A.S.
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Visor de Ingeniería para Campo y Consulta de Especificaciones Técnicas (Revit / CAD)
-            </p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            <a
+              href="/planos/PROYECTO_DOLMEN_PLANOS_COMPLETOS.pdf"
+              download="PROYECTO_DOLMEN_PLANOS_COMPLETOS.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white px-3.5 py-2 text-xs font-bold transition shadow-sm"
+            >
+              <FolderDown className="h-4 w-4" /> Descargar Todo el Juego (PDF 13.6 MB)
+            </a>
+
             <button
               onClick={() => setShowModalSubir(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-slate-800 transition shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-slate-800 transition shadow-sm"
             >
-              <Plus className="h-4 w-4" /> Insertar / Cargar Nuevo Plano
+              <Plus className="h-4 w-4" /> Agregar Plano
             </button>
           </div>
         </div>
@@ -457,7 +347,7 @@ export default function TabPlanos() {
             <button
               key={disc}
               onClick={() => setDisciplinaActiva(disc)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                 disciplinaActiva === disc
                   ? 'bg-slate-900 text-white shadow-sm'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -467,7 +357,6 @@ export default function TabPlanos() {
               {disc === 'Arquitectónico' && '🏛️ '}
               {disc === 'Hidrosanitario' && '💧 '}
               {disc === 'Eléctrico' && '⚡ '}
-              {disc === 'Acabados' && '🎨 '}
               {disc} ({disc === 'Todas' ? planos.length : planos.filter(p => p.disciplina === disc).length})
             </button>
           ))}
@@ -475,15 +364,15 @@ export default function TabPlanos() {
       </div>
 
       {/* 3. BARRA DE BÚSQUEDA */}
-      <div className="rounded-xl bg-white p-3.5 shadow-sm border border-slate-200">
+      <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-200">
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar por código de plano (ej. EST-01), título o descripción..."
+            placeholder="Buscar por código (ej. E-01, E-04), título o especificación..."
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 text-xs focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800"
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:border-slate-800 focus:outline-none"
           />
         </div>
       </div>
@@ -500,69 +389,112 @@ export default function TabPlanos() {
           planosFiltrados.map((plano) => (
             <div
               key={plano.id}
-              className="rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between"
+              className={`rounded-2xl bg-white border shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between ${
+                plano.esModificado ? 'border-amber-300 bg-amber-50/20' : 'border-slate-200'
+              }`}
             >
-              <div className="p-5">
-                {/* Cabecera Tarjeta */}
-                <div className="flex justify-between items-start gap-2 mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="p-2 rounded-lg bg-slate-100 text-lg">
-                      {plano.icono}
-                    </span>
-                    <div>
-                      <span className="font-mono text-xs font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                        {plano.codigo}
-                      </span>
-                      <span className="text-[11px] font-semibold text-slate-400 ml-2">
-                        {plano.disciplina}
-                      </span>
+              <div>
+                {/* VISTA PREVIA / MINIATURA DEL PLANO */}
+                <div 
+                  onClick={() => {
+                    setPlanoSeleccionado(plano);
+                    setZoomLevel(1);
+                    setRotacion(0);
+                  }}
+                  className="h-44 bg-slate-950 border-b border-slate-200 overflow-hidden relative cursor-pointer group"
+                >
+                  {plano.archivoThumb || plano.archivoImg ? (
+                    <img
+                      src={plano.archivoThumb || plano.archivoImg}
+                      alt={plano.titulo}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-cyan-400 p-4">
+                      <Compass className="h-10 w-10 mb-2 opacity-60" />
+                      <span className="text-xs font-mono font-bold text-white">{plano.codigo}</span>
+                      <span className="text-[10px] text-cyan-300">Vista esquemática</span>
                     </div>
+                  )}
+
+                  {/* Etiqueta flotante con código de plano */}
+                  <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-900/90 text-white font-mono text-[11px] font-black shadow border border-slate-700">
+                      {plano.codigo}
+                    </span>
+                    {plano.esModificado && (
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white font-bold text-[10px] shadow">
+                        ⚠️ Modificado en Obra
+                      </span>
+                    )}
                   </div>
 
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
-                    <CheckCircle2 className="h-3 w-3" /> {plano.revision.split(' ')[0]}
-                  </span>
+                  <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                    <Eye className="h-4 w-4" /> Inspeccionar Plano
+                  </div>
                 </div>
 
-                {/* Título y Descripción */}
-                <h3 className="text-sm font-bold text-slate-900 mb-1.5 line-clamp-1">
-                  {plano.titulo}
-                </h3>
-                <p className="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed">
-                  {plano.descripcion}
-                </p>
+                <div className="p-4">
+                  {/* Título y Disciplina */}
+                  <div className="flex justify-between items-start gap-2 mb-1.5">
+                    <h3 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
+                      {plano.titulo}
+                    </h3>
+                  </div>
 
-                {/* Metadata Técnica */}
-                <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-2">
-                  <div>
-                    <span className="text-slate-400 block">Escala:</span>
-                    <strong className="text-slate-800">{plano.escala}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block">Fecha Aprobación:</span>
-                    <strong className="text-slate-800">{plano.fecha}</strong>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-slate-400 block">Responsable:</span>
-                    <span className="text-slate-700 font-semibold truncate block">{plano.responsable}</span>
+                  {plano.esModificado && (
+                    <div className="mb-2 p-2 rounded-lg bg-amber-100/70 border border-amber-200 text-[10px] font-bold text-amber-900 leading-tight">
+                      ⚠️ Ignorar escalera: Se ejecutó con modificación en obra.
+                    </div>
+                  )}
+
+                  <p className="text-[11px] text-slate-500 line-clamp-2 mb-3 leading-relaxed">
+                    {plano.descripcion}
+                  </p>
+
+                  {/* Ficha Técnica */}
+                  <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <div>
+                      <span className="text-slate-400 block font-semibold">Escala:</span>
+                      <strong className="text-slate-700">{plano.escala}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block font-semibold">Fecha:</span>
+                      <strong className="text-slate-700">{plano.fecha}</strong>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-slate-400 block font-semibold">Responsable:</span>
+                      <span className="text-slate-700 font-semibold truncate block">{plano.responsable}</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Botón de Abrir Visor */}
-              <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-500">
-                  Aprobado para construcción
-                </span>
+              {/* Botones de Acción */}
+              <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                {plano.archivoPdf ? (
+                  <a
+                    href={plano.archivoPdf}
+                    download={`${plano.codigo}_${plano.titulo}.pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-slate-900 transition"
+                  >
+                    <Download className="h-3 w-3" /> PDF
+                  </a>
+                ) : (
+                  <span className="text-[10px] text-slate-400">CAD Vector</span>
+                )}
+
                 <button
                   onClick={() => {
                     setPlanoSeleccionado(plano);
                     setZoomLevel(1);
                     setRotacion(0);
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition"
+                  className="inline-flex items-center gap-1 rounded-lg bg-slate-900 hover:bg-slate-800 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm"
                 >
-                  <Eye className="h-3.5 w-3.5" /> Ver Plano
+                  <Eye className="h-3.5 w-3.5" /> Abrir Visor
                 </button>
               </div>
             </div>
@@ -570,38 +502,38 @@ export default function TabPlanos() {
         )}
       </div>
 
-      {/* 5. MODAL INTERACTIVO VISOR DE PLANO EN ALTA RESOLUCIÓN */}
+      {/* 5. VISOR INTERACTIVO DE ULTRA ALTA DEFINICIÓN (MODAL FULLSCREEN) */}
       {planoSeleccionado && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-3 md:p-6 backdrop-blur-md">
-          <div className="w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-2 sm:p-4 backdrop-blur-md">
+          <div className="w-full max-w-6xl max-h-[96vh] flex flex-col rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden">
             
             {/* BARRA SUPERIOR DEL VISOR */}
-            <div className="p-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 text-white">
+            <div className="p-3 sm:p-4 bg-slate-900 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-white">
               <div className="flex items-center gap-2.5">
-                <span className="px-2.5 py-1 rounded bg-cyan-900/60 text-cyan-400 border border-cyan-700 font-mono text-xs font-bold">
+                <span className="px-2.5 py-1 rounded-lg bg-cyan-900/60 text-cyan-400 border border-cyan-700 font-mono text-xs font-black">
                   {planoSeleccionado.codigo}
                 </span>
                 <div>
-                  <h3 className="text-sm font-bold text-white leading-tight">
+                  <h3 className="text-xs sm:text-sm font-bold text-white leading-tight">
                     {planoSeleccionado.titulo}
                   </h3>
-                  <p className="text-[11px] text-slate-400">
-                    {planoSeleccionado.disciplina} • Escala {planoSeleccionado.escala} • {planoSeleccionado.revision}
+                  <p className="text-[10px] sm:text-[11px] text-slate-400">
+                    Proyecto Dolmen • Escala {planoSeleccionado.escala} • {planoSeleccionado.revision}
                   </p>
                 </div>
               </div>
 
-              {/* CONTROLES DE ZOOM Y PANTALLA */}
-              <div className="flex items-center gap-2">
+              {/* CONTROLES DE ZOOM, ROTACIÓN Y DESCARGA */}
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 <button
-                  onClick={() => setZoomLevel(prev => Math.min(prev + 0.25, 2.5))}
+                  onClick={() => setZoomLevel(prev => Math.min(prev + 0.35, 4.0))}
                   title="Acercar (Zoom In)"
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
                 >
                   <ZoomIn className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => setZoomLevel(prev => Math.max(prev - 0.25, 0.75))}
+                  onClick={() => setZoomLevel(prev => Math.max(prev - 0.35, 0.75))}
                   title="Alejar (Zoom Out)"
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
                 >
@@ -616,44 +548,81 @@ export default function TabPlanos() {
                 </button>
                 <button
                   onClick={() => { setZoomLevel(1); setRotacion(0); }}
-                  title="Restablecer vista"
-                  className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-300 transition"
+                  title="Restablecer vista a tamaño original"
+                  className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-slate-300 transition"
                 >
-                  100%
+                  {Math.round(zoomLevel * 100)}%
                 </button>
+
+                {planoSeleccionado.archivoPdf && (
+                  <a
+                    href={planoSeleccionado.archivoPdf}
+                    download={`${planoSeleccionado.codigo}_${planoSeleccionado.titulo}.pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1.5 text-xs font-bold text-white transition shadow-sm"
+                  >
+                    <Download className="h-3.5 w-3.5" /> PDF
+                  </a>
+                )}
+
                 <button
                   onClick={() => setPlanoSeleccionado(null)}
-                  className="ml-2 p-1.5 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white transition"
+                  className="ml-1 p-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition"
+                  title="Cerrar visor"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
-            {/* ÁREA DE CONTENIDO CON ZOOM */}
-            <div className="flex-1 overflow-auto p-4 bg-slate-950 flex items-center justify-center min-h-[400px]">
+            {/* AVISO DE MODIFICACIÓN EN OBRA SI ES LA ESCALERA */}
+            {planoSeleccionado.esModificado && (
+              <div className="bg-amber-500 text-slate-950 px-4 py-2 text-xs font-bold flex items-center gap-2 shadow-inner">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                <span>
+                  <strong>AVISO DE RESIDENCIA:</strong> Este plano de escalera fue modificado durante la ejecución y se ejecutó de otra forma según instrucciones en obra. Se mantiene únicamente como registro histórico.
+                </span>
+              </div>
+            )}
+
+            {/* ÁREA DE VISUALIZACIÓN EN ALTA DEFINICIÓN */}
+            <div className="flex-1 overflow-auto p-4 bg-slate-950 flex items-center justify-center min-h-[480px]">
               <div 
-                className="transition-transform duration-200 origin-center w-full max-w-4xl"
+                className="transition-transform duration-150 origin-center max-w-full"
                 style={{ 
                   transform: `scale(${zoomLevel}) rotate(${rotacion}deg)`,
                 }}
               >
-                {renderPlanoContenido(planoSeleccionado)}
+                {planoSeleccionado.archivoImg ? (
+                  <img
+                    src={planoSeleccionado.archivoImg}
+                    alt={planoSeleccionado.titulo}
+                    className="max-h-[78vh] w-auto object-contain rounded-lg shadow-2xl border border-slate-700 cursor-grab active:cursor-grabbing"
+                  />
+                ) : (
+                  <div className="p-8 text-center text-cyan-400">
+                    <Compass className="h-16 w-16 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm font-bold text-white">{planoSeleccionado.titulo}</p>
+                    <p className="text-xs text-slate-400">{planoSeleccionado.descripcion}</p>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* BARRA INFERIOR DE ACCIONES */}
-            <div className="p-3 bg-slate-900 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
-              <span>
-                💡 Usa los botones de zoom para inspeccionar cotas y armaduras en obra.
+            {/* BARRA INFERIOR DEL VISOR */}
+            <div className="p-3 bg-slate-900 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-slate-400">
+              <span className="text-[11px] text-center sm:text-left">
+                🔍 Usa los botones de zoom para inspeccionar detalles constructivos, armaduras y cotas milimétricas.
               </span>
               <button
                 onClick={() => setPlanoSeleccionado(null)}
-                className="rounded-lg bg-slate-800 hover:bg-slate-700 px-4 py-1.5 text-xs font-bold text-white transition"
+                className="w-full sm:w-auto rounded-lg bg-slate-800 hover:bg-slate-700 px-4 py-1.5 text-xs font-bold text-white transition"
               >
                 Cerrar Visor
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -713,12 +682,12 @@ export default function TabPlanos() {
 
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Título / Descripción del Plano *
+                  Título del Plano *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ej. Detalle de Escalera Metálica de Emergencia"
+                  placeholder="Ej. Planta de Cimentación y Despiece de Vigas"
                   value={nuevoTitulo}
                   onChange={(e) => setNuevoTitulo(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
@@ -728,17 +697,15 @@ export default function TabPlanos() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                    Versión / Revisión
+                    Revisión
                   </label>
                   <input
                     type="text"
                     value={nuevaRevision}
                     onChange={(e) => setNuevaRevision(e.target.value)}
-                    placeholder="Rev. 01 (Aprobado)"
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
                   />
                 </div>
-
                 <div>
                   <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
                     Escala
@@ -747,7 +714,6 @@ export default function TabPlanos() {
                     type="text"
                     value={nuevaEscala}
                     onChange={(e) => setNuevaEscala(e.target.value)}
-                    placeholder="1:50"
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
                   />
                 </div>
@@ -755,58 +721,64 @@ export default function TabPlanos() {
 
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Responsable / Diseñador
+                  Responsable Técnico / Diseñador
                 </label>
                 <input
                   type="text"
                   value={nuevoResponsable}
                   onChange={(e) => setNuevoResponsable(e.target.value)}
-                  placeholder="Ing. Juan González / INGENDES"
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Adjuntar Archivo de Imagen / Plano (Opcional)
-                </label>
-                <input
-                  type="file"
-                  accept="image/*,application/pdf"
-                  onChange={handleArchivoChange}
-                  className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200"
-                />
-                {archivoPreview && (
-                  <div className="mt-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-emerald-700 font-bold flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4" /> Archivo cargado correctamente para visualización
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Notas u Observaciones de Obra
+                  Descripción o Notas Técnicas
                 </label>
                 <textarea
-                  rows="2"
+                  rows={2}
+                  placeholder="Describe los ejes, elementos constructivos o especificaciones..."
                   value={nuevaDescripcion}
                   onChange={(e) => setNuevaDescripcion(e.target.value)}
-                  placeholder="Notas adicionales sobre especificaciones técnicas..."
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              {/* Subir archivo imagen o PDF del plano */}
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                  Archivo del Plano (Imagen / Escaneo)
+                </label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-slate-300 hover:bg-slate-50 cursor-pointer text-xs font-semibold text-slate-600 transition">
+                    <Upload className="h-4 w-4 text-slate-400" />
+                    <span>Seleccionar archivo...</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleArchivoSeleccionado}
+                      className="hidden"
+                    />
+                  </label>
+                  {archivoPreview && (
+                    <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                      <CheckCircle2 className="h-4 w-4" /> Archivo cargado
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowModalSubir(false)}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-slate-900 px-5 py-2 text-xs font-bold text-white hover:bg-slate-800 shadow-sm"
+                  className="px-4 py-2 rounded-lg bg-slate-900 text-xs font-bold text-white hover:bg-slate-800 transition shadow-sm"
                 >
                   Guardar Plano en Repositorio
                 </button>
@@ -815,6 +787,7 @@ export default function TabPlanos() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
