@@ -914,9 +914,9 @@ export default function Home() {
           }`}
         >
           <BarChart3 className="h-4 w-4 text-blue-400" />
-          <span>📊 Balance de Cantidades</span>
+          <span>📊 Cantidades de Obra</span>
           <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-blue-100 text-blue-800">
-            vs. Presupuesto
+            Contratado vs Ejecutado
           </span>
         </button>
 
