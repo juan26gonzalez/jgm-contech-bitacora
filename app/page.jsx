@@ -34,12 +34,16 @@ import {
   FlaskConical,
   Truck,
   Mic,
-  Sparkles
+  Sparkles,
+  BarChart3,
+  Boxes
 } from 'lucide-react';
 import TabCronograma from '../components/TabCronograma';
 import TabPlanos from '../components/TabPlanos';
 import ModuloCalidadConcreto from '../components/ModuloCalidadConcreto';
 import ModuloMixersRemisiones from '../components/ModuloMixersRemisiones';
+import ModuloComparativaCantidades from '../components/ModuloComparativaCantidades';
+import ModuloAlmacenMateriales from '../components/ModuloAlmacenMateriales';
 import CopilotoVozIA from '../components/CopilotoVozIA';
 import ModalEvidenciaFoto from '../components/ModalEvidenciaFoto';
 import ModalReporteEjecutivo from '../components/ModalReporteEjecutivo';
@@ -899,6 +903,38 @@ export default function Home() {
             NTC 3318
           </span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('cantidades')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'cantidades'
+              ? 'bg-blue-900 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <BarChart3 className="h-4 w-4 text-blue-400" />
+          <span>📊 Balance de Cantidades</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-blue-100 text-blue-800">
+            vs. Presupuesto
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('almacen')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'almacen'
+              ? 'bg-teal-900 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <Boxes className="h-4 w-4 text-teal-400" />
+          <span>📦 Almacén & Kardex</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-teal-100 text-teal-800">
+            Bodega
+          </span>
+        </button>
       </div>
 
       {/* VISTA 1: BITÁCORA DE CAPTURA */}
@@ -1585,6 +1621,16 @@ export default function Home() {
       {/* VISTA 5: CONTROL DE RECEPCIÓN DE MIXERS Y REMISIONES (NTC 3318) */}
       {activeTab === 'mixers' && (
         <ModuloMixersRemisiones registros={registros} />
+      )}
+
+      {/* VISTA 6: COMPARATIVA DE CANTIDADES CONTRATADAS VS EJECUTADAS */}
+      {activeTab === 'cantidades' && (
+        <ModuloComparativaCantidades registros={registros} />
+      )}
+
+      {/* VISTA 7: ALMACÉN DE MATERIALES EN OBRA Y CONTROL KARDEX */}
+      {activeTab === 'almacen' && (
+        <ModuloAlmacenMateriales />
       )}
 
       {/* MODAL DE EVIDENCIA FOTOGRÁFICA */}
