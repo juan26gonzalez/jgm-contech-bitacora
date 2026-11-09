@@ -939,9 +939,9 @@ export default function Home() {
           }`}
         >
           <Boxes className="h-4 w-4 text-teal-400" />
-          <span>📦 Almacén & Kardex</span>
+          <span>📦 Almacén, Insumos & Herramientas</span>
           <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-teal-100 text-teal-800">
-            Bodega
+            Bodega & Pañol
           </span>
         </button>
       </div>
