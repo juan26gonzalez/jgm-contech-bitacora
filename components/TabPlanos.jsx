@@ -184,6 +184,22 @@ const PLANOS_OFICIALES = [
     descripcion: "Alimentadores principales, tablero TD-MZ, circuitos de tomas normales y reguladas, luminarias panel 60x60.",
     tipo: "vector_electrico",
     esModificado: false
+  },
+  {
+    id: "PL-CM01",
+    codigo: "CM-01",
+    titulo: "Planta Arquitectónica General - Casa Mendoza 1.1",
+    disciplina: "Revit BIM (Casa Mendoza)",
+    icono: "🏡",
+    revision: "Revit 2027 (Oficial)",
+    escala: "1:50",
+    fecha: "Noviembre 2026",
+    responsable: "Ing. Juan González / Familia Mendoza",
+    descripcion: "Planta arquitectónica general extraída directamente del modelo maestro Casa Mendoza 1.1.rvt. Mampostería, muros, pisos, áreas y distribución en Sabanalarga.",
+    archivoImg: "/planos/plano_casa_mendoza.png",
+    archivoThumb: "/planos/plano_casa_mendoza.png",
+    archivoPdf: "/planos/plano_casa_mendoza.png",
+    esModificado: false
   }
 ];
 
