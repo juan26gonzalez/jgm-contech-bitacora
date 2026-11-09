@@ -789,6 +789,15 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            <a
+              href="https://jg-contech.streamlit.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 border border-blue-200 hover:bg-blue-100 transition shadow-sm"
+              title="Abrir Centro de Control Gerencial BIM 5D"
+            >
+              🏢 App Gerencia BIM ↗
+            </a>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
               <Cloud className="h-3.5 w-3.5" /> Supabase
             </span>
