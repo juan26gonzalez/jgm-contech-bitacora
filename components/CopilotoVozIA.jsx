@@ -218,7 +218,7 @@ export default function CopilotoVozIA({ onDatosDetectados, actividadesDisponible
   };
 
   return (
-    <div className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50/90 via-sky-50/70 to-purple-50/90 p-4 mb-5 shadow-sm transition-all">
+    <div className="rounded-2xl steel-subcard border-slate-400/70 p-4 mb-5 shadow-sm transition-all">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         
         {/* Identificador y Botón de Escucha */}
@@ -229,7 +229,7 @@ export default function CopilotoVozIA({ onDatosDetectados, actividadesDisponible
             className={`relative p-3.5 rounded-2xl font-bold transition shadow-md flex items-center justify-center ${
               escuchando
                 ? 'bg-rose-600 text-white animate-pulse shadow-rose-600/40 ring-4 ring-rose-200'
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20'
+                : 'steel-btn-primary text-white shadow-md'
             }`}
             title={escuchando ? 'Detener dictado' : 'Iniciar dictado por voz'}
           >
@@ -244,11 +244,11 @@ export default function CopilotoVozIA({ onDatosDetectados, actividadesDisponible
 
           <div>
             <div className="flex items-center gap-1.5">
-              <Sparkles className="h-4 w-4 text-indigo-600" />
+              <Sparkles className="h-4 w-4 text-slate-800" />
               <h3 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">
                 Copiloto de IA por Voz JGM
               </h3>
-              <span className="rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-black px-2 py-0.5 border border-indigo-200">
+              <span className="rounded-full bg-slate-200 text-slate-900 text-[10px] font-black px-2 py-0.5 border border-slate-400/70">
                 Dictado en Campo
               </span>
             </div>
@@ -266,14 +266,14 @@ export default function CopilotoVozIA({ onDatosDetectados, actividadesDisponible
           <button
             type="button"
             onClick={() => probarFraseEjemplo('Vaciado de 8.5 metros cúbicos de losa en metaldeck soleado con 1 oficial y 3 ayudantes')}
-            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-100/50 transition truncate max-w-[200px]"
+            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-white/90 border border-slate-300 text-slate-800 hover:bg-slate-200/70 transition truncate max-w-[200px]"
           >
             "8.5 m³ de losa..."
           </button>
           <button
             type="button"
             onClick={() => probarFraseEjemplo('Hoy colocamos 20 metros de mampostería en bloques')}
-            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-100/50 transition truncate max-w-[200px]"
+            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-white/90 border border-slate-300 text-slate-800 hover:bg-slate-200/70 transition truncate max-w-[200px]"
           >
             "20 m² de bloques..."
           </button>
@@ -282,9 +282,9 @@ export default function CopilotoVozIA({ onDatosDetectados, actividadesDisponible
 
       {/* Retroalimentación en Vivo del Copiloto */}
       {(transcripcion || mensajeIA) && (
-        <div className="mt-3 pt-3 border-t border-indigo-100/80 flex flex-col gap-1 text-xs">
+        <div className="mt-3 pt-3 border-t border-slate-300/80 flex flex-col gap-1 text-xs">
           {transcripcion && (
-            <div className="p-2 rounded-lg bg-white/90 border border-indigo-100 text-slate-800 italic font-mono text-[11px]">
+            <div className="p-2 rounded-lg bg-white/90 border border-slate-300 text-slate-800 italic font-mono text-[11px]">
               "{transcripcion}"
             </div>
           )}

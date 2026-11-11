@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="min-h-screen bg-slate-100 flex flex-col justify-between">
+      <body className="min-h-screen bg-[#cbd5e1] text-slate-900 flex flex-col justify-between">
         {children}
       </body>
     </html>

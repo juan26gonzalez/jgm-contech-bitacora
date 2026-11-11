@@ -324,8 +324,8 @@ export default function TabCronograma({ registros = [] }) {
         if (desviacion >= -5) {
           estado = 'en_tiempo';
           estadoLabel = 'Al Día / En Tiempo';
-          colorClass = 'bg-blue-50 text-blue-800 border-blue-300';
-          dotColor = 'bg-blue-500';
+          colorClass = 'bg-slate-200 text-slate-900 border-slate-400';
+          dotColor = 'bg-slate-700';
         } else if (desviacion >= -15) {
           estado = 'en_atencion';
           estadoLabel = 'Alerta Moderada';
@@ -442,7 +442,7 @@ export default function TabCronograma({ registros = [] }) {
   return (
     <div className="space-y-6">
       {/* 1. TARJETA CABECERA DE CONTROL DE CRONOGRAMA */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-2xl steel-card p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
@@ -492,7 +492,7 @@ export default function TabCronograma({ registros = [] }) {
           <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-1">
               <span>ÍNDICE SPI (4D)</span>
-              <Target className="h-4 w-4 text-sky-600" />
+              <Target className="h-4 w-4 text-slate-700" />
             </div>
             <div className={`text-2xl font-black ${kpis.spi >= 0.98 ? 'text-emerald-700' : kpis.spi >= 0.85 ? 'text-amber-600' : 'text-rose-600'}`}>
               {kpis.spi.toFixed(2)}
@@ -542,7 +542,7 @@ export default function TabCronograma({ registros = [] }) {
       </div>
 
       {/* 3. BARRA DE FILTROS Y BÚSQUEDA */}
-      <div className="rounded-xl bg-white p-4 shadow-sm border border-slate-200">
+      <div className="rounded-xl steel-card p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -587,7 +587,7 @@ export default function TabCronograma({ registros = [] }) {
       </div>
 
       {/* 4. TABLA INTERACTIVA DE GANTT / CRONOGRAMA */}
-      <div className="rounded-2xl bg-white shadow-sm border border-slate-200 overflow-hidden">
+      <div className="rounded-2xl steel-card overflow-hidden">
         <div className="p-4 bg-slate-900 text-white flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-emerald-400" />
@@ -684,7 +684,7 @@ export default function TabCronograma({ registros = [] }) {
                             act.pctReal >= 100 
                               ? 'bg-emerald-500' 
                               : act.pctReal >= act.pctProgramado 
-                              ? 'bg-blue-600' 
+                              ? 'bg-slate-800' 
                               : 'bg-amber-500'
                           }`}
                           style={{ width: `${Math.min(act.pctReal, 100)}%` }}
@@ -710,7 +710,7 @@ export default function TabCronograma({ registros = [] }) {
       {/* 5. MODAL DE FICHA TÉCNICA DE ACTIVIDAD (AL HACER CLIC) */}
       {selectedActividad && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-6 shadow-2xl">
             <div className="flex justify-between items-start pb-3 border-b border-slate-100 mb-4">
               <div>
                 <span className="text-xs font-bold text-emerald-600 uppercase">WBS {selectedActividad.wbs}</span>

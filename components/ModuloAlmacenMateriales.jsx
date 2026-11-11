@@ -784,10 +784,10 @@ export default function ModuloAlmacenMateriales() {
     <div className="space-y-6">
 
       {/* CABECERA PRINCIPAL DEL MÓDULO */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+      <div className="rounded-2xl steel-card p-5 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-teal-600 text-white shadow-md shadow-teal-600/20">
+            <div className="p-3 rounded-xl steel-panel-dark text-white shadow-md">
               <Boxes className="h-6 w-6" />
             </div>
             <div>
@@ -795,7 +795,7 @@ export default function ModuloAlmacenMateriales() {
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900">
                   Almacén & Pañol de Obra: Materiales y Herramientas
                 </h2>
-                <span className="rounded-full bg-teal-100 text-teal-800 text-[10px] font-black px-2.5 py-0.5 border border-teal-200">
+                <span className="rounded-full bg-slate-200 text-slate-900 text-[10px] font-black px-2.5 py-0.5 border border-slate-400/70">
                   Bodega & Pañol
                 </span>
               </div>
@@ -841,7 +841,7 @@ export default function ModuloAlmacenMateriales() {
                     setHerrSeleccionadaId(disp ? disp.id : herramientas[0]?.id || '');
                     setShowModalPrestamoHerr(true);
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 text-xs font-bold transition shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-xl steel-btn-primary text-white px-3.5 py-2 text-xs font-bold"
                 >
                   <Wrench className="h-4 w-4" /> Prestar a Cuadrilla
                 </button>
@@ -852,7 +852,7 @@ export default function ModuloAlmacenMateriales() {
                     setHerrSeleccionadaId(enUso ? enUso.id : herramientas[0]?.id || '');
                     setShowModalDevolucionHerr(true);
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white px-3.5 py-2 text-xs font-bold transition shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-xl steel-btn-primary text-white px-3.5 py-2 text-xs font-bold"
                 >
                   <RotateCcw className="h-4 w-4" /> Devolución a Bodega
                 </button>
@@ -881,14 +881,14 @@ export default function ModuloAlmacenMateriales() {
             onClick={() => setSeccionActiva('materiales')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
               seccionActiva === 'materiales'
-                ? 'bg-teal-900 text-white shadow-sm'
+                ? 'steel-btn-primary text-white shadow-sm'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             <Boxes className="h-4 w-4" />
             <span>📦 Materiales e Insumos</span>
             <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-              seccionActiva === 'materiales' ? 'bg-teal-800 text-teal-100' : 'bg-white text-slate-600'
+              seccionActiva === 'materiales' ? 'bg-slate-800 text-slate-200' : 'bg-slate-200 text-slate-800'
             }`}>
               {materiales.length}
             </span>
@@ -898,14 +898,14 @@ export default function ModuloAlmacenMateriales() {
             onClick={() => setSeccionActiva('herramientas')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
               seccionActiva === 'herramientas'
-                ? 'bg-blue-900 text-white shadow-sm'
+                ? 'steel-btn-primary text-white shadow-sm'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            <Wrench className="h-4 w-4 text-blue-400" />
+            <Wrench className="h-4 w-4 text-slate-400" />
             <span>🔨 Herramientas & Equipos Menores</span>
             <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
-              seccionActiva === 'herramientas' ? 'bg-blue-800 text-blue-100' : 'bg-blue-100 text-blue-800'
+              seccionActiva === 'herramientas' ? 'bg-slate-800 text-slate-200' : 'bg-slate-200 text-slate-800'
             }`}>
               {kpisHerr.enUso} en campo
             </span>
@@ -937,7 +937,7 @@ export default function ModuloAlmacenMateriales() {
         <>
           {/* 4 KPIS DE MATERIALES */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Materiales en Inventario
               </span>
@@ -948,7 +948,7 @@ export default function ModuloAlmacenMateriales() {
               <span className="text-[10px] text-slate-500 mt-0.5 block">Controlados en bodega</span>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Stock Crítico / Reorden
               </span>
@@ -963,7 +963,7 @@ export default function ModuloAlmacenMateriales() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Estado de Abastecimiento
               </span>
@@ -973,7 +973,7 @@ export default function ModuloAlmacenMateriales() {
               <span className="text-[10px] text-slate-500 mt-0.5 block">Ítems con stock suficiente</span>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Movimientos de Material
               </span>
@@ -986,7 +986,7 @@ export default function ModuloAlmacenMateriales() {
           </div>
 
           {/* TABLA DE MATERIALES */}
-          <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+          <div className="rounded-2xl steel-card p-5 sm:p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -1082,7 +1082,7 @@ export default function ModuloAlmacenMateriales() {
         <>
           {/* 4 KPIS DE HERRAMIENTAS */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Total Herramientas
               </span>
@@ -1093,18 +1093,18 @@ export default function ModuloAlmacenMateriales() {
               <span className="text-[10px] text-slate-500 mt-0.5 block">Inventariados en obra</span>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 En Uso en Campo
               </span>
-              <div className="text-2xl sm:text-3xl font-black text-blue-700 mt-1 flex items-baseline gap-1.5 font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 flex items-baseline gap-1.5 font-mono">
                 {kpisHerr.enUso}
                 <span className="text-xs font-semibold text-slate-400">en frente activo</span>
               </div>
-              <span className="text-[10px] text-blue-700 font-bold mt-0.5 block">Custodia asignada</span>
+              <span className="text-[10px] text-slate-700 font-bold mt-0.5 block">Custodia asignada</span>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Disponibles en Bodega
               </span>
@@ -1115,7 +1115,7 @@ export default function ModuloAlmacenMateriales() {
               <span className="text-[10px] text-emerald-700 font-bold mt-0.5 block">En pañol de obra</span>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl steel-card p-4">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Mantenimiento / Novedad
               </span>
@@ -1132,7 +1132,7 @@ export default function ModuloAlmacenMateriales() {
           </div>
 
           {/* LISTA / CATÁLOGO INTERACTIVO DE HERRAMIENTAS */}
-          <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+          <div className="rounded-2xl steel-card p-5 sm:p-6">
             {/* FILTROS Y BÚSQUEDA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
               <div className="relative flex-1 max-w-md">
@@ -1201,7 +1201,7 @@ export default function ModuloAlmacenMateriales() {
                         <tr key={h.id} className="hover:bg-slate-50 transition">
                           <td className="py-3 px-3">
                             <div className="flex items-center gap-1.5">
-                              <span className="font-mono font-bold text-[10px] bg-blue-50 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200 shrink-0">
+                              <span className="font-mono font-bold text-[10px] bg-slate-200/80 text-slate-900 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
                                 {h.codigo}
                               </span>
                               <strong className="text-slate-900">{h.nombre}</strong>
@@ -1226,7 +1226,7 @@ export default function ModuloAlmacenMateriales() {
                               </span>
                             )}
                             {estaEnUso && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-bold text-blue-800">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-900">
                                 <Wrench className="h-3 w-3" /> En Campo
                               </span>
                             )}
@@ -1240,7 +1240,7 @@ export default function ModuloAlmacenMateriales() {
                           <td className="py-3 px-3">
                             {estaEnUso ? (
                               <div>
-                                <span className="font-bold text-blue-900 block flex items-center gap-1">
+                                <span className="font-bold text-slate-900 block flex items-center gap-1">
                                   👤 {h.custodioActual}
                                 </span>
                                 <span className="text-[10px] text-slate-500 block">
@@ -1266,7 +1266,7 @@ export default function ModuloAlmacenMateriales() {
                                   setHerrSeleccionadaId(h.id);
                                   setShowModalPrestamoHerr(true);
                                 }}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-sm transition"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg steel-btn-primary text-white"
                               >
                                 Prestar
                               </button>
@@ -1278,7 +1278,7 @@ export default function ModuloAlmacenMateriales() {
                                   setHerrSeleccionadaId(h.id);
                                   setShowModalDevolucionHerr(true);
                                 }}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-teal-700 hover:bg-teal-600 text-white shadow-sm transition"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg steel-btn-primary text-white"
                               >
                                 Retornar
                               </button>
@@ -1316,11 +1316,11 @@ export default function ModuloAlmacenMateriales() {
       {seccionActiva === 'kardex' && (
         <div className="space-y-6">
           {/* MOVIMIENTOS DE MATERIALES */}
-          <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+          <div className="rounded-2xl steel-card p-5 sm:p-6">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Boxes className="h-4 w-4 text-teal-600" />
+                  <Boxes className="h-4 w-4 text-slate-800" />
                   Kardex de Materiales (Entradas por Remisión y Despachos)
                 </h3>
                 <p className="text-xs text-slate-500">Historial de entradas con remisiones de proveedor y vales de salida a frentes</p>
@@ -1392,11 +1392,11 @@ export default function ModuloAlmacenMateriales() {
           </div>
 
           {/* HISTORIAL DE PRÉSTAMOS DE HERRAMIENTAS */}
-          <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+          <div className="rounded-2xl steel-card p-5 sm:p-6">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Wrench className="h-4 w-4 text-blue-600" />
+                  <Wrench className="h-4 w-4 text-slate-800" />
                   Historial de Custodia y Préstamos de Herramientas
                 </h3>
                 <p className="text-xs text-slate-500">Registro de salidas de pañol, responsables en campo y retornos de herramientas</p>
@@ -1425,7 +1425,7 @@ export default function ModuloAlmacenMateriales() {
 
                       <td className="py-3 px-3 text-center">
                         {p.tipo === 'prestamo' ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-black text-blue-800">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-900">
                             <Wrench className="h-3 w-3" /> Préstamo
                           </span>
                         ) : (
@@ -1472,7 +1472,7 @@ export default function ModuloAlmacenMateriales() {
       {/* ===================================================================== */}
       {showModalMovimiento && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-200">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-5 sm:p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 {tipoMovimiento === 'entrada' ? (
@@ -1614,10 +1614,10 @@ export default function ModuloAlmacenMateriales() {
       {/* ===================================================================== */}
       {showModalPrestamoHerr && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-200">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-5 sm:p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Wrench className="h-5 w-5 text-blue-600" />
+                <Wrench className="h-5 w-5 text-slate-800" />
                 Prestar Herramienta a Cuadrilla de Obra
               </h3>
               <button
@@ -1708,7 +1708,7 @@ export default function ModuloAlmacenMateriales() {
                 <button
                   type="submit"
                   disabled={herramientas.filter(h => h.estado === 'disponible').length === 0}
-                  className="px-4 py-1.5 text-xs font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-500 shadow-sm disabled:opacity-50"
+                  className="px-4 py-1.5 text-xs font-bold rounded-lg text-white steel-btn-primary disabled:opacity-50"
                 >
                   Confirmar Préstamo y Salida
                 </button>
@@ -1723,10 +1723,10 @@ export default function ModuloAlmacenMateriales() {
       {/* ===================================================================== */}
       {showModalDevolucionHerr && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-200">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-5 sm:p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <RotateCcw className="h-5 w-5 text-teal-600" />
+                <RotateCcw className="h-5 w-5 text-slate-800" />
                 Registrar Retorno de Herramienta a Pañol
               </h3>
               <button
@@ -1802,7 +1802,7 @@ export default function ModuloAlmacenMateriales() {
                 <button
                   type="submit"
                   disabled={herramientas.filter(h => h.estado === 'en_uso').length === 0}
-                  className="px-4 py-1.5 text-xs font-bold rounded-lg text-white bg-teal-700 hover:bg-teal-600 shadow-sm disabled:opacity-50"
+                  className="px-4 py-1.5 text-xs font-bold rounded-lg text-white steel-btn-primary disabled:opacity-50"
                 >
                   Confirmar Devolución e Ingreso
                 </button>
@@ -1817,10 +1817,10 @@ export default function ModuloAlmacenMateriales() {
       {/* ===================================================================== */}
       {showModalNuevaHerr && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-200">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-5 sm:p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Plus className="h-5 w-5 text-blue-600" />
+                <Plus className="h-5 w-5 text-slate-800" />
                 Registrar Nueva Herramienta en Pañol
               </h3>
               <button

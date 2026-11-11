@@ -683,13 +683,15 @@ export default function Home() {
   if (!user) {
     return (
       <main className="flex min-h-screen items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl border-t-8 border-slate-800">
+        <div className="w-full max-w-md rounded-2xl steel-card p-8 shadow-2xl border-t-8 border-t-slate-900">
           <div className="text-center mb-6">
-            <div className="inline-flex p-3 rounded-full bg-slate-100 text-slate-800 mb-2">
-              <HardHat className="h-10 w-10 text-slate-800" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">JGM ConTech</h1>
-            <p className="text-sm font-medium text-slate-500">Bitácora de Obra • Acceso Seguro</p>
+            <img
+              src="/logo-mark.png"
+              alt="JGM ConTech"
+              className="w-20 h-20 rounded-2xl shadow-lg border border-slate-300 mx-auto mb-3"
+            />
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">JGM ConTech</h1>
+            <p className="text-sm font-medium text-slate-600">Bitácora de Obra • Acceso Seguro</p>
           </div>
 
           {loginError && (
@@ -774,17 +776,19 @@ export default function Home() {
       </div>
 
       {/* TARJETA DE CABECERA Y ESTADO DEL PROYECTO */}
-      <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-200 border-t-8 border-t-slate-900 mb-5 no-print">
+      <div className="rounded-2xl steel-card p-5 border-t-8 border-t-slate-900 mb-5 no-print">
         
         {/* BARRA SUPERIOR DE ESTADO Y USUARIO */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-slate-900 text-white">
-              <HardHat className="h-6 w-6" />
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-300/80">
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo-mark.png"
+              alt="JGM ConTech"
+              className="w-11 h-11 rounded-xl border border-slate-300 shadow-md shrink-0"
+            />
             <div>
-              <h1 className="text-xl font-bold text-slate-900 leading-tight">JGM ConTech</h1>
-              <p className="text-xs font-medium text-slate-500">Gestión de Obra Civil & Captura en Campo</p>
+              <h1 className="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">JGM ConTech</h1>
+              <p className="text-xs font-semibold text-slate-600">Gestión de Obra Civil &amp; Captura en Campo</p>
             </div>
           </div>
 
@@ -793,7 +797,7 @@ export default function Home() {
               href="https://jagm2000-jgmcontech.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 border border-blue-200 hover:bg-blue-100 transition shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-full steel-btn-primary px-3 py-1 text-xs font-bold"
               title="Abrir Centro de Control Gerencial BIM 5D (Vercel)"
             >
               🏢 App Gerencia BIM ↗
@@ -801,7 +805,7 @@ export default function Home() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
               <Cloud className="h-3.5 w-3.5" /> Supabase
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 border border-sky-200">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-200/80 px-3 py-1 text-xs font-bold text-slate-800 border border-slate-400/70">
               <Layers className="h-3.5 w-3.5" /> BIM 4D/5D
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">
@@ -816,13 +820,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ETIQUETA DEL PROYECTO */}
-        <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600 border border-slate-200/80 flex flex-wrap justify-between items-center gap-2">
+        {/* ETIQUETA DEL PROYECTO (Cápsula Gunmetal CNC estilo Opción 19) */}
+        <div className="mt-4 rounded-xl steel-panel-dark p-3.5 text-xs text-slate-200 flex flex-wrap justify-between items-center gap-2">
           <div>
-            Proyecto: <strong className="text-slate-900">MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong>
+            Proyecto: <strong className="text-white">MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong>
           </div>
-          <div className="text-slate-500">
-            Contratista: <strong className="text-slate-900">INGENDES S.A.S.</strong> | Interventoría: <strong className="text-slate-900">DOLMEN S.A.</strong>
+          <div className="text-slate-300">
+            Contratista: <strong className="text-white">INGENDES S.A.S.</strong> | Interventoría: <strong className="text-white">DOLMEN S.A.</strong>
           </div>
         </div>
       </div>
@@ -834,8 +838,8 @@ export default function Home() {
           onClick={() => setActiveTab('bitacora')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === 'bitacora'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
           <FileText className="h-4 w-4" />
@@ -852,8 +856,8 @@ export default function Home() {
           onClick={() => setActiveTab('cronograma')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === 'cronograma'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
           <CalendarDays className="h-4 w-4 text-emerald-400" />
@@ -868,14 +872,14 @@ export default function Home() {
           onClick={() => setActiveTab('planos')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === 'planos'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
           <Compass className="h-4 w-4 text-cyan-400" />
           <span>📐 Planos Constructivos</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-            activeTab === 'planos' ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-600'
+            activeTab === 'planos' ? 'bg-slate-800 text-slate-200' : 'bg-slate-200 text-slate-700'
           }`}>
             7 Aprobados
           </span>
@@ -886,13 +890,13 @@ export default function Home() {
           onClick={() => setActiveTab('calidad')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === 'calidad'
-              ? 'bg-purple-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
-          <FlaskConical className="h-4 w-4 text-purple-400" />
-          <span>🧪 Calidad & Cilindros</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-purple-100 text-purple-800">
+          <FlaskConical className="h-4 w-4 text-slate-400" />
+          <span>🧪 Calidad &amp; Cilindros</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
             NSR-10
           </span>
         </button>
@@ -902,13 +906,13 @@ export default function Home() {
           onClick={() => setActiveTab('mixers')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === 'mixers'
-              ? 'bg-amber-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
           <Truck className="h-4 w-4 text-amber-400" />
-          <span>🚚 Mixers & Remisiones</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-amber-100 text-amber-800">
+          <span>🚚 Mixers &amp; Remisiones</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-amber-100 text-amber-900">
             NTC 3318
           </span>
         </button>
@@ -918,13 +922,13 @@ export default function Home() {
           onClick={() => setActiveTab('cantidades')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === 'cantidades'
-              ? 'bg-blue-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
-          <BarChart3 className="h-4 w-4 text-blue-400" />
+          <BarChart3 className="h-4 w-4 text-slate-400" />
           <span>📊 Cantidades de Obra</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-blue-100 text-blue-800">
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
             Contratado vs Ejecutado
           </span>
         </button>
@@ -934,13 +938,13 @@ export default function Home() {
           onClick={() => setActiveTab('almacen')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === 'almacen'
-              ? 'bg-teal-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
-          <Boxes className="h-4 w-4 text-teal-400" />
-          <span>📦 Almacén, Insumos & Herramientas</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-teal-100 text-teal-800">
+          <Boxes className="h-4 w-4 text-slate-400" />
+          <span>📦 Almacén, Insumos &amp; Herramientas</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
             Bodega & Pañol
           </span>
         </button>
@@ -950,7 +954,7 @@ export default function Home() {
       {activeTab === 'bitacora' && (
         <>
           {/* TARJETA PRINCIPAL DEL FORMULARIO */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 mb-6 no-print">
+          <div className="rounded-2xl steel-card p-6 mb-6 no-print">
             
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
               <FileText className="h-5 w-5 text-slate-800" />
@@ -1321,7 +1325,7 @@ export default function Home() {
       </div>
 
       {/* TARJETA DE REGISTROS EN VIVO */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-2xl steel-card p-6">
         
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100 no-print">
           <div>
@@ -1408,7 +1412,7 @@ export default function Home() {
               return (
                 <div 
                   key={item.id} 
-                  className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm space-y-2.5"
+                  className="rounded-xl steel-subcard p-3.5 space-y-2.5"
                 >
                   {/* Cabecera Tarjeta Móvil */}
                   <div className="flex items-center justify-between text-xs">
@@ -1539,7 +1543,7 @@ export default function Home() {
                         {item.actividad}
                       </td>
                       <td className="py-2.5 px-3">
-                        <span className="rounded bg-sky-50 px-1.5 py-0.5 font-bold text-sky-700 text-[10px]">
+                        <span className="rounded bg-slate-200/80 border border-slate-300 px-1.5 py-0.5 font-bold text-slate-800 text-[10px]">
                           {item.unidad}
                         </span>
                       </td>

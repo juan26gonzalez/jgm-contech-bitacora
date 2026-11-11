@@ -137,7 +137,7 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-2 sm:p-4 md:p-6 backdrop-blur-md overflow-y-auto">
-      <div className="w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
+      <div className="w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl steel-card shadow-2xl overflow-hidden">
         
         {/* BARRA SUPERIOR DE CONTROLES (NO IMPRIMIBLE) */}
         <div className="p-3 sm:p-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">

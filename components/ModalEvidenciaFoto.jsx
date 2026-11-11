@@ -30,7 +30,7 @@ export default function ModalEvidenciaFoto({ evidencia, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-3 md:p-6 backdrop-blur-md">
-      <div className="w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
+      <div className="w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl steel-card shadow-2xl overflow-hidden">
         
         {/* CABECERA */}
         <div className="p-4 bg-slate-900 text-white flex items-center justify-between gap-3">

@@ -202,7 +202,7 @@ export default function ModuloMixersRemisiones({ registros = [] }) {
     <div className="space-y-6">
 
       {/* CABECERA DEL MÓDULO */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="rounded-2xl steel-card p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl bg-amber-500 text-white shadow-md shadow-amber-500/20">
             <Truck className="h-6 w-6" />
@@ -240,7 +240,7 @@ export default function ModuloMixersRemisiones({ registros = [] }) {
 
       {/* 4 KPIS DE CONCRETO */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Volumen Total Recibido
           </span>
@@ -253,7 +253,7 @@ export default function ModuloMixersRemisiones({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Viajes de Mixer Despachados
           </span>
@@ -266,7 +266,7 @@ export default function ModuloMixersRemisiones({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Tiempo Promedio de Viaje
           </span>
@@ -279,7 +279,7 @@ export default function ModuloMixersRemisiones({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Tasa de Aceptación Técnica
           </span>
@@ -294,7 +294,7 @@ export default function ModuloMixersRemisiones({ registros = [] }) {
       </div>
 
       {/* TABLA DE REMISIONES */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 border border-slate-200 shadow-sm">
+      <div className="rounded-2xl steel-card p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-sm sm:text-base font-bold text-slate-900">
@@ -393,7 +393,7 @@ export default function ModuloMixersRemisiones({ registros = [] }) {
       {/* MODAL NUEVA REMISIÓN */}
       {mostrarModalNuevo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-200">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-5 sm:p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Truck className="h-5 w-5 text-amber-600" />

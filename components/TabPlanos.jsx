@@ -319,7 +319,7 @@ export default function TabPlanos() {
     <div className="space-y-6">
       
       {/* 1. CABECERA DEL REPOSITORIO DE PLANOS */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+      <div className="rounded-2xl steel-card p-5 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ export default function TabPlanos() {
       </div>
 
       {/* 3. BARRA DE BÚSQUEDA */}
-      <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-200">
+      <div className="rounded-xl steel-subcard p-3">
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <input
@@ -396,7 +396,7 @@ export default function TabPlanos() {
       {/* 4. GRID DE TARJETAS DE PLANOS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {planosFiltrados.length === 0 ? (
-          <div className="col-span-full rounded-2xl bg-white p-12 text-center border border-slate-200">
+          <div className="col-span-full rounded-2xl steel-card p-12 text-center">
             <Compass className="h-12 w-12 text-slate-300 mx-auto mb-3" />
             <h3 className="text-base font-bold text-slate-700">No se encontraron planos</h3>
             <p className="text-xs text-slate-500 mt-1">Prueba con otra palabra clave o agrega un plano nuevo.</p>
@@ -405,7 +405,7 @@ export default function TabPlanos() {
           planosFiltrados.map((plano) => (
             <div
               key={plano.id}
-              className={`rounded-2xl bg-white border shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between ${
+              className={`rounded-2xl steel-card hover:shadow-md transition overflow-hidden flex flex-col justify-between ${
                 plano.esModificado ? 'border-amber-300 bg-amber-50/20' : 'border-slate-200'
               }`}
             >
@@ -646,7 +646,7 @@ export default function TabPlanos() {
       {/* 6. MODAL PARA INSERTAR / CARGAR NUEVO PLANO */}
       {showModalSubir && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start pb-3 border-b border-slate-100 mb-4">
               <div>
                 <h3 className="text-lg font-black text-slate-900">Insertar Nuevo Plano Constructivo</h3>

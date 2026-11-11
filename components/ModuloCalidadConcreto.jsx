@@ -198,9 +198,9 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
     <div className="space-y-6">
       
       {/* CABECERA DEL MÓDULO */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="rounded-2xl steel-card p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-purple-600 text-white shadow-md shadow-purple-600/20">
+          <div className="p-3 rounded-xl steel-panel-dark text-white shadow-md">
             <FlaskConical className="h-6 w-6" />
           </div>
           <div>
@@ -208,7 +208,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">
                 Control de Calidad de Concreto (NSR-10 / NTC)
               </h2>
-              <span className="rounded-full bg-purple-100 text-purple-800 text-[10px] font-black px-2.5 py-0.5 border border-purple-200">
+              <span className="rounded-full bg-slate-200 text-slate-900 text-[10px] font-black px-2.5 py-0.5 border border-slate-400/70">
                 f'c = 24.5 MPa (3500 PSI)
               </span>
             </div>
@@ -221,7 +221,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setMostrarModalNuevo(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white px-3.5 py-2 text-xs font-bold transition shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-xl steel-btn-primary text-white px-3.5 py-2 text-xs font-bold"
           >
             <Plus className="h-4 w-4" /> Registrar Cilindro / Ensayo
           </button>
@@ -236,7 +236,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
 
       {/* 4 TARJETAS DE INDICADORES CLAVE (KPIS) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Total Probetas Ensayadas
           </span>
@@ -249,11 +249,11 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Resistencia Media Obtenida
           </span>
-          <div className="text-2xl sm:text-3xl font-black text-purple-700 mt-1 flex items-baseline gap-1.5">
+          <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 flex items-baseline gap-1.5">
             {estadisticas.promedioMPa}
             <span className="text-xs font-semibold text-slate-400">MPa</span>
           </div>
@@ -262,7 +262,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Índice de Conformidad
           </span>
@@ -275,7 +275,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Slump Promedio en Obra
           </span>
@@ -290,10 +290,10 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
       </div>
 
       {/* CURVA DE MADURACIÓN DEL CONCRETO (NSR-10) */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 border border-slate-200 shadow-sm">
+      <div className="rounded-2xl steel-card p-5 sm:p-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-purple-600" />
+            <TrendingUp className="h-4 w-4 text-slate-800" />
             Curva de Maduración vs. Resistencia Contractual f'c (NSR-10)
           </h3>
           <span className="text-xs text-slate-500 font-mono hidden sm:inline">
@@ -308,10 +308,10 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
           <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
             <div className="flex justify-between items-center text-xs mb-1">
               <span className="font-bold text-slate-700">7 DÍAS (Temprana)</span>
-              <span className="font-mono font-bold text-purple-700">72.6% (17.8 MPa)</span>
+              <span className="font-mono font-bold text-slate-900">72.6% (17.8 MPa)</span>
             </div>
             <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div className="bg-purple-600 h-full rounded-full" style={{ width: '72.6%' }}></div>
+              <div className="bg-slate-800 h-full rounded-full" style={{ width: '72.6%' }}></div>
             </div>
             <div className="flex justify-between items-center text-[10px] text-slate-400 mt-1.5">
               <span>Rango Esperado: 65 - 75%</span>
@@ -322,10 +322,10 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
           <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
             <div className="flex justify-between items-center text-xs mb-1">
               <span className="font-bold text-slate-700">14 DÍAS (Intermedia)</span>
-              <span className="font-mono font-bold text-purple-700">86.5% (21.2 MPa)</span>
+              <span className="font-mono font-bold text-slate-900">86.5% (21.2 MPa)</span>
             </div>
             <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div className="bg-purple-600 h-full rounded-full" style={{ width: '86.5%' }}></div>
+              <div className="bg-slate-800 h-full rounded-full" style={{ width: '86.5%' }}></div>
             </div>
             <div className="flex justify-between items-center text-[10px] text-slate-400 mt-1.5">
               <span>Rango Esperado: 80 - 90%</span>
@@ -350,7 +350,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
       </div>
 
       {/* TABLA DE PROBETAS / ENSAYOS */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 border border-slate-200 shadow-sm">
+      <div className="rounded-2xl steel-card p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-sm sm:text-base font-bold text-slate-900">
@@ -412,7 +412,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
                       item.porcentajeAlcanzado >= 100 
                         ? 'bg-emerald-100 text-emerald-800' 
                         : item.porcentajeAlcanzado >= 65 
-                          ? 'bg-purple-100 text-purple-800' 
+                          ? 'bg-slate-200 text-slate-900 border border-slate-300' 
                           : 'bg-rose-100 text-rose-800'
                     }`}>
                       {item.porcentajeAlcanzado}%
@@ -448,10 +448,10 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
       {/* MODAL PARA AGREGAR NUEVO ENSAYO */}
       {mostrarModalNuevo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-200">
+          <div className="w-full max-w-lg rounded-2xl steel-card p-5 sm:p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <FlaskConical className="h-5 w-5 text-purple-600" />
+                <FlaskConical className="h-5 w-5 text-slate-800" />
                 Registrar Nuevo Ensayo de Cilindro
               </h3>
               <button
@@ -514,7 +514,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
                     onChange={(e) => setResistenciaMPa(e.target.value)}
                     placeholder="Ej. 25.4"
                     required
-                    className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-black text-purple-700"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-black text-slate-900"
                   />
                 </div>
                 <div>
@@ -560,7 +560,7 @@ export default function ModuloCalidadConcreto({ registros = [] }) {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 text-xs font-bold rounded-lg bg-purple-700 hover:bg-purple-600 text-white shadow-sm"
+                  className="px-4 py-1.5 text-xs font-bold rounded-lg steel-btn-primary text-white"
                 >
                   Guardar Cilindro
                 </button>

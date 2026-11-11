@@ -176,10 +176,10 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
     <div className="space-y-6">
 
       {/* CABECERA PRINCIPAL DEL MÓDULO */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+      <div className="rounded-2xl steel-card p-5 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-600/20">
+            <div className="p-3 rounded-xl steel-panel-dark text-white shadow-md">
               <BarChart3 className="h-6 w-6" />
             </div>
             <div>
@@ -187,7 +187,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900">
                   Control de Cantidades de Obra
                 </h2>
-                <span className="rounded-full bg-blue-100 text-blue-800 text-[10px] font-black px-2.5 py-0.5 border border-blue-200">
+                <span className="rounded-full bg-slate-200 text-slate-900 text-[10px] font-black px-2.5 py-0.5 border border-slate-400/70">
                   Frente de Campo
                 </span>
               </div>
@@ -202,7 +202,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
               href="https://jagm2000-jgmcontech.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3.5 py-2 text-xs font-bold transition shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-xl steel-subcard text-slate-800 hover:bg-slate-200 px-3.5 py-2 text-xs font-bold transition shadow-sm"
               title="Abrir Centro de Control Gerencial BIM 5D para ver el presupuesto en dinero"
             >
               🏢 Ver Presupuesto 5D (Gerencia) ↗
@@ -232,7 +232,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
               <p className="text-[11px] text-slate-400">Promedio de avance físico medido sobre las cantidades contractuales</p>
             </div>
             <div className="text-right">
-              <span className="text-xl sm:text-2xl font-black text-blue-700 font-mono">
+              <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
                 {resumenGeneral.avanceFisicoGlobal}%
               </span>
             </div>
@@ -240,7 +240,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
 
           <div className="w-full bg-slate-200 h-3.5 rounded-full overflow-hidden p-0.5">
             <div 
-              className="bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500 h-full rounded-full transition-all duration-500" 
+              className="bg-gradient-to-r from-slate-800 via-slate-600 to-emerald-500 h-full rounded-full transition-all duration-500" 
               style={{ width: `${Math.min(resumenGeneral.avanceFisicoGlobal, 100)}%` }}
             />
           </div>
@@ -255,7 +255,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
       {/* 4 TARJETAS DE INDICADORES FÍSICOS CLAVE */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Total Actividades
           </span>
@@ -267,19 +267,19 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Actividades en Proceso
           </span>
-          <div className="text-lg sm:text-xl font-black text-blue-700 mt-1 font-mono">
+          <div className="text-lg sm:text-xl font-black text-slate-900 mt-1 font-mono">
             {resumenGeneral.itemsEnProceso} frentes
           </div>
-          <span className="text-[10px] text-blue-700 font-bold mt-0.5 block">
+          <span className="text-[10px] text-slate-700 font-bold mt-0.5 block">
             Con avance físico activo
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Actividades Completadas
           </span>
@@ -292,7 +292,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl steel-card p-4">
           <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Mayor Cantidad de Obra
           </span>
@@ -310,7 +310,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
       </div>
 
       {/* TABLA COMPARATIVA PRINCIPAL */}
-      <div className="rounded-2xl bg-white p-5 sm:p-6 shadow-sm border border-slate-200">
+      <div className="rounded-2xl steel-card p-5 sm:p-6">
         
         {/* FILTROS Y BÚSQUEDA */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
@@ -393,7 +393,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
                       {item.contratado.toLocaleString('es-CO')}
                     </td>
 
-                    <td className="py-3 px-3 text-right font-mono font-bold text-blue-700">
+                    <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
                       {item.ejecutado.toLocaleString('es-CO')}
                     </td>
 
@@ -411,7 +411,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
                                 : item.porcentaje >= 99 
                                 ? 'bg-emerald-500' 
                                 : item.porcentaje > 0 
-                                ? 'bg-blue-600' 
+                                ? 'bg-slate-800' 
                                 : 'bg-transparent'
                             }`}
                             style={{ width: `${Math.min(item.porcentaje, 100)}%` }}
@@ -432,7 +432,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
                         </span>
                       )}
                       {item.estado === 'en_proceso' && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-900">
                           <TrendingUp className="h-3 w-3" /> En Curso
                         </span>
                       )}
