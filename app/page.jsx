@@ -79,6 +79,7 @@ const ACTIVIDADES_CATALOGO = [
   { nombre: "Pañete y mortero de revoco en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, desp: 7 },
   { nombre: "Estuco y pintura vinílica en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, desp: 5 },
   { nombre: "Instalación de piso cerámico / enchape", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, desp: 7 },
+  { nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 45.00, desp: 8 },
   { nombre: "Instalación de cielo raso", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, desp: 5 },
   { nombre: "Instalación de guardaescobas", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "ml", meta: 20.00, desp: 5 },
   // Cubiertas
@@ -1073,6 +1074,7 @@ export default function Home() {
                 <option value="Pañete y mortero de revoco en muros">Pañete y mortero de revoco en muros (m²)</option>
                 <option value="Estuco y pintura vinílica en muros">Estuco y pintura vinílica en muros (m²)</option>
                 <option value="Instalación de piso cerámico / enchape">Instalación de piso cerámico / enchape (m²)</option>
+                <option value="Enchape de pared cerámica / porcelanato (Cocina/Baño)">Enchape de pared cerámica / porcelanato - Cocina/Baño (m²)</option>
                 <option value="Instalación de cielo raso">Instalación de cielo raso (m²)</option>
                 <option value="Instalación de guardaescobas">Instalación de guardaescobas (ml)</option>
               </optgroup>
