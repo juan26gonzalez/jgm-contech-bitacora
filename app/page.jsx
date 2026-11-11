@@ -75,6 +75,7 @@ const ACTIVIDADES_CATALOGO = [
   // Mampostería
   { nombre: "Muros en mampostería de bloques de concreto", capitulo: "🧱 MAMPOSTERÍA Y CERRAMIENTOS", unidad: "m²", meta: 120.00, desp: 5 },
   // Acabados
+  { nombre: "Plantilla de concreto e=7cm (Casa Mendoza)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 110.00, desp: 5 },
   { nombre: "Pañete y mortero de revoco en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, desp: 7 },
   { nombre: "Estuco y pintura vinílica en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, desp: 5 },
   { nombre: "Instalación de piso cerámico / enchape", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, desp: 7 },
@@ -313,7 +314,24 @@ export default function Home() {
   };
 
   // Cálculos de alerta en tiempo real
-  const acumuladoActual = mapaAcumulados[actividadSeleccionada] || 0;
+  const esCasaMendozaFrente = ubicacionFrente.startsWith('Casa Mendoza - ');
+  const casaMendozaRoomTag = esCasaMendozaFrente
+    ? ubicacionFrente.replace('Casa Mendoza - ', '').trim()
+    : '';
+  const acumuladoActual = useMemo(() => {
+    if (!actividadSeleccionada) return 0;
+    if (esCasaMendozaFrente) {
+      return registros.reduce((acc, r) => {
+        const act = String(r.actividad || '');
+        if (act.includes('BIM_TAKEOFF')) return acc;
+        if (act.includes('[casa_mendoza]') && act.includes(actividadSeleccionada)) {
+          return acc + (parseFloat(r.cantidad) || 0);
+        }
+        return acc;
+      }, 0);
+    }
+    return mapaAcumulados[actividadSeleccionada] || 0;
+  }, [actividadSeleccionada, esCasaMendozaFrente, mapaAcumulados, registros]);
   const metaActual = actividadInfo?.meta || 0;
   const cantidadNum = parseFloat(cantidad) || 0;
   const totalProyectado = acumuladoActual + cantidadNum;
@@ -501,9 +519,13 @@ export default function Home() {
       return;
     }
 
+    const actividadFinal = esCasaMendozaFrente
+      ? `[casa_mendoza] [${casaMendozaRoomTag}] ${actividadSeleccionada}`
+      : actividadSeleccionada;
+
     const payload = {
       fecha: fecha,
-      actividad: actividadSeleccionada,
+      actividad: actividadFinal,
       unidad: actividadInfo?.unidad || 'und',
       cantidad: cantidadNum,
       desperdicio: parseFloat(desperdicio) || 0
@@ -992,13 +1014,33 @@ export default function Home() {
                 onChange={(e) => setUbicacionFrente(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800"
               >
-                <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
-                <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
-                <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
-                <option value="3er Piso">3er Piso</option>
-                <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
-                <option value="General de Obra">General de Obra</option>
+                <optgroup label="🏢 FRENTES GENERALES / MEZZANINE">
+                  <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
+                  <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
+                  <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
+                  <option value="3er Piso">3er Piso</option>
+                  <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
+                  <option value="General de Obra">General de Obra</option>
+                </optgroup>
+                <optgroup label="🏡 CASA MENDOZA — HABITACIONES (REVIT 1.1)">
+                  <option value="Casa Mendoza - Habitación Mamá">Casa Mendoza — Habitación Mamá</option>
+                  <option value="Casa Mendoza - Habitación Esteban">Casa Mendoza — Habitación Esteban</option>
+                  <option value="Casa Mendoza - Habitación Nan & I">Casa Mendoza — Habitación Nan & I</option>
+                  <option value="Casa Mendoza - Habitación Abuelos">Casa Mendoza — Habitación Abuelos</option>
+                  <option value="Casa Mendoza - Habitación Lisbeth">Casa Mendoza — Habitación Lisbeth</option>
+                  <option value="Casa Mendoza - Habitación Huésped">Casa Mendoza — Habitación Huésped</option>
+                  <option value="Casa Mendoza - Sala">Casa Mendoza — Sala</option>
+                  <option value="Casa Mendoza - Cocina">Casa Mendoza — Cocina</option>
+                  <option value="Casa Mendoza - Baño 1">Casa Mendoza — Baño 1</option>
+                  <option value="Casa Mendoza - Entrada / Puerta 1">Casa Mendoza — Entrada / Puerta 1</option>
+                  <option value="Casa Mendoza - Entrada / Puerta 2">Casa Mendoza — Entrada / Puerta 2</option>
+                </optgroup>
               </select>
+              {esCasaMendozaFrente && (
+                <p className="mt-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-2 py-1">
+                  🔗 Se registrará como <code>[casa_mendoza] [{casaMendozaRoomTag}]</code> para actualizar automáticamente la habitación en Gerencia BIM.
+                </p>
+              )}
             </div>
           </div>
 
@@ -1027,6 +1069,7 @@ export default function Home() {
               </optgroup>
 
               <optgroup label="🎨 ACABADOS Y REVESTIMIENTOS">
+                <option value="Plantilla de concreto e=7cm (Casa Mendoza)">Plantilla de concreto e=7cm - Casa Mendoza (m²)</option>
                 <option value="Pañete y mortero de revoco en muros">Pañete y mortero de revoco en muros (m²)</option>
                 <option value="Estuco y pintura vinílica en muros">Estuco y pintura vinílica en muros (m²)</option>
                 <option value="Instalación de piso cerámico / enchape">Instalación de piso cerámico / enchape (m²)</option>
