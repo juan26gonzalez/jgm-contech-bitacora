@@ -790,11 +790,11 @@ export default function Home() {
 
           <div className="flex items-center gap-2 flex-wrap">
             <a
-              href="https://jg-contech.streamlit.app/"
+              href="https://jagm2000-jgmcontech.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 border border-blue-200 hover:bg-blue-100 transition shadow-sm"
-              title="Abrir Centro de Control Gerencial BIM 5D"
+              title="Abrir Centro de Control Gerencial BIM 5D (Vercel)"
             >
               🏢 App Gerencia BIM ↗
             </a>

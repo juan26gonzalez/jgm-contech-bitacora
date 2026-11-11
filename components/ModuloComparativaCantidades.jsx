@@ -199,11 +199,11 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
 
           <div className="flex items-center gap-2 flex-wrap">
             <a
-              href="https://jg-contech.streamlit.app/"
+              href="https://jagm2000-jgmcontech.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3.5 py-2 text-xs font-bold transition shadow-sm"
-              title="Abrir Centro de Control Gerencial BIM 5D para ver el presupuesto en dinero ($298M COP)"
+              title="Abrir Centro de Control Gerencial BIM 5D para ver el presupuesto en dinero"
             >
               🏢 Ver Presupuesto 5D (Gerencia) ↗
             </a>
