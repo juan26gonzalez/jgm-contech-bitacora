@@ -263,34 +263,222 @@ export const CRONOGRAMA_BASE = [
   }
 ];
 
-export default function TabCronograma({ registros = [] }) {
+// =============================================================================
+// CRONOGRAMA 4D — REMODELACIÓN CASA MENDOZA (SABANALARGA • REVIT 1.1)
+// =============================================================================
+export const CRONOGRAMA_CASA_MENDOZA = [
+  {
+    id: "CM-1.1",
+    wbs: "1.1",
+    nombre: "Muros en mampostería de bloques de concreto",
+    capitulo: "🧱 MAMPOSTERÍA Y CERRAMIENTOS",
+    inicio: "2026-11-02",
+    fin: "2026-11-16",
+    duracionDias: 14,
+    meta: 227.89,
+    unidad: "m²",
+    pesoPct: 16.0,
+    rutaCritica: true,
+    responsable: "Cuadrilla Mampostería",
+    matchKeys: ["mamposteria", "bloque", "muros en mamposteria"]
+  },
+  {
+    id: "CM-1.2",
+    wbs: "1.2",
+    nombre: "Pañete y mortero de revoco en muros",
+    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    inicio: "2026-11-10",
+    fin: "2026-11-26",
+    duracionDias: 16,
+    meta: 455.78,
+    unidad: "m²",
+    pesoPct: 16.0,
+    rutaCritica: true,
+    responsable: "Cuadrilla Pañete",
+    matchKeys: ["panete", "pañete", "revoco"]
+  },
+  {
+    id: "CM-2.1",
+    wbs: "2.1",
+    nombre: "Plantilla de concreto e=7cm (Casa Mendoza)",
+    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    inicio: "2026-11-14",
+    fin: "2026-11-26",
+    duracionDias: 12,
+    meta: 110.00,
+    unidad: "m²",
+    pesoPct: 7.0,
+    rutaCritica: true,
+    responsable: "Cuadrilla Pisos",
+    matchKeys: ["plantilla", "solado"]
+  },
+  {
+    id: "CM-2.2",
+    wbs: "2.2",
+    nombre: "Instalación de piso cerámico / enchape",
+    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    inicio: "2026-11-22",
+    fin: "2026-12-07",
+    duracionDias: 15,
+    meta: 110.00,
+    unidad: "m²",
+    pesoPct: 12.0,
+    rutaCritica: true,
+    responsable: "Enchapadores",
+    matchKeys: ["piso ceramico", "porcelanato", "enchape"]
+  },
+  {
+    id: "CM-2.3",
+    wbs: "2.3",
+    nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)",
+    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    inicio: "2026-11-25",
+    fin: "2026-12-06",
+    duracionDias: 11,
+    meta: 45.00,
+    unidad: "m²",
+    pesoPct: 5.0,
+    rutaCritica: false,
+    responsable: "Enchapadores",
+    matchKeys: ["enchape de pared", "enchape pared"]
+  },
+  {
+    id: "CM-3.1",
+    wbs: "3.1",
+    nombre: "Instalación de cielo raso",
+    capitulo: "☁️ CIELOS RASOS Y AISLAMIENTO",
+    inicio: "2026-11-28",
+    fin: "2026-12-12",
+    duracionDias: 14,
+    meta: 86.65,
+    unidad: "m²",
+    pesoPct: 7.0,
+    rutaCritica: true,
+    responsable: "Cuadrilla Drywall",
+    matchKeys: ["cielo raso", "cielorraso"]
+  },
+  {
+    id: "CM-3.2",
+    wbs: "3.2",
+    nombre: "Instalación de aislamiento termoacústico Frescasa Eco 2-1/2\"",
+    capitulo: "☁️ CIELOS RASOS Y AISLAMIENTO",
+    inicio: "2026-11-30",
+    fin: "2026-12-13",
+    duracionDias: 13,
+    meta: 86.65,
+    unidad: "m²",
+    pesoPct: 4.0,
+    rutaCritica: false,
+    responsable: "Cuadrilla Aislamiento",
+    matchKeys: ["frescasa", "aislamiento", "fibra de vidrio", "termoacustico"]
+  },
+  {
+    id: "CM-4.1",
+    wbs: "4.1",
+    nombre: "Estuco y pintura vinílica en muros",
+    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    inicio: "2026-12-04",
+    fin: "2026-12-19",
+    duracionDias: 15,
+    meta: 455.78,
+    unidad: "m²",
+    pesoPct: 12.0,
+    rutaCritica: false,
+    responsable: "Cuadrilla Pintura",
+    matchKeys: ["estuco", "pintura", "vinilica"]
+  },
+  {
+    id: "CM-5.1",
+    wbs: "5.1",
+    nombre: "Instalación de puertas interiores y baño",
+    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    inicio: "2026-12-10",
+    fin: "2026-12-18",
+    duracionDias: 8,
+    meta: 7.00,
+    unidad: "und",
+    pesoPct: 5.0,
+    rutaCritica: false,
+    responsable: "Carpintería Madera",
+    matchKeys: ["puertas interiores", "puertas"]
+  },
+  {
+    id: "CM-5.2",
+    wbs: "5.2",
+    nombre: "Instalación de puertas y ventanas",
+    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    inicio: "2026-12-12",
+    fin: "2026-12-20",
+    duracionDias: 8,
+    meta: 8.00,
+    unidad: "und",
+    pesoPct: 4.0,
+    rutaCritica: false,
+    responsable: "Carpintería Aluminio",
+    matchKeys: ["ventanas", "ventaneria", "puertas y ventanas"]
+  },
+  {
+    id: "CM-6.1",
+    wbs: "6.1",
+    nombre: "Montaje de cubierta en Eternit",
+    capitulo: "🏠 CUBIERTAS",
+    inicio: "2026-11-18",
+    fin: "2026-12-03",
+    duracionDias: 15,
+    meta: 132.05,
+    unidad: "m²",
+    pesoPct: 12.0,
+    rutaCritica: true,
+    responsable: "Cuadrilla Cubiertas",
+    matchKeys: ["cubierta", "eternit", "teja"]
+  }
+];
+
+export default function TabCronograma({ registros = [], proyectoActivo = 'mezzanine' }) {
   const [filtroTexto, setFiltroTexto] = useState('');
   const [filtroCapitulo, setFiltroCapitulo] = useState('todos');
   const [filtroEstado, setFiltroEstado] = useState('todos');
   const [selectedActividad, setSelectedActividad] = useState(null);
 
+  const cronogramaSource = proyectoActivo === 'casa_mendoza' ? CRONOGRAMA_CASA_MENDOZA : CRONOGRAMA_BASE;
+
   // Fecha actual de referencia de obra
   const fechaHoy = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   // Fechas globales del proyecto
-  const fechaInicioGlobal = "2026-10-15";
-  const fechaFinGlobal = "2027-01-15";
+  const fechaInicioGlobal = proyectoActivo === 'casa_mendoza' ? "2026-11-02" : "2026-10-15";
+  const fechaFinGlobal = proyectoActivo === 'casa_mendoza' ? "2026-12-22" : "2027-01-15";
 
   // Calcular el progreso real a partir de la bitácora
   const cronogramaConDatos = useMemo(() => {
-    // Agrupar cantidades ejecutadas por nombre de actividad
-    const acumuladosPorActividad = {};
-    registros.forEach((reg) => {
-      const act = reg.actividad;
-      const cant = parseFloat(reg.cantidad) || 0;
-      acumuladosPorActividad[act] = (acumuladosPorActividad[act] || 0) + cant;
-    });
+    const norm = (s) =>
+      String(s || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
 
     const msPorDia = 1000 * 60 * 60 * 24;
     const tHoy = new Date(fechaHoy).getTime();
 
-    return CRONOGRAMA_BASE.map((item) => {
-      const ejecutado = acumuladosPorActividad[item.nombre] || 0;
+    return cronogramaSource.map((item) => {
+      const targetNorm = norm(item.nombre);
+      const keys = (item.matchKeys || [targetNorm]).map(norm);
+      const isCieloItem = item.id === 'CM-3.1' || item.id === 'ACT-11';
+      const isEnchapePiso = item.id === 'CM-2.2';
+
+      const ejecutado = registros.reduce((acc, reg) => {
+        const raw = String(reg.actividad || '');
+        if (raw.toLowerCase().includes('bim_takeoff')) return acc;
+        const regNorm = norm(raw);
+        if (isCieloItem && (regNorm.includes('frescasa') || regNorm.includes('aislamiento'))) {
+          return acc;
+        }
+        if (isEnchapePiso && (regNorm.includes('pared') || regNorm.includes('enchape pared'))) {
+          return acc;
+        }
+        const matches = regNorm.includes(targetNorm) || keys.some((k) => k && regNorm.includes(k));
+        return matches ? acc + (parseFloat(reg.cantidad) || 0) : acc;
+      }, 0);
       const pctReal = item.meta > 0 ? (ejecutado / item.meta) * 100 : 0;
 
       // Cálculo del porcentaje programado a la fecha de hoy
@@ -351,7 +539,7 @@ export default function TabCronograma({ registros = [] }) {
         dotColor
       };
     });
-  }, [registros, fechaHoy]);
+  }, [cronogramaSource, registros, fechaHoy]);
 
   // KPIs Generales del Proyecto
   const kpis = useMemo(() => {
@@ -388,13 +576,13 @@ export default function TabCronograma({ registros = [] }) {
       diasRestantes,
       actividadesCriticas: cronogramaConDatos.filter(a => a.rutaCritica && a.pctReal < 100).length
     };
-  }, [cronogramaConDatos, fechaHoy]);
+  }, [cronogramaConDatos, fechaHoy, fechaInicioGlobal, fechaFinGlobal]);
 
   // Lista de capítulos únicos para selector
   const capitulos = useMemo(() => {
-    const setCap = new Set(CRONOGRAMA_BASE.map(a => a.capitulo));
+    const setCap = new Set(cronogramaSource.map(a => a.capitulo));
     return ['todos', ...Array.from(setCap)];
-  }, []);
+  }, [cronogramaSource]);
 
   // Filtrado de actividades
   const actividadesFiltradas = useMemo(() => {
@@ -449,10 +637,12 @@ export default function TabCronograma({ registros = [] }) {
               <span className="p-2 rounded-lg bg-slate-900 text-white">
                 <CalendarDays className="h-5 w-5" />
               </span>
-              <h2 className="text-xl font-bold text-slate-900">Cronograma de Obra y Control 4D</h2>
+              <h2 className="text-xl font-bold text-slate-900">
+                Cronograma de Obra y Control 4D — {proyectoActivo === 'casa_mendoza' ? '🏡 Remodelación Casa Mendoza' : '🏢 Mezzanine 3 Niveles'}
+              </h2>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Plataforma del Residente de Obra • Sincronización en Tiempo Real con Bitácora y MS Project
+              Plataforma del Residente de Obra • Sincronización en Tiempo Real con Bitácora y MS Project ({cronogramaSource.length} actividades)
             </p>
           </div>
 

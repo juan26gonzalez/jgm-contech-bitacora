@@ -203,10 +203,16 @@ const PLANOS_OFICIALES = [
   }
 ];
 
-export default function TabPlanos() {
+export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
   const [planos, setPlanos] = useState(PLANOS_OFICIALES);
   const [filtroTexto, setFiltroTexto] = useState('');
-  const [disciplinaActiva, setDisciplinaActiva] = useState('Todas');
+  const [disciplinaActiva, setDisciplinaActiva] = useState(
+    proyectoActivo === 'casa_mendoza' ? 'Revit BIM (Casa Mendoza)' : 'Todas'
+  );
+
+  useEffect(() => {
+    setDisciplinaActiva(proyectoActivo === 'casa_mendoza' ? 'Revit BIM (Casa Mendoza)' : 'Todas');
+  }, [proyectoActivo]);
   
   // Modal de Visor
   const [planoSeleccionado, setPlanoSeleccionado] = useState(null);

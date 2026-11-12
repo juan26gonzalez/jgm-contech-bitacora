@@ -53,30 +53,60 @@ const ITEMS_CONTRATADOS = [
   { item: "6.1", capitulo: "6. MAMPOSTERIA", actividad: "Levante de muro en bloque de cemento No. 12 con dovelas", unidad: "m²", contratado: 367.5, matchKeys: ["muros en mamposteria", "bloque", "mamposteria", "bloques"] },
   { item: "6.2", capitulo: "6. MAMPOSTERIA", actividad: "Viga cinta o superior en concreto reforzado 0.15x0.20", unidad: "ml", contratado: 35.0, matchKeys: ["viga cinta"] },
   { item: "6.3", capitulo: "6. MAMPOSTERIA", actividad: "Alfajía remate muro superior en concreto 0.07x0.15", unidad: "ml", contratado: 32.0, matchKeys: ["alfajia", "alfajía"] },
-  { item: "6.4", capitulo: "6. MAMPOSTERIA", actividad: "Pañete interior relación 1:4 e=0.015", unidad: "m²", contratado: 735.0, matchKeys: ["pañete", "revoco"] },
+  { item: "6.4", capitulo: "6. MAMPOSTERIA", actividad: "Pañete interior relación 1:4 e=0.015", unidad: "m²", contratado: 735.0, matchKeys: ["pañete", "panete", "revoco"] },
   { item: "6.5", capitulo: "6. MAMPOSTERIA", actividad: "Instalación de piso cerámico / enchape", unidad: "m²", contratado: 80.0, matchKeys: ["piso ceramico", "enchape", "ceramica"] }
 ];
 
-export default function ModuloComparativaCantidades({ registros = [] }) {
+const ITEMS_CASA_MENDOZA = [
+  { item: "1.1", capitulo: "1. MAMPOSTERÍA", actividad: "Muros en mampostería de bloques de concreto No. 12", unidad: "m²", contratado: 227.89, matchKeys: ["mamposteria", "bloque", "muro"] },
+  { item: "1.2", capitulo: "1. MAMPOSTERÍA", actividad: "Pañete y mortero de revoco en muros (dos caras)", unidad: "m²", contratado: 455.78, matchKeys: ["panete", "pañete", "revoco"] },
+  { item: "2.1", capitulo: "2. PISOS Y ENCHAPES", actividad: "Plantilla de concreto e=7cm (Casa Mendoza)", unidad: "m²", contratado: 110.00, matchKeys: ["plantilla", "solado"] },
+  { item: "2.2", capitulo: "2. PISOS Y ENCHAPES", actividad: "Instalación de piso en porcelanato 51x51 cm y enchape", unidad: "m²", contratado: 110.00, matchKeys: ["porcelanato", "piso ceramico", "enchape", "ceramica"] },
+  { item: "2.3", capitulo: "2. PISOS Y ENCHAPES", actividad: "Enchape de pared cerámica / porcelanato (Cocina/Baño)", unidad: "m²", contratado: 45.00, matchKeys: ["enchape de pared", "enchape pared"] },
+  { item: "3.1", capitulo: "3. CIELOS RASOS", actividad: "Instalación de cielo raso suspendido e=5.3cm", unidad: "m²", contratado: 86.65, matchKeys: ["cielo raso", "cielorraso", "ceiling"] },
+  { item: "3.2", capitulo: "3. CIELOS RASOS", actividad: "Suministro e instalación de aislamiento Frescasa Eco 2-1/2\" sobre cielo raso (todas las zonas)", unidad: "m²", contratado: 86.65, matchKeys: ["frescasa", "aislamiento", "aislante", "fibra de vidrio", "termoacustico"] },
+  { item: "4.1", capitulo: "4. ACABADOS Y PINTURA", actividad: "Estuco plástico y pintura vinílica en muros", unidad: "m²", contratado: 455.78, matchKeys: ["estuco", "pintura", "vinilica"] },
+  { item: "5.1", capitulo: "5. CARPINTERÍA", actividad: "Suministro e instalación de puertas interiores y acceso", unidad: "und", contratado: 7.0, matchKeys: ["puertas interiores", "puertas"] },
+  { item: "5.2", capitulo: "5. CARPINTERÍA", actividad: "Suministro e instalación de ventanería aluminio y vidrio", unidad: "und", contratado: 8.0, matchKeys: ["ventanas", "ventaneria", "puertas y ventanas"] },
+  { item: "6.1", capitulo: "6. CUBIERTA", actividad: "Montaje de cubierta en teja Eternit y caballetes", unidad: "m²", contratado: 132.05, matchKeys: ["cubierta", "eternit", "teja"] }
+];
+
+export default function ModuloComparativaCantidades({ registros = [], proyectoActivo = 'mezzanine' }) {
   const [filtroCapitulo, setFiltroCapitulo] = useState('todos');
   const [filtroTexto, setFiltroTexto] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('todos');
 
+  const itemsBase = proyectoActivo === 'casa_mendoza' ? ITEMS_CASA_MENDOZA : ITEMS_CONTRATADOS;
+
   // Cruce y normalización reactiva de registros de bitácora contra las cantidades contractuales
   const comparativaData = useMemo(() => {
+    const norm = (s) =>
+      String(s || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+
     // 1. Mapear ejecución acumulada desde la bitácora
     const acumuladosBitacora = {};
     
     registros.forEach((reg) => {
-      const actTexto = (reg.actividad || '').toLowerCase().trim();
+      const actTexto = norm(reg.actividad);
+      if (!actTexto || actTexto.includes('bim_takeoff')) return;
       const cant = parseFloat(reg.cantidad) || 0;
-      
-      // Buscar el ítem contractual que mejor coincida
+      const isFrescasa = actTexto.includes('frescasa') || actTexto.includes('aislamiento') || actTexto.includes('fibra');
+      const isWallTile = actTexto.includes('enchape de pared') || actTexto.includes('enchape pared');
+
+      // Buscar el ítem contractual que mejor coincida (priorizando coincidencia específica)
       let matchedItem = null;
-      for (const item of ITEMS_CONTRATADOS) {
-        if (item.matchKeys.some(key => actTexto.includes(key))) {
+      let bestScore = 0;
+      for (const item of itemsBase) {
+        if (isFrescasa && item.item === '3.1') continue;
+        if (isWallTile && item.item === '2.2') continue;
+        const score = item.matchKeys.reduce((s, key) => (actTexto.includes(norm(key)) ? s + key.length : s), 0);
+        if (score > bestScore) {
+          bestScore = score;
           matchedItem = item.item;
-          break;
         }
       }
 
@@ -86,7 +116,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
     });
 
     // 2. Generar tabla consolidada
-    return ITEMS_CONTRATADOS.map((item) => {
+    return itemsBase.map((item) => {
       const ejecutado = acumuladosBitacora[item.item] || 0;
       const contratado = item.contratado;
       const saldo = Math.max(0, contratado - ejecutado);
@@ -106,7 +136,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
         estado
       };
     });
-  }, [registros]);
+  }, [registros, itemsBase]);
 
   // Totales y KPIs Físicos de Obra
   const resumenGeneral = useMemo(() => {
@@ -146,7 +176,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
     });
   }, [comparativaData, filtroCapitulo, filtroTexto, filtroEstado]);
 
-  const capitulosDisponibles = ['todos', ...new Set(ITEMS_CONTRATADOS.map(i => i.capitulo))];
+  const capitulosDisponibles = ['todos', ...new Set(itemsBase.map(i => i.capitulo))];
 
   const exportarCSV = () => {
     const encabezados = ['Item', 'Capitulo', 'Actividad', 'Unidad', 'Cant_Contratada', 'Cant_Ejecutada', 'Saldo_Pendiente', '%_Avance', 'Estado'];
@@ -188,7 +218,7 @@ export default function ModuloComparativaCantidades({ registros = [] }) {
                   Control de Cantidades de Obra
                 </h2>
                 <span className="rounded-full bg-slate-200 text-slate-900 text-[10px] font-black px-2.5 py-0.5 border border-slate-400/70">
-                  Frente de Campo
+                  {proyectoActivo === 'casa_mendoza' ? '🏡 Casa Mendoza' : '🏢 Mezzanine 3 Niveles'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">

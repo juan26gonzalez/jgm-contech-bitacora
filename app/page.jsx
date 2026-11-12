@@ -64,35 +64,64 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 });
 
 // =============================================================================
-// CATÁLOGO HOMOLOGADO WBS (15 ACTIVIDADES EXACTAS PARA BIM 4D/5D)
+// CONFIGURACIÓN DE PROYECTOS EN CAMPO (SELECTOR BITÁCORA)
+// =============================================================================
+const PROYECTOS_BITACORA = {
+  mezzanine: {
+    id: 'mezzanine',
+    nombre: 'Mezzanine 3 Niveles',
+    tituloBanner: 'MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA',
+    subtitulo1Label: 'Contratista',
+    subtitulo1Valor: 'INGENDES S.A.S.',
+    subtitulo2Label: 'Interventoría',
+    subtitulo2Valor: 'DOLMEN S.A.',
+    defaultFrente: 'Cimentación (Zapatas / Vigas / Foso)',
+  },
+  casa_mendoza: {
+    id: 'casa_mendoza',
+    nombre: 'Remodelación Casa Mendoza',
+    tituloBanner: 'REMODELACIÓN CASA MENDOZA - SABANALARGA (REVIT 1.1)',
+    subtitulo1Label: 'Contratante',
+    subtitulo1Valor: 'FAMILIA MENDOZA',
+    subtitulo2Label: 'Dir. Técnica',
+    subtitulo2Valor: 'ING. JUAN GONZÁLEZ MENDOZA',
+    defaultFrente: 'Casa Mendoza - Habitación Mamá',
+  },
+};
+
+// =============================================================================
+// CATÁLOGO HOMOLOGADO WBS (ACTIVIDADES PARA MEZZANINE Y CASA MENDOZA BIM 4D/5D)
 // =============================================================================
 const ACTIVIDADES_CATALOGO = [
   // Cimentación y Estructura
-  { nombre: "Construcción de plantilla de concreto", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 15.00, desp: 5 },
-  { nombre: "Concreto en zapatas y cimentación", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.50, desp: 7 },
-  { nombre: "Concreto en columnas estructurales", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 2.80, desp: 7 },
-  { nombre: "Concreto en vigas de amarre y aéreas", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.20, desp: 7 },
+  { nombre: "Construcción de plantilla de concreto", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 15.00, desp: 5, proyectos: ['mezzanine'] },
+  { nombre: "Concreto en zapatas y cimentación", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.50, desp: 7, proyectos: ['mezzanine'] },
+  { nombre: "Concreto en columnas estructurales", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 2.80, desp: 7, proyectos: ['mezzanine'] },
+  { nombre: "Concreto en vigas de amarre y aéreas", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.20, desp: 7, proyectos: ['mezzanine'] },
   // Mampostería
-  { nombre: "Muros en mampostería de bloques de concreto", capitulo: "🧱 MAMPOSTERÍA Y CERRAMIENTOS", unidad: "m²", meta: 120.00, desp: 5 },
+  { nombre: "Muros en mampostería de bloques de concreto", capitulo: "🧱 MAMPOSTERÍA Y CERRAMIENTOS", unidad: "m²", meta: 120.00, metaCasaMendoza: 227.89, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
   // Acabados
-  { nombre: "Plantilla de concreto e=7cm (Casa Mendoza)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 110.00, desp: 5 },
-  { nombre: "Pañete y mortero de revoco en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, desp: 7 },
-  { nombre: "Estuco y pintura vinílica en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, desp: 5 },
-  { nombre: "Instalación de piso cerámico / enchape", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, desp: 7 },
-  { nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 45.00, desp: 8 },
-  { nombre: "Instalación de cielo raso", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, desp: 5 },
-  { nombre: "Instalación de aislamiento termoacústico Frescasa Eco 2-1/2\"", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 52.00, desp: 5 },
-  { nombre: "Instalación de guardaescobas", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "ml", meta: 20.00, desp: 5 },
+  { nombre: "Plantilla de concreto e=7cm (Casa Mendoza)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 110.00, desp: 5, proyectos: ['casa_mendoza'] },
+  { nombre: "Pañete y mortero de revoco en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, metaCasaMendoza: 455.78, desp: 7, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Estuco y pintura vinílica en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, metaCasaMendoza: 455.78, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de piso cerámico / enchape", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, metaCasaMendoza: 110.00, desp: 7, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 45.00, desp: 8, proyectos: ['casa_mendoza'] },
+  { nombre: "Instalación de cielo raso", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, metaCasaMendoza: 86.65, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de aislamiento termoacústico Frescasa Eco 2-1/2\"", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 86.65, desp: 5, proyectos: ['casa_mendoza'] },
+  { nombre: "Instalación de guardaescobas", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "ml", meta: 20.00, desp: 5, proyectos: ['mezzanine'] },
   // Cubiertas
-  { nombre: "Montaje de cubierta en Eternit", capitulo: "🏠 CUBIERTAS", unidad: "m²", meta: 150.00, desp: 5 },
+  { nombre: "Montaje de cubierta en Eternit", capitulo: "🏠 CUBIERTAS", unidad: "m²", meta: 150.00, metaCasaMendoza: 132.05, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
   // Carpintería e Instalaciones
-  { nombre: "Instalación de puertas y ventanas", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 10.00, desp: 0 },
-  { nombre: "Instalación de puertas interiores y baño", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 4.00, desp: 0 },
-  { nombre: "Instalación de aparatos sanitarios y lavaplatos", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 3.00, desp: 0 },
-  { nombre: "Red de tubería hidrosanitaria PVC", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "ml", meta: 18.00, desp: 5 }
+  { nombre: "Instalación de puertas y ventanas", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 10.00, metaCasaMendoza: 8.00, desp: 0, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de puertas interiores y baño", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 4.00, metaCasaMendoza: 7.00, desp: 0, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de aparatos sanitarios y lavaplatos", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 3.00, desp: 0, proyectos: ['mezzanine'] },
+  { nombre: "Red de tubería hidrosanitaria PVC", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "ml", meta: 18.00, desp: 5, proyectos: ['mezzanine'] }
 ];
 
 export default function Home() {
+  // Proyecto Activo ('mezzanine' | 'casa_mendoza')
+  const [proyectoActivo, setProyectoActivo] = useState('mezzanine');
+
   // Pestaña Activa ('bitacora', 'cronograma', 'planos')
   const [activeTab, setActiveTab] = useState('bitacora');
 
@@ -177,8 +206,15 @@ export default function Home() {
   // EFECTOS INICIALES
   // ===========================================================================
   useEffect(() => {
-    // Inicializar fecha de hoy
+    // Inicializar fecha de hoy y proyecto activo guardado
     setFecha(new Date().toISOString().split('T')[0]);
+    try {
+      const savedProj = localStorage.getItem('jgm_bitacora_proyecto_activo');
+      if (savedProj === 'mezzanine' || savedProj === 'casa_mendoza') {
+        setProyectoActivo(savedProj);
+        setUbicacionFrente(PROYECTOS_BITACORA[savedProj].defaultFrente);
+      }
+    } catch {}
 
     // Verificar sesión inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -290,16 +326,51 @@ export default function Home() {
   };
 
   // ===========================================================================
-  // CÁLCULOS REACTIVOS (ACUMULADOS Y SOBRECOSTO)
+  // CÁLCULOS REACTIVOS Y AISLAMIENTO POR PROYECTO
   // ===========================================================================
+  const proyectoActualInfo = PROYECTOS_BITACORA[proyectoActivo] || PROYECTOS_BITACORA.mezzanine;
+
+  const handleCambiarProyecto = (nextId) => {
+    if (!PROYECTOS_BITACORA[nextId]) return;
+    setProyectoActivo(nextId);
+    setUbicacionFrente(PROYECTOS_BITACORA[nextId].defaultFrente);
+    setActividadSeleccionada('');
+    try {
+      localStorage.setItem('jgm_bitacora_proyecto_activo', nextId);
+    } catch {}
+  };
+
+  const registrosDelProyecto = useMemo(() => {
+    return registros.filter((r) => {
+      const actRaw = String(r.actividad || '');
+      const actTxt = actRaw.toLowerCase();
+      if (proyectoActivo === 'casa_mendoza') {
+        return actTxt.includes('mendoza') || actTxt.includes('sabanalarga') || actTxt.includes('bim_takeoff');
+      }
+      const rowId = Number(r.id || 0);
+      return (
+        (rowId <= 50 && !actTxt.includes('mendoza') && !actTxt.includes('sabanalarga') && !actRaw.trim().startsWith('[')) ||
+        actTxt.includes('mezzanine') ||
+        actTxt.includes('dolmen') ||
+        actTxt.includes('ingendes')
+      );
+    });
+  }, [registros, proyectoActivo]);
+
+  const actividadesDisponiblesProyecto = useMemo(() => {
+    return ACTIVIDADES_CATALOGO.filter(
+      (a) => !a.proyectos || a.proyectos.includes(proyectoActivo)
+    );
+  }, [proyectoActivo]);
+
   const mapaAcumulados = useMemo(() => {
     const mapa = {};
-    registros.forEach((r) => {
+    registrosDelProyecto.forEach((r) => {
       const cant = parseFloat(r.cantidad) || 0;
       mapa[r.actividad] = (mapa[r.actividad] || 0) + cant;
     });
     return mapa;
-  }, [registros]);
+  }, [registrosDelProyecto]);
 
   const actividadInfo = useMemo(() => {
     return ACTIVIDADES_CATALOGO.find((a) => a.nombre === actividadSeleccionada);
@@ -316,25 +387,30 @@ export default function Home() {
   };
 
   // Cálculos de alerta en tiempo real
+  const esCasaMendozaProyecto = proyectoActivo === 'casa_mendoza';
   const esCasaMendozaFrente = ubicacionFrente.startsWith('Casa Mendoza - ');
   const casaMendozaRoomTag = esCasaMendozaFrente
     ? ubicacionFrente.replace('Casa Mendoza - ', '').trim()
     : '';
   const acumuladoActual = useMemo(() => {
     if (!actividadSeleccionada) return 0;
-    if (esCasaMendozaFrente) {
-      return registros.reduce((acc, r) => {
+    if (esCasaMendozaProyecto) {
+      return registrosDelProyecto.reduce((acc, r) => {
         const act = String(r.actividad || '');
         if (act.includes('BIM_TAKEOFF')) return acc;
-        if (act.includes('[casa_mendoza]') && act.includes(actividadSeleccionada)) {
+        if (act.includes(actividadSeleccionada)) {
           return acc + (parseFloat(r.cantidad) || 0);
         }
         return acc;
       }, 0);
     }
     return mapaAcumulados[actividadSeleccionada] || 0;
-  }, [actividadSeleccionada, esCasaMendozaFrente, mapaAcumulados, registros]);
-  const metaActual = actividadInfo?.meta || 0;
+  }, [actividadSeleccionada, esCasaMendozaProyecto, mapaAcumulados, registrosDelProyecto]);
+
+  const metaActual =
+    esCasaMendozaProyecto && actividadInfo?.metaCasaMendoza !== undefined
+      ? actividadInfo.metaCasaMendoza
+      : actividadInfo?.meta || 0;
   const cantidadNum = parseFloat(cantidad) || 0;
   const totalProyectado = acumuladoActual + cantidadNum;
   const pctProyectado = metaActual > 0 ? (totalProyectado / metaActual) * 100 : 0;
@@ -521,9 +597,12 @@ export default function Home() {
       return;
     }
 
-    const actividadFinal = esCasaMendozaFrente
-      ? `[casa_mendoza] [${casaMendozaRoomTag}] ${actividadSeleccionada}`
-      : actividadSeleccionada;
+    const actividadFinal =
+      esCasaMendozaFrente
+        ? `[casa_mendoza] [${casaMendozaRoomTag}] ${actividadSeleccionada}`
+        : esCasaMendozaProyecto
+        ? `[casa_mendoza] ${actividadSeleccionada}`
+        : actividadSeleccionada;
 
     const payload = {
       fecha: fecha,
@@ -539,6 +618,7 @@ export default function Home() {
       unidad: payload.unidad,
       cantidad: payload.cantidad,
       desperdicio: payload.desperdicio,
+      proyectoId: proyectoActivo,
       ubicacion: ubicacionFrente,
       clima: clima,
       cuadrilla: cuadrilla,
@@ -652,10 +732,17 @@ export default function Home() {
     const hoyStr = new Date().toISOString().split('T')[0];
     const busq = filtroTexto.toLowerCase();
 
-    const todos = [
-      ...offlineQueue.map((item) => ({ ...item, isOffline: true, id: `off-${Math.random()}` })),
-      ...registros
-    ];
+    const colaDelProyecto = offlineQueue
+      .filter((item) => {
+        if (item.proyectoId) return item.proyectoId === proyectoActivo;
+        const txt = String(item.actividad || '').toLowerCase();
+        return proyectoActivo === 'casa_mendoza'
+          ? txt.includes('mendoza') || txt.includes('sabanalarga')
+          : !txt.includes('mendoza') && !txt.includes('sabanalarga');
+      })
+      .map((item) => ({ ...item, isOffline: true, id: item.id || `off-${Math.random()}` }));
+
+    const todos = [...colaDelProyecto, ...registrosDelProyecto];
 
     return todos.filter((item) => {
       const coincide =
@@ -670,22 +757,22 @@ export default function Home() {
       }
       return true;
     });
-  }, [registros, offlineQueue, filtroTexto, filtroFecha]);
+  }, [registrosDelProyecto, offlineQueue, proyectoActivo, filtroTexto, filtroFecha]);
 
   const exportarCSV = () => {
-    if (registros.length === 0) {
-      alert('No hay datos para exportar.');
+    if (registrosDelProyecto.length === 0) {
+      alert('No hay datos de este proyecto para exportar.');
       return;
     }
     let csv = '\uFEFFFecha,Actividad,Unidad,Cantidad,Desperdicio (%)\n';
-    registros.forEach((r) => {
+    registrosDelProyecto.forEach((r) => {
       csv += `"${r.fecha}","${r.actividad}","${r.unidad}",${r.cantidad},${r.desperdicio || 0}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Bitacora_JGMConTech_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `Bitacora_${proyectoActivo}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
   };
 
@@ -795,7 +882,7 @@ export default function Home() {
       <div className="hidden print-only text-center mb-6 border-b pb-4">
         <h2 className="text-xl font-bold uppercase text-slate-900">Acta y Memoria de Bitácora Diaria de Obra</h2>
         <p className="text-xs text-slate-600">
-          PROYECTO: MEZZANINE 3 NIVELES SEDE ADMON • CONTRATISTA: INGENDES S.A.S. • INTERVENTORÍA: DOLMEN S.A.
+          PROYECTO: {proyectoActualInfo.tituloBanner} • {proyectoActualInfo.subtitulo1Label.toUpperCase()}: {proyectoActualInfo.subtitulo1Valor} • {proyectoActualInfo.subtitulo2Label.toUpperCase()}: {proyectoActualInfo.subtitulo2Valor}
         </p>
       </div>
 
@@ -844,13 +931,46 @@ export default function Home() {
           </div>
         </div>
 
+        {/* SELECTOR DE PROYECTO ACTIVO EN CAMPO */}
+        <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 bg-slate-200/70 border border-slate-300/80 rounded-xl p-2">
+          <div className="flex items-center gap-2 px-1">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-700">
+              Proyecto en Curso:
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => handleCambiarProyecto('mezzanine')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
+                proyectoActivo === 'mezzanine'
+                  ? 'steel-btn-primary text-white shadow-sm'
+                  : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-slate-50'
+              }`}
+            >
+              <span>🏢 Mezzanine 3 Niveles</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCambiarProyecto('casa_mendoza')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
+                proyectoActivo === 'casa_mendoza'
+                  ? 'bg-emerald-700 text-white shadow-sm border border-emerald-800'
+                  : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-emerald-50 hover:text-emerald-800'
+              }`}
+            >
+              <span>🏡 Casa Mendoza (BIM)</span>
+            </button>
+          </div>
+        </div>
+
         {/* ETIQUETA DEL PROYECTO (Cápsula Gunmetal CNC estilo Opción 19) */}
-        <div className="mt-4 rounded-xl steel-panel-dark p-3.5 text-xs text-slate-200 flex flex-wrap justify-between items-center gap-2">
+        <div className="mt-3 rounded-xl steel-panel-dark p-3.5 text-xs text-slate-200 flex flex-wrap justify-between items-center gap-2">
           <div>
-            Proyecto: <strong className="text-white">MEZZANINE 3 NIVELES - SEDE ADMON BARRANQUILLA</strong>
+            Proyecto: <strong className="text-white">{proyectoActualInfo.tituloBanner}</strong>
           </div>
           <div className="text-slate-300">
-            Contratista: <strong className="text-white">INGENDES S.A.S.</strong> | Interventoría: <strong className="text-white">DOLMEN S.A.</strong>
+            {proyectoActualInfo.subtitulo1Label}: <strong className="text-white">{proyectoActualInfo.subtitulo1Valor}</strong> | {proyectoActualInfo.subtitulo2Label}: <strong className="text-white">{proyectoActualInfo.subtitulo2Valor}</strong>
           </div>
         </div>
       </div>
@@ -871,7 +991,7 @@ export default function Home() {
           <span className={`px-2 py-0.5 rounded-full text-[10px] ${
             activeTab === 'bitacora' ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-600'
           }`}>
-            {registros.length}
+            {registrosDelProyecto.length}
           </span>
         </button>
 
@@ -1009,38 +1129,44 @@ export default function Home() {
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                📍 Nivel / Frente de Obra
+                {esCasaMendozaProyecto ? '🏡 Zona / Habitación (Casa Mendoza)' : '📍 Nivel / Frente de Obra'}
               </label>
               <select
                 value={ubicacionFrente}
                 onChange={(e) => setUbicacionFrente(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800"
               >
-                <optgroup label="🏢 FRENTES GENERALES / MEZZANINE">
-                  <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
-                  <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
-                  <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
-                  <option value="3er Piso">3er Piso</option>
-                  <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
-                  <option value="General de Obra">General de Obra</option>
-                </optgroup>
-                <optgroup label="🏡 CASA MENDOZA — HABITACIONES (REVIT 1.1)">
-                  <option value="Casa Mendoza - Habitación Mamá">Casa Mendoza — Habitación Mamá</option>
-                  <option value="Casa Mendoza - Habitación Esteban">Casa Mendoza — Habitación Esteban</option>
-                  <option value="Casa Mendoza - Habitación Nan & I">Casa Mendoza — Habitación Nan & I</option>
-                  <option value="Casa Mendoza - Habitación Abuelos">Casa Mendoza — Habitación Abuelos</option>
-                  <option value="Casa Mendoza - Habitación Lisbeth">Casa Mendoza — Habitación Lisbeth</option>
-                  <option value="Casa Mendoza - Habitación Huésped">Casa Mendoza — Habitación Huésped</option>
-                  <option value="Casa Mendoza - Sala">Casa Mendoza — Sala</option>
-                  <option value="Casa Mendoza - Cocina">Casa Mendoza — Cocina</option>
-                  <option value="Casa Mendoza - Baño 1">Casa Mendoza — Baño 1</option>
-                  <option value="Casa Mendoza - Entrada / Puerta 1">Casa Mendoza — Entrada / Puerta 1</option>
-                  <option value="Casa Mendoza - Entrada / Puerta 2">Casa Mendoza — Entrada / Puerta 2</option>
-                </optgroup>
+                {esCasaMendozaProyecto ? (
+                  <optgroup label="🏡 CASA MENDOZA — ZONAS Y HABITACIONES (REVIT 1.1)">
+                    <option value="Casa Mendoza - Habitación Mamá">Casa Mendoza — Habitación Mamá</option>
+                    <option value="Casa Mendoza - Habitación Esteban">Casa Mendoza — Habitación Esteban</option>
+                    <option value="Casa Mendoza - Habitación Nan & I">Casa Mendoza — Habitación Nan &amp; I</option>
+                    <option value="Casa Mendoza - Habitación Abuelos">Casa Mendoza — Habitación Abuelos</option>
+                    <option value="Casa Mendoza - Habitación Lisbeth">Casa Mendoza — Habitación Lisbeth</option>
+                    <option value="Casa Mendoza - Habitación Huésped">Casa Mendoza — Habitación Huésped</option>
+                    <option value="Casa Mendoza - Sala">Casa Mendoza — Sala</option>
+                    <option value="Casa Mendoza - Cocina">Casa Mendoza — Cocina</option>
+                    <option value="Casa Mendoza - Baño 1">Casa Mendoza — Baño 1</option>
+                    <option value="Casa Mendoza - Entrada / Puerta 1">Casa Mendoza — Entrada / Puerta 1</option>
+                    <option value="Casa Mendoza - Entrada / Puerta 2">Casa Mendoza — Entrada / Puerta 2</option>
+                    <option value="Casa Mendoza - General">Casa Mendoza — General (Toda la vivienda)</option>
+                  </optgroup>
+                ) : (
+                  <optgroup label="🏢 FRENTES GENERALES / MEZZANINE">
+                    <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
+                    <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
+                    <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
+                    <option value="3er Piso">3er Piso</option>
+                    <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
+                    <option value="General de Obra">General de Obra</option>
+                  </optgroup>
+                )}
               </select>
-              {esCasaMendozaFrente && (
+              {esCasaMendozaProyecto && (
                 <p className="mt-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-2 py-1">
-                  🔗 Se registrará como <code>[casa_mendoza] [{casaMendozaRoomTag}]</code> para actualizar automáticamente la habitación en Gerencia BIM.
+                  🔗 Se registrará como{' '}
+                  <code>{esCasaMendozaFrente ? `[casa_mendoza] [${casaMendozaRoomTag}]` : '[casa_mendoza]'}</code>{' '}
+                  para sincronizar automáticamente con Gerencia BIM 5D.
                 </p>
               )}
             </div>
@@ -1049,7 +1175,7 @@ export default function Home() {
           {/* SELECTOR DE ACTIVIDAD */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              📋 Actividad de Obra (Alineada con MS Project y Revit)
+              📋 Actividad de Obra ({proyectoActualInfo.nombre})
             </label>
             <select
               value={actividadSeleccionada}
@@ -1057,42 +1183,24 @@ export default function Home() {
               required
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800 font-medium text-slate-900"
             >
-              <option value="" disabled>Seleccione una actividad de la obra...</option>
-              
-              <optgroup label="🏗️ CIMENTACIÓN Y ESTRUCTURA">
-                <option value="Construcción de plantilla de concreto">Construcción de plantilla de concreto (m³)</option>
-                <option value="Concreto en zapatas y cimentación">Concreto en zapatas y cimentación (m³)</option>
-                <option value="Concreto en columnas estructurales">Concreto en columnas estructurales (m³)</option>
-                <option value="Concreto en vigas de amarre y aéreas">Concreto en vigas de amarre y aéreas (m³)</option>
-              </optgroup>
-
-              <optgroup label="🧱 MAMPOSTERÍA Y CERRAMIENTOS">
-                <option value="Muros en mampostería de bloques de concreto">Muros en mampostería de bloques de concreto (m²)</option>
-              </optgroup>
-
-              <optgroup label="🎨 ACABADOS Y REVESTIMIENTOS">
-                <option value="Plantilla de concreto e=7cm (Casa Mendoza)">Plantilla de concreto e=7cm - Casa Mendoza (m²)</option>
-                <option value="Pañete y mortero de revoco en muros">Pañete y mortero de revoco en muros (m²)</option>
-                <option value="Estuco y pintura vinílica en muros">Estuco y pintura vinílica en muros (m²)</option>
-                <option value="Instalación de piso cerámico / enchape">Instalación de piso cerámico / enchape (m²)</option>
-                <option value="Enchape de pared cerámica / porcelanato (Cocina/Baño)">Enchape de pared cerámica / porcelanato - Cocina/Baño (m²)</option>
-                <option value="Instalación de cielo raso">Instalación de cielo raso (m²)</option>
-                <option value={'Instalación de aislamiento termoacústico Frescasa Eco 2-1/2"'}>
-                  Instalación de aislamiento Frescasa Eco 2-1/2&quot; - Habitaciones (m²)
-                </option>
-                <option value="Instalación de guardaescobas">Instalación de guardaescobas (ml)</option>
-              </optgroup>
-
-              <optgroup label="🏠 CUBIERTAS">
-                <option value="Montaje de cubierta en Eternit">Montaje de cubierta en Eternit (m²)</option>
-              </optgroup>
-
-              <optgroup label="🚪 CARPINTERÍA E INSTALACIONES">
-                <option value="Instalación de puertas y ventanas">Instalación de puertas y ventanas (und)</option>
-                <option value="Instalación de puertas interiores y baño">Instalación de puertas interiores y baño (und)</option>
-                <option value="Instalación de aparatos sanitarios y lavaplatos">Instalación de aparatos sanitarios y lavaplatos (und)</option>
-                <option value="Red de tubería hidrosanitaria PVC">Red de tubería hidrosanitaria PVC (ml)</option>
-              </optgroup>
+              <option value="" disabled>Seleccione una actividad de {proyectoActualInfo.nombre}...</option>
+              {Array.from(new Set(actividadesDisponiblesProyecto.map((a) => a.capitulo))).map((cap) => (
+                <optgroup key={cap} label={cap}>
+                  {actividadesDisponiblesProyecto
+                    .filter((a) => a.capitulo === cap)
+                    .map((a) => {
+                      const metaItem =
+                        esCasaMendozaProyecto && a.metaCasaMendoza !== undefined
+                          ? a.metaCasaMendoza
+                          : a.meta;
+                      return (
+                        <option key={a.nombre} value={a.nombre}>
+                          {a.nombre} ({a.unidad} • Meta: {metaItem})
+                        </option>
+                      );
+                    })}
+                </optgroup>
+              ))}
             </select>
           </div>
 
@@ -1652,12 +1760,12 @@ export default function Home() {
         {/* FIRMAS DE IMPRESIÓN (SOLO PDF) */}
         <div className="hidden print-only mt-16 pt-8 border-t flex justify-between text-xs">
           <div className="text-center">
-            <p className="border-t border-slate-400 w-48 mx-auto pt-1 font-bold">INGENDES S.A.S.</p>
-            <p className="text-slate-500">Ingeniero Residente de Obra</p>
+            <p className="border-t border-slate-400 w-48 mx-auto pt-1 font-bold">{proyectoActualInfo.subtitulo1Valor}</p>
+            <p className="text-slate-500">{proyectoActualInfo.subtitulo1Label}</p>
           </div>
           <div className="text-center">
-            <p className="border-t border-slate-400 w-48 mx-auto pt-1 font-bold">DOLMEN S.A. E.S.P.</p>
-            <p className="text-slate-500">Interventor / Supervisor Técnico</p>
+            <p className="border-t border-slate-400 w-48 mx-auto pt-1 font-bold">{proyectoActualInfo.subtitulo2Valor}</p>
+            <p className="text-slate-500">{proyectoActualInfo.subtitulo2Label}</p>
           </div>
         </div>
 
@@ -1667,27 +1775,27 @@ export default function Home() {
 
       {/* VISTA 2: CRONOGRAMA DE OBRA (4D) */}
       {activeTab === 'cronograma' && (
-        <TabCronograma registros={registros} />
+        <TabCronograma registros={registrosDelProyecto} proyectoActivo={proyectoActivo} />
       )}
 
       {/* VISTA 3: PLANOS CONSTRUCTIVOS */}
       {activeTab === 'planos' && (
-        <TabPlanos />
+        <TabPlanos proyectoActivo={proyectoActivo} />
       )}
 
       {/* VISTA 4: CONTROL DE CALIDAD Y ROTURA DE CILINDROS (NSR-10) */}
       {activeTab === 'calidad' && (
-        <ModuloCalidadConcreto registros={registros} />
+        <ModuloCalidadConcreto registros={registrosDelProyecto} />
       )}
 
       {/* VISTA 5: CONTROL DE RECEPCIÓN DE MIXERS Y REMISIONES (NTC 3318) */}
       {activeTab === 'mixers' && (
-        <ModuloMixersRemisiones registros={registros} />
+        <ModuloMixersRemisiones registros={registrosDelProyecto} />
       )}
 
       {/* VISTA 6: COMPARATIVA DE CANTIDADES CONTRATADAS VS EJECUTADAS */}
       {activeTab === 'cantidades' && (
-        <ModuloComparativaCantidades registros={registros} />
+        <ModuloComparativaCantidades registros={registrosDelProyecto} proyectoActivo={proyectoActivo} />
       )}
 
       {/* VISTA 7: ALMACÉN DE MATERIALES EN OBRA Y CONTROL KARDEX */}
