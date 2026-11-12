@@ -344,6 +344,9 @@ export default function Home() {
     return registros.filter((r) => {
       const actRaw = String(r.actividad || '');
       const actTxt = actRaw.toLowerCase();
+      // Ignorar sincronizaciones maestras de MS Project
+      if (actTxt.includes('msproject_sync')) return false;
+
       if (proyectoActivo === 'casa_mendoza') {
         return actTxt.includes('mendoza') || actTxt.includes('sabanalarga') || actTxt.includes('bim_takeoff');
       }
