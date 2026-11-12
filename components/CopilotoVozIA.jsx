@@ -54,6 +54,12 @@ const REGLAS_ACTIVIDADES = [
     desperdicio: 5
   },
   {
+    claves: ['frescasa', 'fibra de vidrio', 'aislamiento', 'aislante', 'termoacustico', 'lana de vidrio'],
+    actividad: 'Instalación de aislamiento termoacústico Frescasa Eco 2-1/2"',
+    unidad: 'm²',
+    desperdicio: 5
+  },
+  {
     claves: ['cielo', 'cielorraso', 'drywall', 'yeso', 'durlock'],
     actividad: 'Cielorraso en drywall con estructura galvanizada',
     unidad: 'm²',

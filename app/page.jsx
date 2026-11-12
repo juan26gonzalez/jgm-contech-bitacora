@@ -81,6 +81,7 @@ const ACTIVIDADES_CATALOGO = [
   { nombre: "Instalación de piso cerámico / enchape", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, desp: 7 },
   { nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 45.00, desp: 8 },
   { nombre: "Instalación de cielo raso", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, desp: 5 },
+  { nombre: "Instalación de aislamiento termoacústico Frescasa Eco 2-1/2\"", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 52.00, desp: 5 },
   { nombre: "Instalación de guardaescobas", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "ml", meta: 20.00, desp: 5 },
   // Cubiertas
   { nombre: "Montaje de cubierta en Eternit", capitulo: "🏠 CUBIERTAS", unidad: "m²", meta: 150.00, desp: 5 },
@@ -1076,6 +1077,9 @@ export default function Home() {
                 <option value="Instalación de piso cerámico / enchape">Instalación de piso cerámico / enchape (m²)</option>
                 <option value="Enchape de pared cerámica / porcelanato (Cocina/Baño)">Enchape de pared cerámica / porcelanato - Cocina/Baño (m²)</option>
                 <option value="Instalación de cielo raso">Instalación de cielo raso (m²)</option>
+                <option value={'Instalación de aislamiento termoacústico Frescasa Eco 2-1/2"'}>
+                  Instalación de aislamiento Frescasa Eco 2-1/2&quot; - Habitaciones (m²)
+                </option>
                 <option value="Instalación de guardaescobas">Instalación de guardaescobas (ml)</option>
               </optgroup>
 
