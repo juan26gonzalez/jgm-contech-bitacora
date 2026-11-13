@@ -1,8 +1,9 @@
 import './globals.css';
+import Providers from '../components/Providers';
 
 export const metadata = {
-  title: 'JGM ConTech | Bitácora de Obra',
-  description: 'Control de Obra y Captura en Campo • Ing. Juan González • Conectado a Supabase y BIM 5D/4D',
+  title: 'JGM ConTech | Bitácora de Obra & Field Ops',
+  description: 'Control de Obra, Calidad y Captura en Campo ISO 19650 • Conectado a Supabase y BIM 4D/5D',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -36,7 +37,7 @@ export default function RootLayout({ children }) {
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen bg-[#cbd5e1] text-slate-900 flex flex-col justify-between">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -19,6 +19,7 @@ import {
   Printer, 
   Search, 
   Sun, 
+  Moon,
   CloudRain, 
   Users, 
   FileText,
@@ -36,8 +37,32 @@ import {
   Mic,
   Sparkles,
   BarChart3,
-  Boxes
+  Boxes,
+  Globe,
+  Building2,
+  ExternalLink,
+  User,
+  Clock
 } from 'lucide-react';
+import { useAppPreferences } from '../lib/i18n';
+import {
+  convertInputToMetric,
+  convertQty,
+  localizeActivity,
+  localizeChapter,
+  localizeRoomName,
+  localizeWeather,
+  localizeCrew,
+  localizeBitacoraObservacion,
+} from '../lib/units';
+import {
+  DEMO_SHOWCASE_PROJECT_ID,
+  DEMO_SESSION_STORAGE_KEY,
+  PROYECTO_DEMO_CONFIG,
+  DEMO_CATALOGO_SHOWCASE,
+  DEMO_BITACORA_ROWS,
+} from '../lib/demoFieldData';
+import LoginGateBitacora from '../components/LoginGateBitacora';
 import TabCronograma from '../components/TabCronograma';
 import TabPlanos from '../components/TabPlanos';
 import ModuloCalidadConcreto from '../components/ModuloCalidadConcreto';
@@ -84,43 +109,84 @@ const PROYECTOS_BITACORA = {
     subtitulo1Label: 'Contratante',
     subtitulo1Valor: 'FAMILIA MENDOZA',
     subtitulo2Label: 'Dir. Técnica',
-    subtitulo2Valor: 'ING. JUAN GONZÁLEZ MENDOZA',
+    subtitulo2Valor: 'DIRECCIÓN DE OBRA CIVIL',
     defaultFrente: 'Casa Mendoza - Habitación Mamá',
   },
 };
 
 // =============================================================================
-// CATÁLOGO HOMOLOGADO WBS (ACTIVIDADES PARA MEZZANINE Y CASA MENDOZA BIM 4D/5D)
+// CATÁLOGO HOMOLOGADO WBS (SIN EMOJIS • ADAPTADO A MÉTRICO / IMPERIAL)
 // =============================================================================
 const ACTIVIDADES_CATALOGO = [
   // Cimentación y Estructura
-  { nombre: "Construcción de plantilla de concreto", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 15.00, desp: 5, proyectos: ['mezzanine'] },
-  { nombre: "Concreto en zapatas y cimentación", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.50, desp: 7, proyectos: ['mezzanine'] },
-  { nombre: "Concreto en columnas estructurales", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 2.80, desp: 7, proyectos: ['mezzanine'] },
-  { nombre: "Concreto en vigas de amarre y aéreas", capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.20, desp: 7, proyectos: ['mezzanine'] },
+  { nombre: "Construcción de plantilla de concreto", capitulo: "CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 15.00, desp: 5, proyectos: ['mezzanine'] },
+  { nombre: "Concreto en zapatas y cimentación", capitulo: "CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.50, desp: 7, proyectos: ['mezzanine'] },
+  { nombre: "Concreto en columnas estructurales", capitulo: "CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 2.80, desp: 7, proyectos: ['mezzanine'] },
+  { nombre: "Concreto en vigas de amarre y aéreas", capitulo: "CIMENTACIÓN Y ESTRUCTURA", unidad: "m³", meta: 3.20, desp: 7, proyectos: ['mezzanine'] },
   // Mampostería
-  { nombre: "Muros en mampostería de bloques de concreto", capitulo: "🧱 MAMPOSTERÍA Y CERRAMIENTOS", unidad: "m²", meta: 120.00, metaCasaMendoza: 227.89, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Muros en mampostería de bloques de concreto", capitulo: "MAMPOSTERÍA Y CERRAMIENTOS", unidad: "m²", meta: 120.00, metaCasaMendoza: 227.89, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
   // Acabados
-  { nombre: "Plantilla de concreto e=7cm (Casa Mendoza)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 110.00, desp: 5, proyectos: ['casa_mendoza'] },
-  { nombre: "Pañete y mortero de revoco en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, metaCasaMendoza: 455.78, desp: 7, proyectos: ['mezzanine', 'casa_mendoza'] },
-  { nombre: "Estuco y pintura vinílica en muros", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, metaCasaMendoza: 455.78, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
-  { nombre: "Instalación de piso cerámico / enchape", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, metaCasaMendoza: 110.00, desp: 7, proyectos: ['mezzanine', 'casa_mendoza'] },
-  { nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 45.00, desp: 8, proyectos: ['casa_mendoza'] },
-  { nombre: "Instalación de cielo raso", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, metaCasaMendoza: 86.65, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
-  { nombre: "Instalación de aislamiento termoacústico Frescasa Eco 2-1/2\"", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 86.65, desp: 5, proyectos: ['casa_mendoza'] },
-  { nombre: "Instalación de guardaescobas", capitulo: "🎨 ACABADOS Y REVESTIMIENTOS", unidad: "ml", meta: 20.00, desp: 5, proyectos: ['mezzanine'] },
+  { nombre: "Plantilla de concreto e=7cm (Casa Mendoza)", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 110.00, desp: 5, proyectos: ['casa_mendoza'] },
+  { nombre: "Pañete y mortero de revoco en muros", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, metaCasaMendoza: 455.78, desp: 7, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Estuco y pintura vinílica en muros", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 240.00, metaCasaMendoza: 455.78, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de piso cerámico / enchape", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, metaCasaMendoza: 110.00, desp: 7, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 45.00, desp: 8, proyectos: ['casa_mendoza'] },
+  { nombre: "Instalación de cielo raso", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 80.00, metaCasaMendoza: 86.65, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de aislamiento termoacústico Frescasa Eco 2-1/2\"", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "m²", meta: 86.65, desp: 5, proyectos: ['casa_mendoza'] },
+  { nombre: "Instalación de guardaescobas", capitulo: "ACABADOS Y REVESTIMIENTOS", unidad: "ml", meta: 20.00, desp: 5, proyectos: ['mezzanine'] },
   // Cubiertas
-  { nombre: "Montaje de cubierta en Eternit", capitulo: "🏠 CUBIERTAS", unidad: "m²", meta: 150.00, metaCasaMendoza: 132.05, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Montaje de cubierta en Eternit", capitulo: "CUBIERTAS", unidad: "m²", meta: 150.00, metaCasaMendoza: 132.05, desp: 5, proyectos: ['mezzanine', 'casa_mendoza'] },
   // Carpintería e Instalaciones
-  { nombre: "Instalación de puertas y ventanas", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 10.00, metaCasaMendoza: 8.00, desp: 0, proyectos: ['mezzanine', 'casa_mendoza'] },
-  { nombre: "Instalación de puertas interiores y baño", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 4.00, metaCasaMendoza: 7.00, desp: 0, proyectos: ['mezzanine', 'casa_mendoza'] },
-  { nombre: "Instalación de aparatos sanitarios y lavaplatos", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 3.00, desp: 0, proyectos: ['mezzanine'] },
-  { nombre: "Red de tubería hidrosanitaria PVC", capitulo: "🚪 CARPINTERÍA E INSTALACIONES", unidad: "ml", meta: 18.00, desp: 5, proyectos: ['mezzanine'] }
+  { nombre: "Instalación de puertas y ventanas", capitulo: "CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 10.00, metaCasaMendoza: 8.00, desp: 0, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de puertas interiores y baño", capitulo: "CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 4.00, metaCasaMendoza: 7.00, desp: 0, proyectos: ['mezzanine', 'casa_mendoza'] },
+  { nombre: "Instalación de aparatos sanitarios y lavaplatos", capitulo: "CARPINTERÍA E INSTALACIONES", unidad: "und", meta: 3.00, desp: 0, proyectos: ['mezzanine'] },
+  { nombre: "Red de tubería hidrosanitaria PVC", capitulo: "CARPINTERÍA E INSTALACIONES", unidad: "ml", meta: 18.00, desp: 5, proyectos: ['mezzanine'] }
 ];
 
+const DEMO_ACTIVIDADES_CATALOGO = DEMO_CATALOGO_SHOWCASE.map((item) => ({
+  nombre: item.id,
+  capitulo: item.capitulo,
+  unidad: item.unidad,
+  meta: item.cantidadPresupuesto,
+  desp: 5,
+  proyectos: [DEMO_SHOWCASE_PROJECT_ID],
+}));
+
+const MAP_DEMO_INITIAL_RECORDS = () =>
+  DEMO_BITACORA_ROWS.map((row) => {
+    const metaMatch = DEMO_CATALOGO_SHOWCASE.find((c) => c.id === row.actividad);
+    return {
+      id: row.id,
+      fecha: row.fecha,
+      actividad: row.actividad,
+      unidad: metaMatch?.unidad || 'und',
+      cantidad: row.cantidad_ejecutada,
+      desperdicio: 5,
+      clima: row.clima,
+      cuadrilla: row.cuadrilla,
+      observaciones: row.observaciones,
+      foto: row.evidencia_foto,
+      isDemoRow: true,
+    };
+  });
+
 export default function Home() {
-  // Proyecto Activo ('mezzanine' | 'casa_mendoza')
+  const {
+    lang,
+    setLang,
+    currency,
+    setCurrency,
+    darkTheme,
+    toggleTheme,
+    rates,
+    fxLive,
+    formatQty,
+    unitLabel,
+  } = useAppPreferences();
+
+  // Proyecto Activo ('mezzanine' | 'casa_mendoza' | 'demo_showcase')
   const [proyectoActivo, setProyectoActivo] = useState('mezzanine');
+  const [isDemo, setIsDemo] = useState(false);
 
   // Pestaña Activa ('bitacora', 'cronograma', 'planos')
   const [activeTab, setActiveTab] = useState('bitacora');
@@ -128,8 +194,6 @@ export default function Home() {
   // Estado de Autenticación
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -203,27 +267,70 @@ export default function Home() {
   };
 
   // ===========================================================================
-  // EFECTOS INICIALES
+  // EFECTOS INICIALES & MODO DEMO SANDBOX
   // ===========================================================================
-  useEffect(() => {
-    // Inicializar fecha de hoy y proyecto activo guardado
-    setFecha(new Date().toISOString().split('T')[0]);
+  const enterDemoSession = () => {
     try {
-      const savedProj = localStorage.getItem('jgm_bitacora_proyecto_activo');
-      if (savedProj === 'mezzanine' || savedProj === 'casa_mendoza') {
-        setProyectoActivo(savedProj);
-        setUbicacionFrente(PROYECTOS_BITACORA[savedProj].defaultFrente);
-      }
+      localStorage.setItem(DEMO_SESSION_STORAGE_KEY, 'true');
     } catch {}
+    setIsDemo(true);
+    setUser({ id: 'demo-readonly', email: 'guest.demo@jgmcontech.com', isDemo: true });
+    setProyectoActivo(DEMO_SHOWCASE_PROJECT_ID);
+    setUbicacionFrente('Zona A — Pórticos & Cimentación');
+    setRegistros(MAP_DEMO_INITIAL_RECORDS());
+    setLoginError('');
+    setLoadingAuth(false);
+  };
 
-    // Verificar sesión inicial
+  useEffect(() => {
+    setFecha(new Date().toISOString().split('T')[0]);
+
+    // Verificar sesión inicial Supabase vs Demo Sandbox
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-      setLoadingAuth(false);
+      if (session?.user) {
+        try {
+          localStorage.removeItem(DEMO_SESSION_STORAGE_KEY);
+          const savedProj = localStorage.getItem('jgm_bitacora_proyecto_activo');
+          if (savedProj === 'mezzanine' || savedProj === 'casa_mendoza') {
+            setProyectoActivo(savedProj);
+            setUbicacionFrente(PROYECTOS_BITACORA[savedProj].defaultFrente);
+          }
+        } catch {}
+        setIsDemo(false);
+        setUser(session.user);
+        setLoadingAuth(false);
+      } else {
+        let isDemoSaved = false;
+        try {
+          isDemoSaved = localStorage.getItem(DEMO_SESSION_STORAGE_KEY) === 'true';
+        } catch {}
+        if (isDemoSaved) {
+          enterDemoSession();
+        } else {
+          setUser(null);
+          setIsDemo(false);
+          setLoadingAuth(false);
+        }
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
+      if (session?.user) {
+        try {
+          localStorage.removeItem(DEMO_SESSION_STORAGE_KEY);
+        } catch {}
+        setIsDemo(false);
+        setUser(session.user);
+      } else {
+        let isDemoSaved = false;
+        try {
+          isDemoSaved = localStorage.getItem(DEMO_SESSION_STORAGE_KEY) === 'true';
+        } catch {}
+        if (!isDemoSaved) {
+          setUser(null);
+          setIsDemo(false);
+        }
+      }
       setLoadingAuth(false);
     });
 
@@ -238,11 +345,9 @@ export default function Home() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Cargar cola offline almacenada
     const colaGuardada = JSON.parse(localStorage.getItem('jgm_offline_queue') || '[]');
     setOfflineQueue(colaGuardada);
 
-    // Cargar repositorio de evidencias fotográficas (IndexedDB + localStorage)
     obtenerEvidenciasDeDB().then((dbEvidencias) => {
       try {
         const localFotos = JSON.parse(localStorage.getItem('jgm_evidencias_fotos') || '{}');
@@ -260,12 +365,11 @@ export default function Home() {
     };
   }, []);
 
-  // Cargar datos cuando el usuario esté autenticado
+  // Cargar datos cuando el usuario real esté autenticado (Demo usa sandbox local)
   useEffect(() => {
-    if (user) {
+    if (user && !isDemo) {
       cargarRegistros();
 
-      // Suscribirse a Supabase Realtime
       const channel = supabase
         .channel('jgm_realtime_bitacora')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'bitacora_obra' }, () => {
@@ -277,38 +381,65 @@ export default function Home() {
         supabase.removeChannel(channel);
       };
     }
-  }, [user]);
+  }, [user, isDemo]);
 
   // ===========================================================================
   // MÉTODOS DE BASE DE DATOS Y AUTENTICACIÓN
   // ===========================================================================
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (credsOrEvent) => {
+    let emailVal = '';
+    let passVal = '';
+    if (credsOrEvent?.preventDefault) {
+      credsOrEvent.preventDefault();
+    } else if (credsOrEvent) {
+      emailVal = credsOrEvent.email || '';
+      passVal = credsOrEvent.password || '';
+    }
     setIsLoggingIn(true);
     setLoginError('');
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginEmail.trim(),
-        password: loginPassword,
+        email: emailVal.trim(),
+        password: passVal,
       });
       if (error) throw error;
+      try {
+        localStorage.removeItem(DEMO_SESSION_STORAGE_KEY);
+      } catch {}
+      setIsDemo(false);
+      setProyectoActivo('mezzanine');
+      setUbicacionFrente(PROYECTOS_BITACORA.mezzanine.defaultFrente);
       setUser(data.user);
     } catch (err) {
-      setLoginError(err.message || 'Error al iniciar sesión');
+      setLoginError(err.message || (lang === 'en' ? 'Sign in failed' : 'Error al iniciar sesión'));
     } finally {
       setIsLoggingIn(false);
     }
   };
 
   const handleLogout = async () => {
-    if (confirm('¿Deseas cerrar tu sesión?')) {
+    if (isDemo) {
+      try {
+        localStorage.removeItem(DEMO_SESSION_STORAGE_KEY);
+      } catch {}
+      setIsDemo(false);
+      setUser(null);
+      setRegistros([]);
+      return;
+    }
+    const msg = lang === 'en' ? 'Do you want to sign out?' : '¿Deseas cerrar tu sesión?';
+    if (confirm(msg)) {
       await supabase.auth.signOut();
       setUser(null);
     }
   };
 
   const cargarRegistros = async (silencioso = false) => {
+    if (isDemo) {
+      setRegistros(MAP_DEMO_INITIAL_RECORDS());
+      return;
+    }
     if (!silencioso) setLoadingRegistros(true);
     try {
       const { data, error } = await supabase
@@ -328,9 +459,27 @@ export default function Home() {
   // ===========================================================================
   // CÁLCULOS REACTIVOS Y AISLAMIENTO POR PROYECTO
   // ===========================================================================
-  const proyectoActualInfo = PROYECTOS_BITACORA[proyectoActivo] || PROYECTOS_BITACORA.mezzanine;
+  const proyectoActualInfo = useMemo(() => {
+    if (isDemo || proyectoActivo === DEMO_SHOWCASE_PROJECT_ID) {
+      return {
+        id: DEMO_SHOWCASE_PROJECT_ID,
+        nombre: PROYECTO_DEMO_CONFIG.nombre,
+        tituloBanner:
+          lang === 'en'
+            ? 'NORTHBRIDGE CORPORATE HUB — ISO 19650 BIM 5D SHOWCASE'
+            : 'NORTHBRIDGE CORPORATE HUB — SHOWCASE BIM 5D (DEMO)',
+        subtitulo1Label: lang === 'en' ? 'Client' : 'Contratante',
+        subtitulo1Valor: PROYECTO_DEMO_CONFIG.cliente,
+        subtitulo2Label: lang === 'en' ? 'Engineering' : 'Ingeniería',
+        subtitulo2Valor: lang === 'en' ? 'JGM ConTech Engineering Team' : 'Equipo de Ingeniería JGM ConTech',
+        defaultFrente: 'Zona A — Pórticos & Cimentación',
+      };
+    }
+    return PROYECTOS_BITACORA[proyectoActivo] || PROYECTOS_BITACORA.mezzanine;
+  }, [isDemo, proyectoActivo, lang]);
 
   const handleCambiarProyecto = (nextId) => {
+    if (isDemo) return;
     if (!PROYECTOS_BITACORA[nextId]) return;
     setProyectoActivo(nextId);
     setUbicacionFrente(PROYECTOS_BITACORA[nextId].defaultFrente);
@@ -341,10 +490,12 @@ export default function Home() {
   };
 
   const registrosDelProyecto = useMemo(() => {
+    if (isDemo || proyectoActivo === DEMO_SHOWCASE_PROJECT_ID) {
+      return registros;
+    }
     return registros.filter((r) => {
       const actRaw = String(r.actividad || '');
       const actTxt = actRaw.toLowerCase();
-      // Ignorar sincronizaciones maestras de MS Project
       if (actTxt.includes('msproject_sync')) return false;
 
       if (proyectoActivo === 'casa_mendoza') {
@@ -358,13 +509,16 @@ export default function Home() {
         actTxt.includes('ingendes')
       );
     });
-  }, [registros, proyectoActivo]);
+  }, [registros, proyectoActivo, isDemo]);
 
   const actividadesDisponiblesProyecto = useMemo(() => {
+    if (isDemo || proyectoActivo === DEMO_SHOWCASE_PROJECT_ID) {
+      return DEMO_ACTIVIDADES_CATALOGO;
+    }
     return ACTIVIDADES_CATALOGO.filter(
       (a) => !a.proyectos || a.proyectos.includes(proyectoActivo)
     );
-  }, [proyectoActivo]);
+  }, [proyectoActivo, isDemo]);
 
   const mapaAcumulados = useMemo(() => {
     const mapa = {};
@@ -376,14 +530,14 @@ export default function Home() {
   }, [registrosDelProyecto]);
 
   const actividadInfo = useMemo(() => {
-    return ACTIVIDADES_CATALOGO.find((a) => a.nombre === actividadSeleccionada);
-  }, [actividadSeleccionada]);
+    return actividadesDisponiblesProyecto.find((a) => a.nombre === actividadSeleccionada);
+  }, [actividadSeleccionada, actividadesDisponiblesProyecto]);
 
   // Auto-ajustar desperdicio sugerido al elegir actividad
   const handleSelectActividad = (e) => {
     const val = e.target.value;
     setActividadSeleccionada(val);
-    const info = ACTIVIDADES_CATALOGO.find((a) => a.nombre === val);
+    const info = actividadesDisponiblesProyecto.find((a) => a.nombre === val);
     if (info) {
       setDesperdicio(info.desp);
     }
@@ -410,17 +564,19 @@ export default function Home() {
     return mapaAcumulados[actividadSeleccionada] || 0;
   }, [actividadSeleccionada, esCasaMendozaProyecto, mapaAcumulados, registrosDelProyecto]);
 
+  const unidadActividad = actividadInfo?.unidad || 'und';
   const metaActual =
     esCasaMendozaProyecto && actividadInfo?.metaCasaMendoza !== undefined
       ? actividadInfo.metaCasaMendoza
       : actividadInfo?.meta || 0;
-  const cantidadNum = parseFloat(cantidad) || 0;
+  const cantidadInputNum = parseFloat(cantidad) || 0;
+  const cantidadNum = convertInputToMetric(cantidadInputNum, unidadActividad, lang);
   const totalProyectado = acumuladoActual + cantidadNum;
   const pctProyectado = metaActual > 0 ? (totalProyectado / metaActual) * 100 : 0;
   const isOverBudget = metaActual > 0 && totalProyectado > metaActual;
   const excesoCantidad = totalProyectado - metaActual;
 
-  // Calculadora dimensional reactiva
+  // Calculadora dimensional reactiva (m en ES / ft en EN -> calcula en unidad visual activa)
   useEffect(() => {
     const l = parseFloat(calcLargo) || 0;
     const a = parseFloat(calcAncho) || 0;
@@ -428,16 +584,24 @@ export default function Home() {
     const p = parseInt(calcPiezas) || 1;
 
     let total = 0;
-    if (l > 0 && a > 0 && h > 0) total = l * a * h * p;
-    else if (l > 0 && a > 0 && h === 0) total = l * a * p;
-    else if (l > 0 && a === 0 && h === 0) total = l * p;
+    if (l > 0 && a > 0 && h > 0) {
+      total = l * a * h * p;
+      // En EN (ft * ft * ft = ft3), si la actividad es m3/yd3 convertimos a yd3 (1 yd3 = 27 ft3)
+      if (lang === 'en' && (unidadActividad === 'm³' || unidadActividad === 'm3')) {
+        total = total / 27;
+      }
+    } else if (l > 0 && a > 0 && h === 0) {
+      total = l * a * p;
+    } else if (l > 0 && a === 0 && h === 0) {
+      total = l * p;
+    }
 
     if (total > 0) {
       setCantidad(total.toFixed(2));
     }
-  }, [calcLargo, calcAncho, calcAlto, calcPiezas]);
+  }, [calcLargo, calcAncho, calcAlto, calcPiezas, lang, unidadActividad]);
 
-  // Función robusta de compresión de imagen compatible con celulares (Canvas + Fallback seguro) + Estampado Forense GPS
+  // Función robusta de compresión de imagen compatible con celulares + Estampado Forense GPS
   const comprimirImagen = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -469,44 +633,39 @@ export default function Home() {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
 
-            // Estampado Forense GPS y Metadatos Técnicos de Obra
             if (estamparGPS) {
               const gps = await obtenerCoordenadasGPS();
               const ahora = new Date();
-              const fechaStr = ahora.toLocaleDateString('es-CO');
-              const horaStr = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+              const locale = lang === 'en' ? 'en-US' : 'es-CO';
+              const fechaStr = ahora.toLocaleDateString(locale);
+              const horaStr = ahora.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
               const bannerHeight = Math.max(52, Math.round(height * 0.13));
               const bannerY = height - bannerHeight;
 
-              // Fondo traslúcido técnico estilo cámara forense
               ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
               ctx.fillRect(0, bannerY, width, bannerHeight);
 
-              // Franja superior esmeralda
               ctx.fillStyle = '#10b981';
               ctx.fillRect(0, bannerY, width, 3);
 
-              // Textos técnicos
               const fontSize = Math.max(9, Math.round(width * 0.022));
               ctx.font = `bold ${fontSize}px sans-serif`;
               ctx.fillStyle = '#ffffff';
 
-              // Lado Izquierdo: Coordenadas y Fecha
-              const line1Left = `📍 ${gps.lat}° N, ${gps.lon}° W • BARRANQUILLA • ALT: ${gps.alt}m`;
-              const line2Left = `🕒 ${fechaStr} ${horaStr} • JGM CONTECH`;
+              const line1Left = `GPS ${gps.lat}° N, ${gps.lon}° W • ALT: ${lang === 'en' ? Math.round(gps.alt * 3.28084) + 'ft' : gps.alt + 'm'}`;
+              const line2Left = `${fechaStr} ${horaStr} • JGM CONTECH`;
               ctx.fillText(line1Left, 12, bannerY + fontSize + 6);
 
               ctx.font = `normal ${fontSize - 1}px sans-serif`;
               ctx.fillStyle = '#94a3b8';
               ctx.fillText(line2Left, 12, bannerY + (fontSize * 2) + 12);
 
-              // Lado Derecho: Contrato e Interventoría
               if (width > 440) {
                 ctx.font = `bold ${fontSize - 1}px sans-serif`;
                 ctx.fillStyle = '#38bdf8';
-                const line1Right = 'MEZZANINE 3 NIVELES';
-                const line2Right = 'INGENDES S.A.S. • DOLMEN S.A.';
+                const line1Right = String(proyectoActualInfo.nombre || 'PROJECT SITE').toUpperCase().slice(0, 32);
+                const line2Right = `${proyectoActualInfo.subtitulo1Valor} • ISO 19650`.slice(0, 38);
                 const m1 = ctx.measureText(line1Right);
                 const m2 = ctx.measureText(line2Right);
                 ctx.fillText(line1Right, width - m1.width - 12, bannerY + fontSize + 6);
@@ -525,7 +684,6 @@ export default function Home() {
           }
         };
         img.onerror = () => {
-          // En caso de formatos especiales de celular, usar dataUrl directo
           resolve({ dataUrl: rawData, kb: Math.round(file.size / 1024) });
         };
         img.src = rawData;
@@ -535,7 +693,6 @@ export default function Home() {
     });
   };
 
-  // Compresión y manejo de fotos en el formulario
   const handleFotoSeleccionada = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -550,7 +707,6 @@ export default function Home() {
     }
   };
 
-  // Adjuntar foto a un registro ya existente en la base de datos
   const handleAdjuntarFotoARegistroExistente = async (recordId, file) => {
     if (!file) return;
     const res = await comprimirImagen(file);
@@ -575,28 +731,33 @@ export default function Home() {
     };
     setEvidenciasFotos(nuevasEvidencias);
 
-    // Guardar en almacenamiento permanente IndexedDB y LocalStorage
-    await guardarEvidenciaEnDB(evidenciaActualizada);
-    try {
-      localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
-    } catch (e) {
-      console.warn('Límite en localStorage:', e);
+    if (!isDemo) {
+      await guardarEvidenciaEnDB(evidenciaActualizada);
+      try {
+        localStorage.setItem('jgm_evidencias_fotos', JSON.stringify(nuevasEvidencias));
+      } catch (e) {
+        console.warn('Límite en localStorage:', e);
+      }
     }
 
-    alert('📸 ¡Fotografía vinculada exitosamente a la actividad!');
+    alert(
+      lang === 'en'
+        ? 'Photo successfully linked to field activity.'
+        : 'Fotografía vinculada exitosamente a la actividad.'
+    );
   };
 
   // ===========================================================================
-  // ENVÍO DE DATOS (ONLINE / OFFLINE)
+  // ENVÍO DE DATOS (DEMO SANDBOX / ONLINE SUPABASE / OFFLINE)
   // ===========================================================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!actividadSeleccionada) {
-      alert('⚠️ Seleccione una actividad de obra.');
+      alert(lang === 'en' ? 'Please select a construction activity.' : 'Seleccione una actividad de obra.');
       return;
     }
     if (isNaN(cantidadNum) || cantidadNum <= 0) {
-      alert('⚠️ Ingrese una cantidad válida mayor a cero.');
+      alert(lang === 'en' ? 'Enter a valid quantity greater than zero.' : 'Ingrese una cantidad válida mayor a cero.');
       return;
     }
 
@@ -611,7 +772,7 @@ export default function Home() {
       fecha: fecha,
       actividad: actividadFinal,
       unidad: actividadInfo?.unidad || 'und',
-      cantidad: cantidadNum,
+      cantidad: Number(cantidadNum.toFixed(4)),
       desperdicio: parseFloat(desperdicio) || 0
     };
 
@@ -628,6 +789,35 @@ export default function Home() {
       observaciones: observaciones,
       foto: fotoPreview
     };
+
+    // Sandbox Demo (nunca escribe en Supabase ni localStorage de producción)
+    if (isDemo) {
+      const demoId = Date.now();
+      const newDemoRow = {
+        ...payload,
+        id: demoId,
+        ubicacion: ubicacionFrente,
+        clima,
+        cuadrilla: cuadrilla || (lang === 'en' ? 'Showcase Demo Crew' : 'Cuadrilla Demo'),
+        observaciones: observaciones || ubicacionFrente,
+        foto: fotoPreview || null,
+        isDemoRow: true,
+      };
+      setRegistros((prev) => [newDemoRow, ...prev]);
+      if (fotoPreview || observaciones || cuadrilla) {
+        setEvidenciasFotos((prev) => ({
+          ...prev,
+          [demoId]: { ...evidenciaCompleta, id: demoId },
+        }));
+      }
+      limpiarFormulario();
+      alert(
+        lang === 'en'
+          ? `DEMO SANDBOX: Local preview log added (${formatQty(payload.cantidad, payload.unidad)} ${unitLabel(payload.unidad)}) without writing to cloud database.`
+          : `SANDBOX DEMO: Registro simulado en memoria local (${formatQty(payload.cantidad, payload.unidad)} ${unitLabel(payload.unidad)}), sin modificar Supabase.`
+      );
+      return;
+    }
 
     // Modo Offline
     if (!navigator.onLine) {
@@ -647,7 +837,11 @@ export default function Home() {
       }
 
       limpiarFormulario();
-      alert('📶 MODO OFFLINE: Registro y foto guardados en tu dispositivo. Se sincronizarán al recuperar señal.');
+      alert(
+        lang === 'en'
+          ? 'OFFLINE MODE: Entry & photo backed up on device. Will sync when online.'
+          : 'MODO OFFLINE: Registro y foto guardados en tu dispositivo. Se sincronizarán al recuperar señal.'
+      );
       return;
     }
 
@@ -659,7 +853,6 @@ export default function Home() {
       const recordId = data && data[0] ? data[0].id : Date.now();
       const itemEv = { ...evidenciaCompleta, id: recordId };
 
-      // Guardar evidencia fotográfica en IndexedDB y localStorage
       if (fotoPreview || observaciones || cuadrilla) {
         const nuevasEvidencias = {
           ...evidenciasFotos,
@@ -677,7 +870,11 @@ export default function Home() {
 
       await cargarRegistros(true);
       limpiarFormulario();
-      alert(`✅ ¡Registro y evidencia guardados exitosamente!\n${payload.actividad}: ${payload.cantidad} ${payload.unidad}`);
+      alert(
+        lang === 'en'
+          ? `Entry saved cleanly! ${localizeActivity(payload.actividad, lang)}: ${formatQty(payload.cantidad, payload.unidad)} ${unitLabel(payload.unidad)}`
+          : `Registro y evidencia guardados exitosamente.\n${payload.actividad}: ${formatQty(payload.cantidad, payload.unidad)} ${unitLabel(payload.unidad)}`
+      );
     } catch (err) {
       console.error('Error al registrar:', err);
       const offlineId = `off-${Date.now()}`;
@@ -685,17 +882,21 @@ export default function Home() {
       setOfflineQueue(nuevaCola);
       localStorage.setItem('jgm_offline_queue', JSON.stringify(nuevaCola));
       limpiarFormulario();
-      alert('⚠️ Conexión inestable: Se respaldó en tu dispositivo con la foto adjunta.');
+      alert(
+        lang === 'en'
+          ? 'Unstable connection: Entry & photo backed up locally on device.'
+          : 'Conexión inestable: Se respaldó en tu dispositivo con la foto adjunta.'
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const sincronizarColaOffline = async () => {
+    if (isDemo) return;
     const cola = JSON.parse(localStorage.getItem('jgm_offline_queue') || '[]');
     if (cola.length === 0) return;
 
-    // Extraer solo los campos compatibles con la tabla base de Supabase
     const registrosCompatibles = cola.map(c => ({
       fecha: c.fecha,
       actividad: c.actividad,
@@ -710,7 +911,11 @@ export default function Home() {
         localStorage.removeItem('jgm_offline_queue');
         setOfflineQueue([]);
         await cargarRegistros(true);
-        alert(`✅ Sincronizados ${cola.length} registro(s) que estaban pendientes offline.`);
+        alert(
+          lang === 'en'
+            ? `Synced ${cola.length} pending offline log(s).`
+            : `Sincronizados ${cola.length} registro(s) pendientes offline.`
+        );
       }
     } catch (e) {
       console.error('Error sincronizando cola offline:', e);
@@ -735,21 +940,25 @@ export default function Home() {
     const hoyStr = new Date().toISOString().split('T')[0];
     const busq = filtroTexto.toLowerCase();
 
-    const colaDelProyecto = offlineQueue
-      .filter((item) => {
-        if (item.proyectoId) return item.proyectoId === proyectoActivo;
-        const txt = String(item.actividad || '').toLowerCase();
-        return proyectoActivo === 'casa_mendoza'
-          ? txt.includes('mendoza') || txt.includes('sabanalarga')
-          : !txt.includes('mendoza') && !txt.includes('sabanalarga');
-      })
-      .map((item) => ({ ...item, isOffline: true, id: item.id || `off-${Math.random()}` }));
+    const colaDelProyecto = isDemo
+      ? []
+      : offlineQueue
+          .filter((item) => {
+            if (item.proyectoId) return item.proyectoId === proyectoActivo;
+            const txt = String(item.actividad || '').toLowerCase();
+            return proyectoActivo === 'casa_mendoza'
+              ? txt.includes('mendoza') || txt.includes('sabanalarga')
+              : !txt.includes('mendoza') && !txt.includes('sabanalarga');
+          })
+          .map((item) => ({ ...item, isOffline: true, id: item.id || `off-${Math.random()}` }));
 
     const todos = [...colaDelProyecto, ...registrosDelProyecto];
 
     return todos.filter((item) => {
+      const localizedAct = localizeActivity(item.actividad || '', lang).toLowerCase();
       const coincide =
         (item.actividad || '').toLowerCase().includes(busq) ||
+        localizedAct.includes(busq) ||
         (item.fecha || '').toLowerCase().includes(busq);
       if (!coincide) return false;
 
@@ -760,22 +969,28 @@ export default function Home() {
       }
       return true;
     });
-  }, [registrosDelProyecto, offlineQueue, proyectoActivo, filtroTexto, filtroFecha]);
+  }, [registrosDelProyecto, offlineQueue, proyectoActivo, filtroTexto, filtroFecha, isDemo, lang]);
 
   const exportarCSV = () => {
     if (registrosDelProyecto.length === 0) {
-      alert('No hay datos de este proyecto para exportar.');
+      alert(lang === 'en' ? 'No records available to export.' : 'No hay datos de este proyecto para exportar.');
       return;
     }
-    let csv = '\uFEFFFecha,Actividad,Unidad,Cantidad,Desperdicio (%)\n';
+    let csv =
+      lang === 'en'
+        ? '\uFEFFDate,Activity,Unit,Net Qty,Waste (%)\n'
+        : '\uFEFFFecha,Actividad,Unidad,Cantidad,Desperdicio (%)\n';
     registrosDelProyecto.forEach((r) => {
-      csv += `"${r.fecha}","${r.actividad}","${r.unidad}",${r.cantidad},${r.desperdicio || 0}\n`;
+      const actOut = localizeActivity(r.actividad, lang).replace(/"/g, '""');
+      const unitOut = unitLabel(r.unidad);
+      const qtyOut = convertQty(r.cantidad, r.unidad, lang).toFixed(2);
+      csv += `"${r.fecha}","${actOut}","${unitOut}",${qtyOut},${r.desperdicio || 0}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Bitacora_${proyectoActivo}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `Bitacora_${proyectoActivo}_${lang.toUpperCase()}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
   };
 
@@ -787,112 +1002,69 @@ export default function Home() {
       <div className="flex h-screen items-center justify-center bg-slate-900 text-white">
         <div className="flex items-center gap-3">
           <HardHat className="h-8 w-8 animate-bounce text-emerald-400" />
-          <span className="text-lg font-bold tracking-wide">Cargando JGM ConTech...</span>
+          <span className="text-lg font-bold tracking-wide">
+            {lang === 'en' ? 'Loading JGM ConTech...' : 'Cargando JGM ConTech...'}
+          </span>
         </div>
       </div>
     );
   }
 
-  // VISTA 1: LOGIN SEGURO
+  // VISTA 1: LOGIN SEGURO + ACCESO DEMO INTERACTIVO
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-2xl steel-card p-8 shadow-2xl border-t-8 border-t-slate-900">
-          <div className="text-center mb-6">
-            <img
-              src="/logo-mark.png"
-              alt="JGM ConTech"
-              className="w-20 h-20 rounded-2xl shadow-lg border border-slate-300 mx-auto mb-3"
-            />
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">JGM ConTech</h1>
-            <p className="text-sm font-medium text-slate-600">Bitácora de Obra • Acceso Seguro</p>
-          </div>
-
-          {loginError && (
-            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700 border border-red-200">
-              {loginError}
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                Correo Electrónico
-              </label>
-              <input
-                type="email"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder="juanandresgm12@gmail.com"
-                required
-                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/10"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                Contraseña
-              </label>
-              <input
-                type="password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/10"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoggingIn}
-              className="w-full rounded-lg bg-slate-900 py-3 text-sm font-bold text-white shadow-md transition hover:bg-slate-800 disabled:bg-slate-400"
-            >
-              {isLoggingIn ? 'Verificando credenciales...' : 'Iniciar Sesión en Bitácora'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-xs text-slate-400">
-            JGM ConTech • Plataforma de Ingeniería Civil • Barranquilla
-          </p>
-        </div>
-      </main>
+      <LoginGateBitacora
+        onLogin={handleLogin}
+        onEnterDemo={enterDemoSession}
+        loadingAuth={isLoggingIn}
+        authError={loginError}
+      />
     );
   }
+
+  const fxTooltip = fxLive
+    ? `Live FX • 1 USD = $${rates.USD.toLocaleString('es-CO')} COP | 1 EUR = $${rates.EUR.toLocaleString('es-CO')} COP`
+    : `Ref FX • 1 USD = $${rates.USD.toLocaleString('es-CO')} COP | 1 EUR = $${rates.EUR.toLocaleString('es-CO')} COP`;
 
   // VISTA 2: APLICACIÓN PRINCIPAL (REACT + TAILWIND CSS)
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl">
       
       {/* BANNER OFFLINE */}
-      {(!isOnline || offlineQueue.length > 0) && (
+      {(!isOnline || offlineQueue.length > 0) && !isDemo && (
         <div className="mb-4 flex items-center justify-between rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs font-semibold text-amber-800 shadow-sm no-print">
           <div className="flex items-center gap-2">
             <WifiOff className="h-4 w-4" />
             <span>
               {!isOnline
-                ? 'Modo Sin Conexión: Los registros se respaldan en tu dispositivo y subirán a Supabase al recuperar señal.'
+                ? lang === 'en'
+                  ? 'Offline Mode: Entries are saved locally on your device and will upload once online.'
+                  : 'Modo Sin Conexión: Los registros se respaldan en tu dispositivo y subirán a Supabase al recuperar señal.'
+                : lang === 'en'
+                ? `Syncing ${offlineQueue.length} queued record(s) to cloud...`
                 : `Sincronizando ${offlineQueue.length} registro(s) pendientes con Supabase...`}
             </span>
           </div>
           <span className="rounded-full bg-amber-200 px-2.5 py-0.5 text-amber-900 font-bold">
-            {offlineQueue.length} en cola
+            {offlineQueue.length} {lang === 'en' ? 'queued' : 'en cola'}
           </span>
         </div>
       )}
 
       {/* ENCABEZADO OFICIAL DE IMPRESIÓN */}
       <div className="hidden print-only text-center mb-6 border-b pb-4">
-        <h2 className="text-xl font-bold uppercase text-slate-900">Acta y Memoria de Bitácora Diaria de Obra</h2>
+        <h2 className="text-xl font-bold uppercase text-slate-900">
+          {lang === 'en' ? 'Official Daily Field Log & Site Report' : 'Acta y Memoria de Bitácora Diaria de Obra'}
+        </h2>
         <p className="text-xs text-slate-600">
-          PROYECTO: {proyectoActualInfo.tituloBanner} • {proyectoActualInfo.subtitulo1Label.toUpperCase()}: {proyectoActualInfo.subtitulo1Valor} • {proyectoActualInfo.subtitulo2Label.toUpperCase()}: {proyectoActualInfo.subtitulo2Valor}
+          {lang === 'en' ? 'PROJECT' : 'PROYECTO'}: {proyectoActualInfo.tituloBanner} • {proyectoActualInfo.subtitulo1Label.toUpperCase()}: {proyectoActualInfo.subtitulo1Valor} • {proyectoActualInfo.subtitulo2Label.toUpperCase()}: {proyectoActualInfo.subtitulo2Valor}
         </p>
       </div>
 
       {/* TARJETA DE CABECERA Y ESTADO DEL PROYECTO */}
       <div className="rounded-2xl steel-card p-5 border-t-8 border-t-slate-900 mb-5 no-print">
         
-        {/* BARRA SUPERIOR DE ESTADO Y USUARIO */}
+        {/* BARRA SUPERIOR DE ESTADO, PREFERENCIAS GLOBALES Y USUARIO */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-300/80">
           <div className="flex items-center gap-3">
             <img
@@ -901,35 +1073,116 @@ export default function Home() {
               className="w-11 h-11 rounded-xl border border-slate-300 shadow-md shrink-0"
             />
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">JGM ConTech</h1>
-              <p className="text-xs font-semibold text-slate-600">Gestión de Obra Civil &amp; Captura en Campo</p>
+              <h1 className="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                JGM ConTech
+              </h1>
+              <p className="text-xs font-semibold text-slate-600">
+                {lang === 'en'
+                  ? 'Civil Field Operations & QA Capture'
+                  : 'Gestión de Obra Civil & Captura en Campo'}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <a
               href="https://jagm2000-jgmcontech.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-full steel-btn-primary px-3 py-1 text-xs font-bold"
-              title="Abrir Centro de Control Gerencial BIM 5D (Vercel)"
+              title={lang === 'en' ? 'Open BIM 5D Management Control Center' : 'Abrir Centro de Control Gerencial BIM 5D'}
             >
-              🏢 App Gerencia BIM ↗
+              <Building2 className="h-3.5 w-3.5" />
+              <span>{lang === 'en' ? 'BIM 5D Mgmt App' : 'App Gerencia BIM'}</span>
+              <ExternalLink className="h-3 w-3" />
             </a>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
-              <Cloud className="h-3.5 w-3.5" /> Supabase
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-200/80 px-3 py-1 text-xs font-bold text-slate-800 border border-slate-400/70">
-              <Layers className="h-3.5 w-3.5" /> BIM 4D/5D
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">
-              👤 {user.email?.split('@')[0]}
-            </span>
+
+            {/* Switcher ES / EN */}
+            <div
+              className="inline-flex items-center rounded-full bg-slate-200/80 border border-slate-300 p-0.5 text-[11px] font-black"
+              title={lang === 'en' ? 'Language & Imperial Units' : 'Idioma y Sistema Métrico'}
+            >
+              <Globe className="h-3.5 w-3.5 text-slate-600 mx-1.5" />
+              <button
+                type="button"
+                onClick={() => setLang('es')}
+                className={`px-2 py-0.5 rounded-full transition ${
+                  lang === 'es' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                ES
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang('en')}
+                className={`px-2 py-0.5 rounded-full transition ${
+                  lang === 'en' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                EN
+              </button>
+            </div>
+
+            {/* Switcher Divisa COP / USD / EUR con FX */}
+            <div
+              className="inline-flex items-center rounded-full bg-slate-200/80 border border-slate-300 p-0.5 text-[11px] font-black"
+              title={fxTooltip}
+            >
+              {['COP', 'USD', 'EUR'].map((curr) => (
+                <button
+                  key={curr}
+                  type="button"
+                  onClick={() => setCurrency(curr)}
+                  className={`px-2 py-0.5 rounded-full transition ${
+                    currency === curr
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {curr}
+                </button>
+              ))}
+            </div>
+
+            {/* Toggle Tema Oscuro / Claro */}
             <button
+              type="button"
+              onClick={toggleTheme}
+              title={darkTheme ? (lang === 'en' ? 'Light theme' : 'Tema claro') : (lang === 'en' ? 'Dark theme' : 'Tema oscuro')}
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white p-1.5 text-slate-700 hover:bg-slate-100 transition"
+            >
+              {darkTheme ? <Sun className="h-3.5 w-3.5 text-amber-500" /> : <Moon className="h-3.5 w-3.5" />}
+            </button>
+
+            {isDemo ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black text-amber-800 border border-amber-300">
+                <Sparkles className="h-3.5 w-3.5" />
+                {lang === 'en' ? 'DEMO (READ-ONLY)' : 'DEMO (SOLO LECTURA)'}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
+                <Cloud className="h-3.5 w-3.5" /> Supabase
+              </span>
+            )}
+
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">
+              <User className="h-3.5 w-3.5 text-slate-500" />
+              {isDemo ? 'demo-guest' : user.email?.split('@')[0]}
+            </span>
+
+            <button
+              type="button"
               onClick={handleLogout}
               className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition"
             >
-              <LogOut className="h-3.5 w-3.5" /> Salir
+              <LogOut className="h-3.5 w-3.5" />
+              {isDemo
+                ? lang === 'en'
+                  ? 'Sign In'
+                  : 'Ingresar'
+                : lang === 'en'
+                ? 'Sign Out'
+                : 'Salir'}
             </button>
           </div>
         </div>
@@ -938,47 +1191,65 @@ export default function Home() {
         <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 bg-slate-200/70 border border-slate-300/80 rounded-xl p-2">
           <div className="flex items-center gap-2 px-1">
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-700">
-              Proyecto en Curso:
+              {lang === 'en' ? 'Active Project:' : 'Proyecto en Curso:'}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => handleCambiarProyecto('mezzanine')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
-                proyectoActivo === 'mezzanine'
-                  ? 'steel-btn-primary text-white shadow-sm'
-                  : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              <span>🏢 Mezzanine 3 Niveles</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCambiarProyecto('casa_mendoza')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
-                proyectoActivo === 'casa_mendoza'
-                  ? 'bg-emerald-700 text-white shadow-sm border border-emerald-800'
-                  : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-emerald-50 hover:text-emerald-800'
-              }`}
-            >
-              <span>🏡 Casa Mendoza (BIM)</span>
-            </button>
+            {isDemo ? (
+              <button
+                type="button"
+                className="px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 steel-btn-primary text-white shadow-sm"
+              >
+                <Building2 className="h-3.5 w-3.5 text-emerald-400" />
+                <span>{PROYECTO_DEMO_CONFIG.nombre}</span>
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleCambiarProyecto('mezzanine')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
+                    proyectoActivo === 'mezzanine'
+                      ? 'steel-btn-primary text-white shadow-sm'
+                      : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  <Building2 className="h-3.5 w-3.5" />
+                  <span>Mezzanine 3 Niveles</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleCambiarProyecto('casa_mendoza')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
+                    proyectoActivo === 'casa_mendoza'
+                      ? 'bg-emerald-700 text-white shadow-sm border border-emerald-800'
+                      : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-emerald-50 hover:text-emerald-800'
+                  }`}
+                >
+                  <Layers className="h-3.5 w-3.5" />
+                  <span>Casa Mendoza (BIM)</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        {/* ETIQUETA DEL PROYECTO (Cápsula Gunmetal CNC estilo Opción 19) */}
+        {/* ETIQUETA DEL PROYECTO (Cápsula Gunmetal CNC) */}
         <div className="mt-3 rounded-xl steel-panel-dark p-3.5 text-xs text-slate-200 flex flex-wrap justify-between items-center gap-2">
           <div>
-            Proyecto: <strong className="text-white">{proyectoActualInfo.tituloBanner}</strong>
+            {lang === 'en' ? 'Project:' : 'Proyecto:'}{' '}
+            <strong className="text-white">{proyectoActualInfo.tituloBanner}</strong>
           </div>
           <div className="text-slate-300">
-            {proyectoActualInfo.subtitulo1Label}: <strong className="text-white">{proyectoActualInfo.subtitulo1Valor}</strong> | {proyectoActualInfo.subtitulo2Label}: <strong className="text-white">{proyectoActualInfo.subtitulo2Valor}</strong>
+            {proyectoActualInfo.subtitulo1Label}:{' '}
+            <strong className="text-white">{proyectoActualInfo.subtitulo1Valor}</strong> |{' '}
+            {proyectoActualInfo.subtitulo2Label}:{' '}
+            <strong className="text-white">{proyectoActualInfo.subtitulo2Valor}</strong>
           </div>
         </div>
       </div>
 
-      {/* PESTAÑAS PRINCIPALES DE NAVEGACIÓN */}
+      {/* PESTAÑAS PRINCIPALES DE NAVEGACIÓN (SIN EMOJIS) */}
       <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3 overflow-x-auto no-print">
         <button
           type="button"
@@ -989,8 +1260,8 @@ export default function Home() {
               : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
-          <FileText className="h-4 w-4" />
-          <span>📝 Bitácora de Campo</span>
+          <FileText className="h-4 w-4 text-emerald-400" />
+          <span>{lang === 'en' ? 'Field Log' : 'Bitácora de Campo'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] ${
             activeTab === 'bitacora' ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-600'
           }`}>
@@ -1008,9 +1279,9 @@ export default function Home() {
           }`}
         >
           <CalendarDays className="h-4 w-4 text-emerald-400" />
-          <span>📅 Cronograma de Obra (4D)</span>
+          <span>{lang === 'en' ? '4D Schedule' : 'Cronograma de Obra (4D)'}</span>
           <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700">
-            Ruta Crítica
+            {lang === 'en' ? 'Critical Path' : 'Ruta Crítica'}
           </span>
         </button>
 
@@ -1024,11 +1295,17 @@ export default function Home() {
           }`}
         >
           <Compass className="h-4 w-4 text-cyan-400" />
-          <span>📐 Planos Constructivos</span>
+          <span>{lang === 'en' ? 'Drawings & IFC' : 'Planos Constructivos'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] ${
             activeTab === 'planos' ? 'bg-slate-800 text-slate-200' : 'bg-slate-200 text-slate-700'
           }`}>
-            7 Aprobados
+            {isDemo
+              ? lang === 'en'
+                ? '3 IFC Sheets'
+                : '3 Planos IFC'
+              : lang === 'en'
+              ? '7 Approved'
+              : '7 Aprobados'}
           </span>
         </button>
 
@@ -1041,10 +1318,10 @@ export default function Home() {
               : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
-          <FlaskConical className="h-4 w-4 text-slate-400" />
-          <span>🧪 Calidad &amp; Cilindros</span>
+          <FlaskConical className="h-4 w-4 text-sky-400" />
+          <span>{lang === 'en' ? 'Concrete QA & Breaks' : 'Calidad & Cilindros'}</span>
           <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
-            NSR-10
+            {lang === 'en' ? 'ASTM / NSR-10' : 'NSR-10'}
           </span>
         </button>
 
@@ -1058,9 +1335,9 @@ export default function Home() {
           }`}
         >
           <Truck className="h-4 w-4 text-amber-400" />
-          <span>🚚 Mixers &amp; Remisiones</span>
+          <span>{lang === 'en' ? 'Ready-Mix Tickets' : 'Mixers & Remisiones'}</span>
           <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-amber-100 text-amber-900">
-            NTC 3318
+            {lang === 'en' ? 'ASTM C94' : 'NTC 3318'}
           </span>
         </button>
 
@@ -1073,10 +1350,10 @@ export default function Home() {
               : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
-          <BarChart3 className="h-4 w-4 text-slate-400" />
-          <span>📊 Cantidades de Obra</span>
+          <BarChart3 className="h-4 w-4 text-indigo-400" />
+          <span>{lang === 'en' ? 'Contract Quantities' : 'Cantidades de Obra'}</span>
           <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
-            Contratado vs Ejecutado
+            {lang === 'en' ? 'BOQ vs Actual' : 'Contratado vs Ejecutado'}
           </span>
         </button>
 
@@ -1089,10 +1366,10 @@ export default function Home() {
               : 'steel-card text-slate-700 hover:text-slate-950'
           }`}
         >
-          <Boxes className="h-4 w-4 text-slate-400" />
-          <span>📦 Almacén, Insumos &amp; Herramientas</span>
+          <Boxes className="h-4 w-4 text-teal-400" />
+          <span>{lang === 'en' ? 'Warehouse & Tools' : 'Almacén, Insumos & Herramientas'}</span>
           <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
-            Bodega & Pañol
+            {lang === 'en' ? 'Kardex & Crib' : 'Bodega & Pañol'}
           </span>
         </button>
       </div>
@@ -1103,23 +1380,29 @@ export default function Home() {
           {/* TARJETA PRINCIPAL DEL FORMULARIO */}
           <div className="rounded-2xl steel-card p-6 mb-6 no-print">
             
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-              <FileText className="h-5 w-5 text-slate-800" />
-              <h2 className="text-base font-bold text-slate-900">
-                Captura Diaria de Avance en Campo
-              </h2>
+            <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-slate-800" />
+                <h2 className="text-base font-bold text-slate-900">
+                  {lang === 'en' ? 'Daily Field Progress Capture' : 'Captura Diaria de Avance en Campo'}
+                </h2>
+              </div>
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                {lang === 'en' ? 'Imperial Units (US)' : 'Sistema Métrico (SI)'}
+              </span>
             </div>
 
             {/* COPILOTO DE INTELIGENCIA ARTIFICIAL POR VOZ */}
-            <CopilotoVozIA onDatosDetectados={handleDatosVoz} />
+            <CopilotoVozIA onDatosDetectados={handleDatosVoz} isDemo={isDemo} />
 
             {/* FORMULARIO REACT */}
             <form onSubmit={handleSubmit} className="space-y-4">
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                📅 Fecha de Ejecución
+              <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                <Calendar className="h-3.5 w-3.5 text-slate-500" />
+                {lang === 'en' ? 'Execution Date' : 'Fecha de Ejecución'}
               </label>
               <input
                 type="date"
@@ -1131,45 +1414,65 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                {esCasaMendozaProyecto ? '🏡 Zona / Habitación (Casa Mendoza)' : '📍 Nivel / Frente de Obra'}
+              <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                {isDemo
+                  ? lang === 'en'
+                    ? 'Work Zone / BIM Area'
+                    : 'Zona / Área BIM de Obra'
+                  : esCasaMendozaProyecto
+                  ? lang === 'en'
+                    ? 'Zone / Room (Casa Mendoza)'
+                    : 'Zona / Habitación (Casa Mendoza)'
+                  : lang === 'en'
+                  ? 'Level / Work Front'
+                  : 'Nivel / Frente de Obra'}
               </label>
               <select
                 value={ubicacionFrente}
                 onChange={(e) => setUbicacionFrente(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800"
               >
-                {esCasaMendozaProyecto ? (
-                  <optgroup label="🏡 CASA MENDOZA — ZONAS Y HABITACIONES (REVIT 1.1)">
-                    <option value="Casa Mendoza - Habitación Mamá">Casa Mendoza — Habitación Mamá</option>
-                    <option value="Casa Mendoza - Habitación Esteban">Casa Mendoza — Habitación Esteban</option>
-                    <option value="Casa Mendoza - Habitación Nan & I">Casa Mendoza — Habitación Nan &amp; I</option>
-                    <option value="Casa Mendoza - Habitación Abuelos">Casa Mendoza — Habitación Abuelos</option>
-                    <option value="Casa Mendoza - Habitación Lisbeth">Casa Mendoza — Habitación Lisbeth</option>
-                    <option value="Casa Mendoza - Habitación Huésped">Casa Mendoza — Habitación Huésped</option>
-                    <option value="Casa Mendoza - Sala">Casa Mendoza — Sala</option>
-                    <option value="Casa Mendoza - Cocina">Casa Mendoza — Cocina</option>
-                    <option value="Casa Mendoza - Baño 1">Casa Mendoza — Baño 1</option>
-                    <option value="Casa Mendoza - Entrada / Puerta 1">Casa Mendoza — Entrada / Puerta 1</option>
-                    <option value="Casa Mendoza - Entrada / Puerta 2">Casa Mendoza — Entrada / Puerta 2</option>
-                    <option value="Casa Mendoza - General">Casa Mendoza — General (Toda la vivienda)</option>
+                {isDemo ? (
+                  <optgroup label={lang === 'en' ? 'NORTHBRIDGE HUB — BIM ZONES' : 'NORTHBRIDGE HUB — ZONAS BIM'}>
+                    <option value="Zona A — Pórticos & Cimentación">{localizeRoomName('Zona A — Pórticos & Cimentación', lang)}</option>
+                    <option value="Zona B — Envolvente & Acabados">{localizeRoomName('Zona B — Envolvente & Acabados', lang)}</option>
+                    <option value="Lobby Principal">{localizeRoomName('Lobby Principal', lang)}</option>
+                    <option value="Oficina Norte">{localizeRoomName('Oficina Norte', lang)}</option>
+                    <option value="Sala de Juntas">{localizeRoomName('Sala de Juntas', lang)}</option>
+                    <option value="Zona C — Cubierta & Carpintería">{localizeRoomName('Zona C — Cubierta & Carpintería', lang)}</option>
+                    <option value="Zona General — Obra Completa">{localizeRoomName('Zona General — Obra Completa', lang)}</option>
+                  </optgroup>
+                ) : esCasaMendozaProyecto ? (
+                  <optgroup label={lang === 'en' ? 'CASA MENDOZA — ZONES & ROOMS (REVIT 1.1)' : 'CASA MENDOZA — ZONAS Y HABITACIONES (REVIT 1.1)'}>
+                    <option value="Casa Mendoza - Habitación Mamá">Casa Mendoza — {localizeRoomName('Habitación Mamá', lang)}</option>
+                    <option value="Casa Mendoza - Habitación Esteban">Casa Mendoza — {localizeRoomName('Habitación Esteban', lang)}</option>
+                    <option value="Casa Mendoza - Habitación Nan & I">Casa Mendoza — {localizeRoomName('Habitación Nan & I', lang)}</option>
+                    <option value="Casa Mendoza - Habitación Abuelos">Casa Mendoza — {localizeRoomName('Habitación Abuelos', lang)}</option>
+                    <option value="Casa Mendoza - Habitación Lisbeth">Casa Mendoza — {localizeRoomName('Habitación Lisbeth', lang)}</option>
+                    <option value="Casa Mendoza - Habitación Huésped">Casa Mendoza — {localizeRoomName('Habitación Huésped', lang)}</option>
+                    <option value="Casa Mendoza - Sala">Casa Mendoza — {localizeRoomName('Sala', lang)}</option>
+                    <option value="Casa Mendoza - Cocina">Casa Mendoza — {localizeRoomName('Cocina', lang)}</option>
+                    <option value="Casa Mendoza - Baño 1">Casa Mendoza — {localizeRoomName('Baño 1', lang)}</option>
+                    <option value="Casa Mendoza - Entrada / Puerta 1">Casa Mendoza — {localizeRoomName('Entrada / Puerta 1', lang)}</option>
+                    <option value="Casa Mendoza - Entrada / Puerta 2">Casa Mendoza — {localizeRoomName('Entrada / Puerta 2', lang)}</option>
+                    <option value="Casa Mendoza - General">{lang === 'en' ? 'Casa Mendoza — General (Full House)' : 'Casa Mendoza — General (Toda la vivienda)'}</option>
                   </optgroup>
                 ) : (
-                  <optgroup label="🏢 FRENTES GENERALES / MEZZANINE">
-                    <option value="Cimentación (Zapatas / Vigas / Foso)">Cimentación (Zapatas / Vigas / Foso)</option>
-                    <option value="1er Piso (Ejes A1-C2)">1er Piso (Ejes A1-C2)</option>
-                    <option value="2do Piso (Mezzanine)">2do Piso (Mezzanine)</option>
-                    <option value="3er Piso">3er Piso</option>
-                    <option value="Azotea / Cubierta / Foso">Azotea / Cubierta / Foso</option>
-                    <option value="General de Obra">General de Obra</option>
+                  <optgroup label={lang === 'en' ? 'GENERAL WORK FRONTS / MEZZANINE' : 'FRENTES GENERALES / MEZZANINE'}>
+                    <option value="Cimentación (Zapatas / Vigas / Foso)">{lang === 'en' ? 'Foundations (Footings / Grade Beams / Pit)' : 'Cimentación (Zapatas / Vigas / Foso)'}</option>
+                    <option value="1er Piso (Ejes A1-C2)">{lang === 'en' ? '1st Floor (Grid A1-C2)' : '1er Piso (Ejes A1-C2)'}</option>
+                    <option value="2do Piso (Mezzanine)">{lang === 'en' ? '2nd Floor (Mezzanine)' : '2do Piso (Mezzanine)'}</option>
+                    <option value="3er Piso">{lang === 'en' ? '3rd Floor' : '3er Piso'}</option>
+                    <option value="Azotea / Cubierta / Foso">{lang === 'en' ? 'Roof Deck / Slab' : 'Azotea / Cubierta / Foso'}</option>
+                    <option value="General de Obra">{lang === 'en' ? 'General Site Work' : 'General de Obra'}</option>
                   </optgroup>
                 )}
               </select>
-              {esCasaMendozaProyecto && (
+              {esCasaMendozaProyecto && !isDemo && (
                 <p className="mt-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-2 py-1">
-                  🔗 Se registrará como{' '}
-                  <code>{esCasaMendozaFrente ? `[casa_mendoza] [${casaMendozaRoomTag}]` : '[casa_mendoza]'}</code>{' '}
-                  para sincronizar automáticamente con Gerencia BIM 5D.
+                  {lang === 'en' ? 'Sync tag:' : 'Etiqueta BIM:'}{' '}
+                  <code>{esCasaMendozaFrente ? `[casa_mendoza] [${casaMendozaRoomTag}]` : '[casa_mendoza]'}</code>
                 </p>
               )}
             </div>
@@ -1177,8 +1480,9 @@ export default function Home() {
 
           {/* SELECTOR DE ACTIVIDAD */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              📋 Actividad de Obra ({proyectoActualInfo.nombre})
+            <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+              <FileText className="h-3.5 w-3.5 text-slate-500" />
+              {lang === 'en' ? `Work Activity (${proyectoActualInfo.nombre})` : `Actividad de Obra (${proyectoActualInfo.nombre})`}
             </label>
             <select
               value={actividadSeleccionada}
@@ -1186,9 +1490,13 @@ export default function Home() {
               required
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800 font-medium text-slate-900"
             >
-              <option value="" disabled>Seleccione una actividad de {proyectoActualInfo.nombre}...</option>
+              <option value="" disabled>
+                {lang === 'en'
+                  ? `Select an activity from ${proyectoActualInfo.nombre}...`
+                  : `Seleccione una actividad de ${proyectoActualInfo.nombre}...`}
+              </option>
               {Array.from(new Set(actividadesDisponiblesProyecto.map((a) => a.capitulo))).map((cap) => (
-                <optgroup key={cap} label={cap}>
+                <optgroup key={cap} label={localizeChapter(cap, lang)}>
                   {actividadesDisponiblesProyecto
                     .filter((a) => a.capitulo === cap)
                     .map((a) => {
@@ -1198,7 +1506,7 @@ export default function Home() {
                           : a.meta;
                       return (
                         <option key={a.nombre} value={a.nombre}>
-                          {a.nombre} ({a.unidad} • Meta: {metaItem})
+                          {localizeActivity(a.nombre, lang)} ({unitLabel(a.unidad)} • {lang === 'en' ? 'Target' : 'Meta'}: {formatQty(metaItem, a.unidad)})
                         </option>
                       );
                     })}
@@ -1212,11 +1520,11 @@ export default function Home() {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-2">
                 <span>
-                  Acumulado Ejecutado:{' '}
+                  {lang === 'en' ? 'Cumulative Executed:' : 'Acumulado Ejecutado:'}{' '}
                   <strong className="text-slate-900">
-                    {acumuladoActual.toFixed(2)} {actividadInfo?.unidad}
+                    {formatQty(acumuladoActual, unidadActividad)} {unitLabel(unidadActividad)}
                   </strong>{' '}
-                  de {metaActual.toFixed(2)} {actividadInfo?.unidad}
+                  {lang === 'en' ? 'of' : 'de'} {formatQty(metaActual, unidadActividad)} {unitLabel(unidadActividad)}
                 </span>
                 <span
                   className={`px-2 py-0.5 rounded font-black ${
@@ -1250,18 +1558,21 @@ export default function Home() {
                 <div className="flex items-start gap-2 rounded-lg bg-rose-50 border border-rose-200 p-3 text-xs font-semibold text-rose-800">
                   <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
                   <div>
-                    <strong>ALERTA DE MAYOR CANTIDAD / ADICIONAL:</strong> Totalizará{' '}
+                    <strong>{lang === 'en' ? 'OVERRUN / CHANGE ORDER ALERT:' : 'ALERTA DE MAYOR CANTIDAD / ADICIONAL:'}</strong>{' '}
+                    {lang === 'en' ? 'Projected total' : 'Totalizará'}{' '}
                     <strong>
-                      {totalProyectado.toFixed(2)} {actividadInfo?.unidad} ({pctProyectado.toFixed(1)}%)
+                      {formatQty(totalProyectado, unidadActividad)} {unitLabel(unidadActividad)} ({pctProyectado.toFixed(1)}%)
                     </strong>
-                    . Supera la meta contratada en +{excesoCantidad.toFixed(2)} {actividadInfo?.unidad}.
+                    . {lang === 'en' ? 'Exceeds contracted target by' : 'Supera la meta contratada en'} +{formatQty(excesoCantidad, unidadActividad)} {unitLabel(unidadActividad)}.
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                   <span>
-                    Dentro de contrato: Quedarán {(metaActual - totalProyectado).toFixed(2)} {actividadInfo?.unidad} por ejecutar.
+                    {lang === 'en'
+                      ? `Within contract: ${formatQty(metaActual - totalProyectado, unidadActividad)} ${unitLabel(unidadActividad)} remaining.`
+                      : `Dentro de contrato: Quedarán ${formatQty(metaActual - totalProyectado, unidadActividad)} ${unitLabel(unidadActividad)} por ejecutar.`}
                   </span>
                 </div>
               )}
@@ -1276,7 +1587,13 @@ export default function Home() {
               className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 border border-dashed border-slate-300 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition"
             >
               <Ruler className="h-3.5 w-3.5" />
-              {showCalc ? 'Ocultar Calculadora Dimensional' : '📐 ¿Calcular dimensiones en campo? (Largo × Ancho × Alto)'}
+              {showCalc
+                ? lang === 'en'
+                  ? 'Hide Field Dimension Calculator'
+                  : 'Ocultar Calculadora Dimensional'
+                : lang === 'en'
+                ? 'Calculate field dimensions? (L × W × H)'
+                : '¿Calcular dimensiones en campo? (Largo × Ancho × Alto)'}
               {showCalc ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
             </button>
 
@@ -1284,7 +1601,9 @@ export default function Home() {
               <div className="mt-2.5 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Largo (m)</label>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      {lang === 'en' ? 'Length (ft)' : 'Largo (m)'}
+                    </label>
                     <input
                       type="number"
                       step="any"
@@ -1296,7 +1615,9 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Ancho (m)</label>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      {lang === 'en' ? 'Width (ft)' : 'Ancho (m)'}
+                    </label>
                     <input
                       type="number"
                       step="any"
@@ -1308,7 +1629,9 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Alto/Espesor (m)</label>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      {lang === 'en' ? 'Height / Thick (ft)' : 'Alto/Espesor (m)'}
+                    </label>
                     <input
                       type="number"
                       step="any"
@@ -1320,7 +1643,9 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Nº Piezas</label>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      {lang === 'en' ? 'No. Elements' : 'Nº Piezas'}
+                    </label>
                     <input
                       type="number"
                       step="1"
@@ -1338,8 +1663,11 @@ export default function Home() {
           {/* CANTIDAD NETA Y DESPERDICIO */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                ⚡ Cantidad Neta Ejecutada Hoy
+              <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                <Layers className="h-3.5 w-3.5 text-emerald-600" />
+                {lang === 'en'
+                  ? `Net Executed Today (${unitLabel(unidadActividad)})`
+                  : `Cantidad Neta Ejecutada Hoy (${unitLabel(unidadActividad)})`}
               </label>
               <input
                 type="number"
@@ -1347,7 +1675,7 @@ export default function Home() {
                 min="0.0001"
                 value={cantidad}
                 onChange={(e) => setCantidad(e.target.value)}
-                placeholder="Ej. 15.50"
+                placeholder={lang === 'en' ? 'e.g. 15.50' : 'Ej. 15.50'}
                 inputMode="decimal"
                 required
                 className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base font-bold text-slate-900 focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800"
@@ -1356,7 +1684,7 @@ export default function Home() {
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                Desperdicio Estimado (%)
+                {lang === 'en' ? 'Estimated Waste Allowance (%)' : 'Desperdicio Estimado (%)'}
               </label>
               <input
                 type="number"
@@ -1374,43 +1702,54 @@ export default function Home() {
           {/* CONDICIONES DIARIAS (CLIMA Y CUADRILLA) */}
           <div className="rounded-xl border border-slate-200 p-4 bg-slate-50/50 space-y-3">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-              <Sun className="h-3.5 w-3.5 text-amber-500" /> Condiciones de Obra y Control de Calidad
+              <Sun className="h-3.5 w-3.5 text-amber-500" />{' '}
+              {lang === 'en' ? 'Site Weather & Quality Conditions' : 'Condiciones de Obra y Control de Calidad'}
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">Clima</label>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                  {lang === 'en' ? 'Weather' : 'Clima'}
+                </label>
                 <select
                   value={clima}
                   onChange={(e) => setClima(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs"
                 >
-                  <option value="Soleado">☀️ Soleado (Normal)</option>
-                  <option value="Nublado">⛅ Nublado</option>
-                  <option value="Lluvia Ligera">🌦️ Lluvia Ligera</option>
-                  <option value="Lluvia Fuerte / Suspensión">🌧️ Lluvia Fuerte (Suspensión)</option>
+                  <option value="Soleado">{lang === 'en' ? 'Clear / Sunny (Normal)' : 'Soleado (Normal)'}</option>
+                  <option value="Nublado">{lang === 'en' ? 'Overcast / Cloudy' : 'Nublado'}</option>
+                  <option value="Lluvia Ligera">{lang === 'en' ? 'Light Drizzle' : 'Lluvia Ligera'}</option>
+                  <option value="Lluvia Fuerte / Suspensión">{lang === 'en' ? 'Heavy Rain (Standby)' : 'Lluvia Fuerte (Suspensión)'}</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">Personal / Cuadrilla</label>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                  {lang === 'en' ? 'Field Crew / Labor' : 'Personal / Cuadrilla'}
+                </label>
                 <input
                   type="text"
                   value={cuadrilla}
                   onChange={(e) => setCuadrilla(e.target.value)}
-                  placeholder="Ej. 1 Oficial + 2 Ayudantes"
+                  placeholder={lang === 'en' ? 'e.g. 1 Lead Tech + 2 Helpers' : 'Ej. 1 Oficial + 2 Ayudantes'}
                   className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1">Observaciones Técnicas</label>
+              <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                {lang === 'en' ? 'Technical Observations' : 'Observaciones Técnicas'}
+              </label>
               <textarea
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
                 rows={2}
-                placeholder="Ej. Slump 5 pulgadas, vaciado terminado a las 3:30 PM..."
+                placeholder={
+                  lang === 'en'
+                    ? 'e.g. Slump 5 in verified, pour completed at 3:30 PM...'
+                    : 'Ej. Slump 5 pulgadas, vaciado terminado a las 3:30 PM...'
+                }
                 className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-normal"
               />
             </div>
@@ -1420,7 +1759,8 @@ export default function Home() {
           <div className="rounded-xl border border-slate-200 p-4 bg-slate-50/50 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <Camera className="h-4 w-4 text-emerald-600" /> Registro Fotográfico Forense
+                <Camera className="h-4 w-4 text-emerald-600" />{' '}
+                {lang === 'en' ? 'Forensic Photo Documentation' : 'Registro Fotográfico Forense'}
               </h3>
               <label className="inline-flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-700 bg-white border border-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-50 transition">
                 <input
@@ -1429,15 +1769,26 @@ export default function Home() {
                   onChange={(e) => setEstamparGPS(e.target.checked)}
                   className="h-3.5 w-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                 />
-                <span>📍 Estampar Coordenadas GPS y Fecha Forense</span>
+                <MapPin className="h-3 w-3 text-emerald-600" />
+                <span>
+                  {lang === 'en'
+                    ? 'Stamp GPS Coordinates & Forensic Date'
+                    : 'Estampar Coordenadas GPS y Fecha Forense'}
+                </span>
               </label>
             </div>
 
             {!fotoPreview ? (
               <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 rounded-xl bg-white hover:bg-slate-50 cursor-pointer transition group">
                 <Camera className="h-7 w-7 text-slate-400 group-hover:text-slate-600 mb-1.5" />
-                <span className="text-xs font-bold text-slate-700">Tomar foto o subir evidencia</span>
-                <span className="text-[10px] text-slate-400 mt-0.5">JPG, PNG optimizado automáticamente para celular</span>
+                <span className="text-xs font-bold text-slate-700">
+                  {lang === 'en' ? 'Take photo or upload site evidence' : 'Tomar foto o subir evidencia'}
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5">
+                  {lang === 'en'
+                    ? 'JPG / PNG automatically compressed for mobile upload'
+                    : 'JPG, PNG optimizado automáticamente para celular'}
+                </span>
                 <input
                   type="file"
                   accept="image/*"
@@ -1453,17 +1804,18 @@ export default function Home() {
                 </div>
                 <div className="flex-1 min-w-0 text-xs">
                   <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Foto lista para adjuntar
+                    <CheckCircle2 className="h-3.5 w-3.5" />{' '}
+                    {lang === 'en' ? 'Photo ready to attach' : 'Foto lista para adjuntar'}
                   </div>
                   <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                    {fotoInfo?.nombre || 'Foto de campo'} • {fotoInfo?.kb || 50} KB (comprimida)
+                    {fotoInfo?.nombre || (lang === 'en' ? 'Field photo' : 'Foto de campo')} • {fotoInfo?.kb || 50} KB ({lang === 'en' ? 'compressed' : 'comprimida'})
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => { setFotoPreview(null); setFotoInfo(null); }}
                   className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 transition"
-                  title="Eliminar foto"
+                  title={lang === 'en' ? 'Remove photo' : 'Eliminar foto'}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1478,7 +1830,17 @@ export default function Home() {
             className="w-full rounded-xl bg-slate-900 py-3.5 text-sm font-bold text-white shadow-lg shadow-slate-900/10 hover:bg-slate-800 active:scale-[0.99] transition disabled:bg-slate-400 flex items-center justify-center gap-2"
           >
             <Send className="h-4 w-4" />
-            {isSubmitting ? 'Sincronizando con Supabase...' : 'Enviar a Base de Datos (Supabase)'}
+            {isDemo
+              ? lang === 'en'
+                ? 'Simulate Entry in Demo Sandbox'
+                : 'Simular Registro en Sandbox Demo'
+              : isSubmitting
+              ? lang === 'en'
+                ? 'Syncing with Supabase...'
+                : 'Sincronizando con Supabase...'
+              : lang === 'en'
+              ? 'Submit Entry to Cloud Database'
+              : 'Enviar a Base de Datos (Supabase)'}
           </button>
         </form>
 
@@ -1489,10 +1851,27 @@ export default function Home() {
         
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100 no-print">
           <div>
-            <h2 className="text-base font-bold text-slate-900">
-              📋 Registros en la Nube ({registrosFiltrados.length})
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-emerald-600" />
+              <span>
+                {isDemo
+                  ? lang === 'en'
+                    ? `Demo Field Log Entries (${registrosFiltrados.length})`
+                    : `Registros Demo de Obra (${registrosFiltrados.length})`
+                  : lang === 'en'
+                  ? `Cloud Field Records (${registrosFiltrados.length})`
+                  : `Registros en la Nube (${registrosFiltrados.length})`}
+              </span>
             </h2>
-            <p className="text-xs text-slate-500">Historial sincronizado en PostgreSQL</p>
+            <p className="text-xs text-slate-500">
+              {isDemo
+                ? lang === 'en'
+                  ? 'ISO 19650 local interactive showcase dataset'
+                  : 'Historial local interactivo del proyecto showcase ISO 19650'
+                : lang === 'en'
+                ? 'Real-time history synced in PostgreSQL'
+                : 'Historial sincronizado en PostgreSQL'}
+            </p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
@@ -1500,25 +1879,25 @@ export default function Home() {
               onClick={() => cargarRegistros()}
               className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
             >
-              <RefreshCw className="h-3.5 w-3.5" /> Recargar
+              <RefreshCw className="h-3.5 w-3.5" /> {lang === 'en' ? 'Reload' : 'Recargar'}
             </button>
             <button
               onClick={() => setShowReporteModal(true)}
               className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm"
             >
-              <FileText className="h-3.5 w-3.5" /> Informe Ejecutivo (PDF)
+              <FileText className="h-3.5 w-3.5" /> {lang === 'en' ? 'Executive Report (PDF)' : 'Informe Ejecutivo (PDF)'}
             </button>
             <button
               onClick={exportarCSV}
               className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
             >
-              <Download className="h-3.5 w-3.5" /> Exportar CSV
+              <Download className="h-3.5 w-3.5" /> {lang === 'en' ? 'Export CSV' : 'Exportar CSV'}
             </button>
             <button
               onClick={() => window.print()}
               className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition"
             >
-              <Printer className="h-3.5 w-3.5" /> Imprimir Acta
+              <Printer className="h-3.5 w-3.5" /> {lang === 'en' ? 'Print Log' : 'Imprimir Acta'}
             </button>
           </div>
         </div>
@@ -1531,23 +1910,27 @@ export default function Home() {
               type="text"
               value={filtroTexto}
               onChange={(e) => setFiltroTexto(e.target.value)}
-              placeholder="Buscar por actividad o fecha..."
+              placeholder={lang === 'en' ? 'Filter by activity or date...' : 'Buscar por actividad o fecha...'}
               className="w-full rounded-lg border border-slate-200 pl-8 pr-3 py-1.5 text-xs"
             />
           </div>
 
           <div className="flex gap-1">
-            {['todos', 'hoy', 'semana'].map((tipo) => (
+            {[
+              { id: 'todos', label: lang === 'en' ? 'All' : 'Todos' },
+              { id: 'hoy', label: lang === 'en' ? 'Today' : 'Hoy' },
+              { id: 'semana', label: lang === 'en' ? '7 Days' : 'Semana' },
+            ].map((tipo) => (
               <button
-                key={tipo}
-                onClick={() => setFiltroFecha(tipo)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-bold capitalize transition ${
-                  filtroFecha === tipo
+                key={tipo.id}
+                onClick={() => setFiltroFecha(tipo.id)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                  filtroFecha === tipo.id
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {tipo}
+                {tipo.label}
               </button>
             ))}
           </div>
@@ -1557,11 +1940,11 @@ export default function Home() {
         <div className="block md:hidden space-y-3">
           {loadingRegistros ? (
             <div className="p-8 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
-              Consultando registros en Supabase...
+              {lang === 'en' ? 'Querying cloud records...' : 'Consultando registros en Supabase...'}
             </div>
           ) : registrosFiltrados.length === 0 ? (
             <div className="p-8 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
-              No hay registros disponibles con el filtro actual.
+              {lang === 'en' ? 'No records match current filter.' : 'No hay registros disponibles con el filtro actual.'}
             </div>
           ) : (
             registrosFiltrados.map((item) => {
@@ -1582,12 +1965,12 @@ export default function Home() {
                     </span>
 
                     {item.isOffline ? (
-                      <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                        🟡 Offline
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                        <Clock className="h-3 w-3" /> Offline
                       </span>
                     ) : (
-                      <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                        ✅ Nube OK
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                        <CheckCircle2 className="h-3 w-3" /> {isDemo ? (lang === 'en' ? 'Demo QA' : 'Demo OK') : lang === 'en' ? 'Synced' : 'Nube OK'}
                       </span>
                     )}
                   </div>
@@ -1595,21 +1978,30 @@ export default function Home() {
                   {/* Actividad */}
                   <div>
                     <h3 className="text-xs font-bold text-slate-900 leading-snug">
-                      {item.actividad}
+                      {localizeActivity(item.actividad, lang)}
                     </h3>
+                    {item.observaciones && (
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        {localizeBitacoraObservacion(item.observaciones, lang)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Métricas: Cantidad y Desperdicio */}
                   <div className="flex items-center justify-between bg-slate-50 p-2 rounded-lg text-xs border border-slate-100">
                     <div>
-                      <span className="text-[10px] text-slate-400 block uppercase font-bold">Ejecutado</span>
+                      <span className="text-[10px] text-slate-400 block uppercase font-bold">
+                        {lang === 'en' ? 'Executed' : 'Ejecutado'}
+                      </span>
                       <strong className="text-slate-900 font-black">
-                        {Number(item.cantidad).toFixed(2)} {item.unidad}
+                        {formatQty(item.cantidad, item.unidad)} {unitLabel(item.unidad)}
                       </strong>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[10px] text-slate-400 block uppercase font-bold">Desperdicio</span>
+                      <span className="text-[10px] text-slate-400 block uppercase font-bold">
+                        {lang === 'en' ? 'Waste' : 'Desperdicio'}
+                      </span>
                       <span className="text-slate-700 font-semibold">{item.desperdicio || 0}%</span>
                     </div>
                   </div>
@@ -1634,13 +2026,13 @@ export default function Home() {
                           }}
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-200 transition"
                         >
-                          <Camera className="h-3.5 w-3.5" /> Ver Evidencia
+                          <Camera className="h-3.5 w-3.5" /> {lang === 'en' ? 'View Evidence' : 'Ver Evidencia'}
                         </button>
                       </div>
                     ) : (
                       <label className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-dashed border-slate-300 text-slate-600 hover:bg-slate-50 font-bold text-xs cursor-pointer transition">
                         <Camera className="h-3.5 w-3.5 text-slate-400" />
-                        <span>+ Adjuntar Foto</span>
+                        <span>{lang === 'en' ? '+ Attach Photo' : '+ Adjuntar Foto'}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -1666,26 +2058,26 @@ export default function Home() {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-700 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
               <tr>
-                <th className="py-2.5 px-3">Fecha</th>
-                <th className="py-2.5 px-3">Actividad de Obra</th>
-                <th className="py-2.5 px-3">Unidad</th>
-                <th className="py-2.5 px-3 text-right">Cant. Neta</th>
-                <th className="py-2.5 px-3 text-center">Desp (%)</th>
-                <th className="py-2.5 px-3 text-center">📸 Evidencia</th>
-                <th className="py-2.5 px-3 text-center">Estado</th>
+                <th className="py-2.5 px-3">{lang === 'en' ? 'Date' : 'Fecha'}</th>
+                <th className="py-2.5 px-3">{lang === 'en' ? 'Work Activity' : 'Actividad de Obra'}</th>
+                <th className="py-2.5 px-3">{lang === 'en' ? 'Unit' : 'Unidad'}</th>
+                <th className="py-2.5 px-3 text-right">{lang === 'en' ? 'Net Qty' : 'Cant. Neta'}</th>
+                <th className="py-2.5 px-3 text-center">{lang === 'en' ? 'Waste (%)' : 'Desp (%)'}</th>
+                <th className="py-2.5 px-3 text-center">{lang === 'en' ? 'Evidence' : 'Evidencia'}</th>
+                <th className="py-2.5 px-3 text-center">{lang === 'en' ? 'Status' : 'Estado'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loadingRegistros ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-slate-400">
-                    Consultando registros en Supabase...
+                    {lang === 'en' ? 'Querying cloud records...' : 'Consultando registros en Supabase...'}
                   </td>
                 </tr>
               ) : registrosFiltrados.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-slate-400">
-                    No hay registros disponibles.
+                    {lang === 'en' ? 'No records available.' : 'No hay registros disponibles.'}
                   </td>
                 </tr>
               ) : (
@@ -1700,15 +2092,20 @@ export default function Home() {
                         {item.fecha || '-'}
                       </td>
                       <td className="py-2.5 px-3 text-slate-800 font-medium">
-                        {item.actividad}
+                        <div>{localizeActivity(item.actividad, lang)}</div>
+                        {item.observaciones && (
+                          <div className="text-[11px] text-slate-500 mt-0.5">
+                            {localizeBitacoraObservacion(item.observaciones, lang)}
+                          </div>
+                        )}
                       </td>
                       <td className="py-2.5 px-3">
                         <span className="rounded bg-slate-200/80 border border-slate-300 px-1.5 py-0.5 font-bold text-slate-800 text-[10px]">
-                          {item.unidad}
+                          {unitLabel(item.unidad)}
                         </span>
                       </td>
                       <td className="py-2.5 px-3 text-right font-black text-slate-900">
-                        {Number(item.cantidad).toFixed(2)}
+                        {formatQty(item.cantidad, item.unidad)}
                       </td>
                       <td className="py-2.5 px-3 text-center text-slate-500">
                         {item.desperdicio || 0}%
@@ -1726,11 +2123,11 @@ export default function Home() {
                             }}
                             className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200 transition"
                           >
-                            <Camera className="h-3 w-3" /> Ver Foto
+                            <Camera className="h-3 w-3" /> {lang === 'en' ? 'View Photo' : 'Ver Foto'}
                           </button>
                         ) : (
                           <label className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-dashed border-slate-300 hover:bg-slate-50 text-slate-500 font-semibold text-[10px] cursor-pointer transition">
-                            <Camera className="h-3 w-3" /> + Foto
+                            <Camera className="h-3 w-3" /> {lang === 'en' ? '+ Photo' : '+ Foto'}
                             <input
                               type="file"
                               accept="image/*"
@@ -1743,12 +2140,12 @@ export default function Home() {
                       </td>
                       <td className="py-2.5 px-3 text-center">
                         {item.isOffline ? (
-                          <span className="inline-flex rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                            🟡 Offline
+                          <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                            <Clock className="h-3 w-3" /> Offline
                           </span>
                         ) : (
-                          <span className="inline-flex rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                            ✅ Nube OK
+                          <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                            <CheckCircle2 className="h-3 w-3" /> {isDemo ? (lang === 'en' ? 'Demo QA' : 'Demo OK') : lang === 'en' ? 'Synced' : 'Nube OK'}
                           </span>
                         )}
                       </td>
@@ -1778,38 +2175,40 @@ export default function Home() {
 
       {/* VISTA 2: CRONOGRAMA DE OBRA (4D) */}
       {activeTab === 'cronograma' && (
-        <TabCronograma registros={registrosDelProyecto} proyectoActivo={proyectoActivo} />
+        <TabCronograma registros={registrosDelProyecto} proyectoActivo={proyectoActivo} isDemo={isDemo} />
       )}
 
       {/* VISTA 3: PLANOS CONSTRUCTIVOS */}
       {activeTab === 'planos' && (
-        <TabPlanos proyectoActivo={proyectoActivo} />
+        <TabPlanos proyectoActivo={proyectoActivo} isDemo={isDemo} />
       )}
 
       {/* VISTA 4: CONTROL DE CALIDAD Y ROTURA DE CILINDROS (NSR-10) */}
       {activeTab === 'calidad' && (
-        <ModuloCalidadConcreto registros={registrosDelProyecto} />
+        <ModuloCalidadConcreto registros={registrosDelProyecto} isDemo={isDemo} />
       )}
 
       {/* VISTA 5: CONTROL DE RECEPCIÓN DE MIXERS Y REMISIONES (NTC 3318) */}
       {activeTab === 'mixers' && (
-        <ModuloMixersRemisiones registros={registrosDelProyecto} />
+        <ModuloMixersRemisiones registros={registrosDelProyecto} isDemo={isDemo} />
       )}
 
       {/* VISTA 6: COMPARATIVA DE CANTIDADES CONTRATADAS VS EJECUTADAS */}
       {activeTab === 'cantidades' && (
-        <ModuloComparativaCantidades registros={registrosDelProyecto} proyectoActivo={proyectoActivo} />
+        <ModuloComparativaCantidades registros={registrosDelProyecto} proyectoActivo={proyectoActivo} isDemo={isDemo} />
       )}
 
       {/* VISTA 7: ALMACÉN DE MATERIALES EN OBRA Y CONTROL KARDEX */}
       {activeTab === 'almacen' && (
-        <ModuloAlmacenMateriales />
+        <ModuloAlmacenMateriales isDemo={isDemo} />
       )}
 
       {/* MODAL DE EVIDENCIA FOTOGRÁFICA */}
       {selectedEvidencia && (
         <ModalEvidenciaFoto
           evidencia={selectedEvidencia}
+          isDemo={isDemo}
+          proyectoInfo={proyectoActualInfo}
           onClose={() => setSelectedEvidencia(null)}
         />
       )}
@@ -1819,12 +2218,20 @@ export default function Home() {
         <ModalReporteEjecutivo
           registros={registrosFiltrados}
           evidenciasFotos={evidenciasFotos}
+          isDemo={isDemo}
+          proyectoInfo={proyectoActualInfo}
           onClose={() => setShowReporteModal(false)}
         />
       )}
 
       <footer className="mt-8 text-center text-xs text-slate-400 no-print">
-        JGM ConTech • Sistema de Control de Obra Civil • Barranquilla, Colombia
+        {isDemo
+          ? lang === 'en'
+            ? 'JGM ConTech • ISO 19650 BIM 4D/5D Field Operations Showcase'
+            : 'JGM ConTech • Plataforma Showcase de Control de Obra BIM 4D/5D'
+          : lang === 'en'
+          ? 'JGM ConTech • Civil Project Controls & Field Operations'
+          : 'JGM ConTech • Sistema de Control de Obra Civil'}
       </footer>
 
     </main>

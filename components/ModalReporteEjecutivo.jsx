@@ -1,26 +1,32 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-  X, 
-  Printer, 
-  Download, 
-  Calendar, 
-  FileText, 
-  HardHat, 
-  CheckCircle2, 
-  Filter, 
-  Building2, 
-  Camera, 
+import {
+  X,
+  Printer,
+  FileText,
+  HardHat,
+  Camera,
   TrendingUp,
-  MapPin
 } from 'lucide-react';
+import { useAppPreferences } from '../lib/i18n';
+import {
+  localizeActivity,
+  localizeRoomName,
+  localizeBitacoraObservacion,
+} from '../lib/units';
 
-export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos = {}, onClose }) {
-  const [periodoFiltro, setPeriodoFiltro] = useState('todos'); // Por defecto 'todos' para ver todas las evidencias acumuladas
-  const [frenteFiltro, setFrenteFiltro] = useState('todos');
+export default function ModalReporteEjecutivo({
+  registros = [],
+  evidenciasFotos = {},
+  isDemo = false,
+  proyectoInfo = null,
+  onClose,
+}) {
+  const { lang, formatQty, unitLabel } = useAppPreferences();
+  const [periodoFiltro, setPeriodoFiltro] = useState('todos');
+  const [frenteFiltro] = useState('todos');
 
-  // Filtrado de registros según el período seleccionado
   const registrosFiltrados = useMemo(() => {
     const ahora = new Date();
 
@@ -31,8 +37,7 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
       }
 
       if (!reg.fecha) return true;
-      
-      // Parsear fecha ISO o DD/MM/YYYY
+
       let fReg;
       if (reg.fecha.includes('/')) {
         const partes = reg.fecha.split('/');
@@ -41,8 +46,8 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
         fReg = new Date(reg.fecha);
       }
 
-      const diffDias = !isNaN(fReg.getTime()) 
-        ? Math.floor((ahora - fReg) / (1000 * 60 * 60 * 24)) 
+      const diffDias = !isNaN(fReg.getTime())
+        ? Math.floor((ahora - fReg) / (1000 * 60 * 60 * 24))
         : 0;
 
       let matchPeriodo = true;
@@ -55,7 +60,6 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
     });
   }, [registros, periodoFiltro, frenteFiltro]);
 
-  // Resumen consolidado por actividad
   const consolidadoActividades = useMemo(() => {
     const mapa = {};
     registrosFiltrados.forEach((r) => {
@@ -66,7 +70,7 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
           actividad: act,
           unidad: r.unidad || 'und',
           cantidadPeriodo: 0,
-          conteo: 0
+          conteo: 0,
         };
       }
       mapa[act].cantidadPeriodo += cant;
@@ -75,7 +79,6 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
     return Object.values(mapa);
   }, [registrosFiltrados]);
 
-  // Fotos de evidencia del período (búsqueda robusta por ID string/number o timestamp)
   const fotosPeriodo = useMemo(() => {
     const fotos = [];
     const idsProcesados = new Set();
@@ -86,32 +89,40 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
       const numKey = Number(reg.id);
       const createdKey = reg.created_at;
 
-      const fotoData = reg.foto || 
-                       evidenciasFotos[idKey] || 
-                       evidenciasFotos[strKey] || 
-                       evidenciasFotos[numKey] || 
-                       evidenciasFotos[createdKey];
+      const fotoData =
+        reg.foto ||
+        evidenciasFotos[idKey] ||
+        evidenciasFotos[strKey] ||
+        evidenciasFotos[numKey] ||
+        evidenciasFotos[createdKey];
 
       if (fotoData) {
-        const src = typeof fotoData === 'string' 
-          ? fotoData 
-          : (fotoData.foto || fotoData.fotoSrc || fotoData.fotoUrl);
+        const src =
+          typeof fotoData === 'string'
+            ? fotoData
+            : fotoData.foto || fotoData.fotoSrc || fotoData.fotoUrl;
 
         if (src && !idsProcesados.has(reg.id)) {
           idsProcesados.add(reg.id);
           fotos.push({
             ...reg,
             fotoSrc: src,
-            observaciones: typeof fotoData === 'object' && fotoData.observaciones ? fotoData.observaciones : reg.observaciones,
-            cuadrilla: typeof fotoData === 'object' && fotoData.cuadrilla ? fotoData.cuadrilla : reg.cuadrilla,
-            clima: typeof fotoData === 'object' && fotoData.clima ? fotoData.clima : reg.clima
+            observaciones:
+              typeof fotoData === 'object' && fotoData.observaciones
+                ? fotoData.observaciones
+                : reg.observaciones,
+            cuadrilla:
+              typeof fotoData === 'object' && fotoData.cuadrilla
+                ? fotoData.cuadrilla
+                : reg.cuadrilla,
+            clima:
+              typeof fotoData === 'object' && fotoData.clima ? fotoData.clima : reg.clima,
           });
         }
       }
     });
 
-    // Si aún no hay fotos por cruce exacto de ID, revisar si hay fotos guardadas en evidenciasFotos
-    if (fotos.length === 0 && Object.keys(evidenciasFotos).length > 0) {
+    if (!isDemo && fotos.length === 0 && Object.keys(evidenciasFotos).length > 0) {
       Object.values(evidenciasFotos).forEach((ev) => {
         if (ev && (ev.foto || ev.fotoSrc)) {
           fotos.push({
@@ -122,18 +133,62 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
             fecha: ev.fecha || new Date().toISOString().split('T')[0],
             ubicacion: ev.ubicacion || 'Frente Principal',
             observaciones: ev.observaciones || '',
-            fotoSrc: ev.foto || ev.fotoSrc
+            fotoSrc: ev.foto || ev.fotoSrc,
           });
         }
       });
     }
 
     return fotos;
-  }, [registrosFiltrados, evidenciasFotos]);
+  }, [registrosFiltrados, evidenciasFotos, isDemo]);
+
+  const headerSubtitle = isDemo
+    ? lang === 'en'
+      ? 'ISO 19650 Official Format • Northbridge Capital Partners & JGM ConTech'
+      : 'Formato Oficial ISO 19650 • Northbridge Capital Partners & JGM ConTech'
+    : proyectoInfo
+    ? `${proyectoInfo.subtitulo2Valor} • ${proyectoInfo.subtitulo1Valor}`
+    : 'Formato Oficial de Interventoría & Ingeniería';
+
+  const metaProyecto = isDemo
+    ? 'NORTHBRIDGE CORPORATE HUB (BIM 5D)'
+    : proyectoInfo?.nombre?.toUpperCase() || 'MEZZANINE 3 NIVELES';
+  const metaUbicacion = isDemo
+    ? 'Barranquilla / Miami / Madrid • ISO 19650'
+    : proyectoInfo?.id === 'casa_mendoza'
+    ? 'Sabanalarga, Atlántico'
+    : 'Sede Admon Barranquilla';
+  const metaLbl1 = proyectoInfo?.subtitulo1Label || (lang === 'en' ? 'Client' : 'Contratista');
+  const metaVal1 = isDemo
+    ? 'Northbridge Capital Partners'
+    : proyectoInfo?.subtitulo1Valor || 'INGENDES S.A.S.';
+  const metaLbl2 = proyectoInfo?.subtitulo2Label || (lang === 'en' ? 'Engineering' : 'Interventoría');
+  const metaVal2 = isDemo
+    ? lang === 'en'
+      ? 'JGM ConTech Engineering Team'
+      : 'Equipo de Ingeniería JGM ConTech'
+    : proyectoInfo?.subtitulo2Valor || 'DOLMEN S.A.';
 
   const imprimirPDF = () => {
     window.print();
   };
+
+  const periodoText =
+    periodoFiltro === 'semana'
+      ? lang === 'en'
+        ? 'Last 7 Days'
+        : 'Últimos 7 Días'
+      : periodoFiltro === 'quincena'
+      ? lang === 'en'
+        ? 'Last 15 Days'
+        : 'Últimos 15 Días'
+      : periodoFiltro === 'mes'
+      ? lang === 'en'
+        ? 'Last 30 Days'
+        : 'Últimos 30 Días'
+      : lang === 'en'
+      ? 'Full Project Summary'
+      : 'Consolidado General';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-2 sm:p-4 md:p-6 backdrop-blur-md overflow-y-auto">
@@ -147,45 +202,46 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
             </span>
             <div>
               <h3 className="text-xs sm:text-sm font-bold text-white leading-tight">
-                Generador de Informe Ejecutivo y Acta de Avance
+                {lang === 'en'
+                  ? 'Executive Progress Report & Field Log Builder'
+                  : 'Generador de Informe Ejecutivo y Acta de Avance'}
               </h3>
-              <p className="text-[10px] sm:text-[11px] text-slate-400">
-                Formato Oficial para Interventoría DOLMEN S.A. • INGENDES S.A.S.
-              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-400">{headerSubtitle}</p>
             </div>
           </div>
 
-          {/* SELECTORES DE PERÍODO Y BOTÓN DE IMPRESIÓN */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             <select
               value={periodoFiltro}
               onChange={(e) => setPeriodoFiltro(e.target.value)}
               className="flex-1 sm:flex-initial rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-1.5 text-xs text-white focus:outline-none"
             >
-              <option value="todos">Todo el Histórico ({registros.length})</option>
-              <option value="semana">Últimos 7 días (Semanal)</option>
-              <option value="quincena">Últimos 15 días (Quincenal)</option>
-              <option value="mes">Últimos 30 días (Mensual)</option>
+              <option value="todos">
+                {lang === 'en' ? `Full History (${registros.length})` : `Todo el Histórico (${registros.length})`}
+              </option>
+              <option value="semana">{lang === 'en' ? 'Last 7 days (Weekly)' : 'Últimos 7 días (Semanal)'}</option>
+              <option value="quincena">{lang === 'en' ? 'Last 15 days (Biweekly)' : 'Últimos 15 días (Quincenal)'}</option>
+              <option value="mes">{lang === 'en' ? 'Last 30 days (Monthly)' : 'Últimos 30 días (Mensual)'}</option>
             </select>
 
             <button
               onClick={imprimirPDF}
               className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm whitespace-nowrap"
             >
-              <Printer className="h-3.5 w-3.5" /> Imprimir / PDF
+              <Printer className="h-3.5 w-3.5" /> {lang === 'en' ? 'Print / PDF' : 'Imprimir / PDF'}
             </button>
 
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
-              title="Cerrar modal"
+              title={lang === 'en' ? 'Close modal' : 'Cerrar modal'}
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* ÁREA DE DOCUMENTO IMPRIMIBLE (DOCUMENTO OFICIAL) */}
+        {/* ÁREA DE DOCUMENTO IMPRIMIBLE */}
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 md:p-10 bg-white text-slate-900 printable-document">
           
           {/* MEMBRETE OFICIAL DE OBRA */}
@@ -194,96 +250,119 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <div className="p-1 rounded bg-slate-900 text-white inline-block">
-                    <HardHat className="h-4 sm:h-5 w-4 sm:h-5" />
+                    <HardHat className="h-4 sm:h-5 w-4 sm:w-5" />
                   </div>
                   <span className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">JGM ConTech</span>
                 </div>
                 <h1 className="text-sm sm:text-base font-bold text-slate-800 uppercase leading-snug">
-                  Informe Ejecutivo de Avance de Obra y Registro Fotográfico
+                  {lang === 'en'
+                    ? 'Executive Site Progress & Photo Inspection Report'
+                    : 'Informe Ejecutivo de Avance de Obra y Registro Fotográfico'}
                 </h1>
                 <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
-                  Período: <strong>{periodoFiltro === 'semana' ? 'Últimos 7 Días' : periodoFiltro === 'quincena' ? 'Últimos 15 Días' : periodoFiltro === 'mes' ? 'Últimos 30 Días' : 'Consolidado General'}</strong>
+                  {lang === 'en' ? 'Reporting Period:' : 'Período:'} <strong>{periodoText}</strong> ({lang === 'en' ? 'Imperial US Units' : 'Unidades Métricas SI'})
                 </p>
               </div>
 
               <div className="text-left sm:text-right text-[11px] sm:text-xs space-y-0.5 bg-slate-50 sm:bg-transparent p-2 sm:p-0 rounded-lg w-full sm:w-auto">
-                <div className="font-mono font-bold text-slate-900">ACTA INF-{new Date().getFullYear()}-{String(registrosFiltrados.length).padStart(3, '0')}</div>
-                <div className="text-slate-500">Fecha de Emisión: <strong>{new Date().toLocaleDateString('es-CO')}</strong></div>
-                <div className="text-[11px] text-emerald-700 font-bold">● Reporte Conforme a Bitácora</div>
+                <div className="font-mono font-bold text-slate-900">
+                  {lang === 'en' ? 'REPORT' : 'ACTA'} INF-{new Date().getFullYear()}-{String(registrosFiltrados.length).padStart(3, '0')}
+                </div>
+                <div className="text-slate-500">
+                  {lang === 'en' ? 'Issue Date:' : 'Fecha de Emisión:'}{' '}
+                  <strong>{new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'es-CO')}</strong>
+                </div>
+                <div className="text-[11px] text-emerald-700 font-bold">
+                  {lang === 'en' ? 'Verified against Field Log' : 'Reporte Conforme a Bitácora'}
+                </div>
               </div>
             </div>
 
-            {/* TABLA DE METADATA DEL CONTRATO (RESPONSIVA) */}
+            {/* TABLA DE METADATA DEL CONTRATO */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 p-2.5 sm:p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
               <div>
-                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">Proyecto</span>
-                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">MEZZANINE 3 NIVELES</strong>
+                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">
+                  {lang === 'en' ? 'Project' : 'Proyecto'}
+                </span>
+                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">{metaProyecto}</strong>
               </div>
               <div>
-                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">Ubicación</span>
-                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">Sede Admon Barranquilla</strong>
+                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">
+                  {lang === 'en' ? 'Location' : 'Ubicación'}
+                </span>
+                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">{metaUbicacion}</strong>
               </div>
               <div>
-                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">Contratista</span>
-                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">INGENDES S.A.S.</strong>
+                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">{metaLbl1}</span>
+                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">{metaVal1}</strong>
               </div>
               <div>
-                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">Interventoría</span>
-                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">DOLMEN S.A. E.S.P.</strong>
+                <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase font-bold">{metaLbl2}</span>
+                <strong className="text-slate-800 text-[10px] sm:text-[11px] block truncate">{metaVal2}</strong>
               </div>
             </div>
           </div>
 
-          {/* 1. RESUMEN EJECUTIVO DEL PERÍODO (TARJETAS ADAPTADAS A CELULAR) */}
+          {/* 1. RESUMEN EJECUTIVO DEL PERÍODO */}
           <div className="mb-6">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2.5 flex items-center gap-1.5">
               <TrendingUp className="h-4 w-4 text-emerald-600" />
-              1. Resumen de Ejecución Física del Período
+              {lang === 'en'
+                ? '1. Physical Execution Summary for Period'
+                : '1. Resumen de Ejecución Física del Período'}
             </h2>
 
-            {/* Tarjetas responsivas: 1 columna en móvil, 3 en pantalla grande */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mb-4">
               <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 flex sm:flex-col justify-between items-center sm:text-center">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">Jornadas / Registros</span>
+                <span className="text-[11px] font-bold text-slate-500 uppercase">
+                  {lang === 'en' ? 'Logged Shifts / Entries' : 'Jornadas / Registros'}
+                </span>
                 <div className="text-lg sm:text-2xl font-black text-slate-900">{registrosFiltrados.length}</div>
               </div>
 
               <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 flex sm:flex-col justify-between items-center sm:text-center">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">Actividades Atendidas</span>
+                <span className="text-[11px] font-bold text-slate-500 uppercase">
+                  {lang === 'en' ? 'Active WBS Items' : 'Actividades Atendidas'}
+                </span>
                 <div className="text-lg sm:text-2xl font-black text-slate-900">{consolidadoActividades.length}</div>
               </div>
 
               <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 flex sm:flex-col justify-between items-center sm:text-center">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">Evidencias Fotográficas</span>
+                <span className="text-[11px] font-bold text-slate-500 uppercase">
+                  {lang === 'en' ? 'Photographic Evidence' : 'Evidencias Fotográficas'}
+                </span>
                 <div className="text-lg sm:text-2xl font-black text-emerald-700">{fotosPeriodo.length}</div>
               </div>
             </div>
 
-            {/* TABLA DE CANTIDADES EJECUTADAS (CON SCROLL HORIZONTAL SUAVE EN MÓVIL) */}
             <div className="border border-slate-200 rounded-xl overflow-x-auto shadow-sm">
               <table className="w-full text-left text-xs text-slate-800 min-w-[380px] sm:min-w-full">
                 <thead className="bg-slate-100 text-[10px] sm:text-[11px] font-bold text-slate-600 uppercase border-b border-slate-200">
                   <tr>
-                    <th className="py-2.5 px-3">Actividad (APU/WBS)</th>
-                    <th className="py-2.5 px-2 text-center">Unidad</th>
-                    <th className="py-2.5 px-3 text-right">Cant. Ejecutada</th>
-                    <th className="py-2.5 px-3 text-center">Reportes</th>
+                    <th className="py-2.5 px-3">{lang === 'en' ? 'Activity (BOQ/WBS)' : 'Actividad (APU/WBS)'}</th>
+                    <th className="py-2.5 px-2 text-center">{lang === 'en' ? 'Unit' : 'Unidad'}</th>
+                    <th className="py-2.5 px-3 text-right">{lang === 'en' ? 'Executed Qty' : 'Cant. Ejecutada'}</th>
+                    <th className="py-2.5 px-3 text-center">{lang === 'en' ? 'Logs' : 'Reportes'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
                   {consolidadoActividades.length === 0 ? (
                     <tr>
                       <td colSpan="4" className="py-4 text-center text-slate-400">
-                        No hay actividades registradas en el período seleccionado.
+                        {lang === 'en'
+                          ? 'No activities logged for the selected period.'
+                          : 'No hay actividades registradas en el período seleccionado.'}
                       </td>
                     </tr>
                   ) : (
                     consolidadoActividades.map((item, idx) => (
                       <tr key={idx} className="hover:bg-slate-50">
-                        <td className="py-2.5 px-3 font-semibold text-slate-900 leading-snug">{item.actividad}</td>
-                        <td className="py-2.5 px-2 text-center font-mono">{item.unidad}</td>
+                        <td className="py-2.5 px-3 font-semibold text-slate-900 leading-snug">
+                          {localizeActivity(item.actividad, lang)}
+                        </td>
+                        <td className="py-2.5 px-2 text-center font-mono">{unitLabel(item.unidad)}</td>
                         <td className="py-2.5 px-3 text-right font-black text-slate-900">
-                          {item.cantidadPeriodo.toFixed(2)}
+                          {formatQty(item.cantidadPeriodo, item.unidad)}
                         </td>
                         <td className="py-2.5 px-3 text-center text-slate-500 font-semibold">{item.conteo}</td>
                       </tr>
@@ -292,24 +371,29 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
                 </tbody>
               </table>
             </div>
-            <div className="text-[10px] text-slate-400 mt-1 block sm:hidden text-right">
-              ↔ Desliza horizontalmente para ver la tabla completa
-            </div>
           </div>
 
-          {/* 2. REGISTRO FOTOGRÁFICO DE OBRA (ÁLBUM DE EVIDENCIAS) */}
+          {/* 2. REGISTRO FOTOGRÁFICO DE OBRA */}
           <div className="mb-8">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2.5 flex items-center gap-1.5">
               <Camera className="h-4 w-4 text-slate-700" />
-              2. Álbum Fotográfico de Evidencias en Campo ({fotosPeriodo.length} {fotosPeriodo.length === 1 ? 'foto' : 'fotos'})
+              {lang === 'en'
+                ? `2. Field Photographic Inspection Album (${fotosPeriodo.length} ${fotosPeriodo.length === 1 ? 'photo' : 'photos'})`
+                : `2. Álbum Fotográfico de Evidencias en Campo (${fotosPeriodo.length} ${fotosPeriodo.length === 1 ? 'foto' : 'fotos'})`}
             </h2>
 
             {fotosPeriodo.length === 0 ? (
               <div className="p-6 sm:p-8 border-2 border-dashed border-slate-200 rounded-xl text-center text-slate-500 text-xs bg-slate-50/50">
                 <Camera className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                <p className="font-bold text-slate-700">Aún no se han adjuntado fotos en este período.</p>
+                <p className="font-bold text-slate-700">
+                  {lang === 'en'
+                    ? 'No photos attached in this period yet.'
+                    : 'Aún no se han adjuntado fotos en este período.'}
+                </p>
                 <p className="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
-                  💡 Puedes adjuntar fotos de evidencia directamente desde la cámara del celular al crear un nuevo registro de bitácora.
+                  {lang === 'en'
+                    ? 'Attach field inspection evidence directly from the Field Log form.'
+                    : 'Puedes adjuntar fotos de evidencia directamente al registrar una nueva entrada de bitácora.'}
                 </p>
               </div>
             ) : (
@@ -319,24 +403,24 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
                     <div className="h-52 sm:h-56 bg-slate-950 flex items-center justify-center overflow-hidden">
                       <img
                         src={fotoItem.fotoSrc}
-                        alt={fotoItem.actividad}
+                        alt={localizeActivity(fotoItem.actividad, lang)}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="p-3 bg-slate-50 border-t border-slate-200 text-[11px] space-y-1">
                       <div className="flex justify-between items-center font-bold text-slate-900">
-                        <span className="truncate pr-2">{fotoItem.actividad}</span>
+                        <span className="truncate pr-2">{localizeActivity(fotoItem.actividad, lang)}</span>
                         <span className="text-emerald-700 shrink-0 font-black">
-                          {Number(fotoItem.cantidad).toFixed(2)} {fotoItem.unidad}
+                          {formatQty(fotoItem.cantidad, fotoItem.unidad)} {unitLabel(fotoItem.unidad)}
                         </span>
                       </div>
                       <div className="text-slate-500 text-[10px] flex justify-between">
-                        <span>Fecha: {fotoItem.fecha}</span>
-                        <span>Frente: {fotoItem.ubicacion || 'General'}</span>
+                        <span>{lang === 'en' ? 'Date:' : 'Fecha:'} {fotoItem.fecha}</span>
+                        <span>{lang === 'en' ? 'Zone:' : 'Frente:'} {localizeRoomName(fotoItem.ubicacion || 'General', lang)}</span>
                       </div>
                       {fotoItem.observaciones && (
                         <p className="text-slate-600 italic text-[10px] pt-1 border-t border-slate-200 leading-tight">
-                          "{fotoItem.observaciones}"
+                          "{localizeBitacoraObservacion(fotoItem.observaciones, lang)}"
                         </p>
                       )}
                     </div>
@@ -346,26 +430,60 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
             )}
           </div>
 
-          {/* 3. FIRMAS FORMALES DE ENTREGA Y APROBACIÓN (RESPONSIVAS PARA MÓVIL) */}
+          {/* 3. FIRMAS FORMALES DE ENTREGA Y APROBACIÓN */}
           <div className="mt-8 pt-6 border-t-2 border-slate-900 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-center text-xs">
             <div className="flex flex-col items-center">
               <div className="border-b border-slate-400 w-48 sm:w-56 mb-2" />
-              <p className="font-black text-slate-900">ING. JUAN GONZÁLEZ</p>
-              <p className="text-slate-600 font-semibold">Ingeniero Residente de Obra</p>
-              <p className="text-[10px] text-slate-400">INGENDES S.A.S. • Contratista</p>
+              <p className="font-black text-slate-900">
+                {isDemo
+                  ? lang === 'en'
+                    ? 'PROJECT DIRECTOR / LEAD ENGINEER'
+                    : 'DIRECCIÓN DE PROYECTO / INGENIERÍA'
+                  : lang === 'en'
+                  ? 'RESIDENT PROJECT ENGINEER'
+                  : 'INGENIERO RESIDENTE DE OBRA'}
+              </p>
+              <p className="text-slate-600 font-semibold">
+                {isDemo
+                  ? 'JGM ConTech Engineering Team'
+                  : proyectoInfo?.subtitulo2Valor || 'Dirección Técnica de Obra'}
+              </p>
+              <p className="text-[10px] text-slate-400">
+                {isDemo ? 'JGM ConTech Showcase Platform' : 'Control Técnico de Obra'}
+              </p>
             </div>
 
             <div className="flex flex-col items-center">
               <div className="border-b border-slate-400 w-48 sm:w-56 mb-2" />
-              <p className="font-black text-slate-900">INTERVENTOR TÉCNICO DE OBRA</p>
-              <p className="text-slate-600 font-semibold">Supervisor / Interventor Delegado</p>
-              <p className="text-[10px] text-slate-400">DOLMEN S.A. E.S.P. • Interventoría</p>
+              <p className="font-black text-slate-900">
+                {isDemo
+                  ? lang === 'en'
+                    ? "OWNER'S REPRESENTATIVE"
+                    : 'REPRESENTANTE DEL CONTRATANTE'
+                  : lang === 'en'
+                  ? 'TECHNICAL SUPERVISION / QA LEAD'
+                  : 'INTERVENTOR TÉCNICO DE OBRA'}
+              </p>
+              <p className="text-slate-600 font-semibold">
+                {isDemo
+                  ? 'Northbridge Capital Partners'
+                  : proyectoInfo?.subtitulo1Valor || 'Supervisión Delegada'}
+              </p>
+              <p className="text-[10px] text-slate-400">
+                {lang === 'en' ? 'Approval & Audit' : 'Supervisión y Aprobación'}
+              </p>
             </div>
           </div>
 
           {/* PIE DE PÁGINA */}
           <div className="mt-6 pt-3 border-t border-slate-200 text-center text-[10px] text-slate-400">
-            Documento generado digitalmente por la plataforma JGM ConTech • Sistema de Control y Gestión de Obra Civil • Barranquilla, Colombia
+            {isDemo
+              ? lang === 'en'
+                ? 'Digitally generated by JGM ConTech Platform • ISO 19650 BIM 4D/5D Controls (Showcase)'
+                : 'Documento generado digitalmente por JGM ConTech • Sistema de Control ISO 19650 (Showcase)'
+              : lang === 'en'
+              ? 'Digitally generated by JGM ConTech • Civil Project Controls Platform'
+              : 'Documento generado digitalmente por JGM ConTech • Sistema de Control y Gestión de Obra Civil'}
           </div>
 
         </div>
@@ -373,13 +491,15 @@ export default function ModalReporteEjecutivo({ registros = [], evidenciasFotos 
         {/* PIE DE MODAL (NO IMPRIMIBLE) */}
         <div className="p-3 bg-slate-100 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs no-print">
           <span className="text-slate-500 text-[10px] sm:text-[11px] text-center sm:text-left">
-            💡 Al presionar Imprimir, selecciona "Guardar como PDF" para archivar o enviar por correo a interventoría.
+            {lang === 'en'
+              ? 'Tip: Press Print and choose "Save as PDF" to export the official executive field report.'
+              : 'Al presionar Imprimir, selecciona "Guardar como PDF" para archivar o enviar el acta ejecutiva.'}
           </span>
           <button
             onClick={onClose}
             className="w-full sm:w-auto rounded-lg bg-slate-900 px-4 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition"
           >
-            Cerrar Informe
+            {lang === 'en' ? 'Close Report' : 'Cerrar Informe'}
           </button>
         </div>
 

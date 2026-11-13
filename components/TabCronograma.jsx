@@ -1,22 +1,36 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle2, 
-  TrendingUp, 
-  Search, 
-  Filter, 
-  Flame, 
-  ChevronRight, 
-  ArrowUpRight, 
-  Download, 
+import {
+  Calendar,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  TrendingUp,
+  Search,
+  Filter,
+  Flame,
+  ChevronRight,
+  ArrowUpRight,
+  Download,
   Info,
   CalendarDays,
-  Target
+  Target,
+  X
 } from 'lucide-react';
+import { useAppPreferences } from '../lib/i18n';
+import {
+  DEMO_SHOWCASE_PROJECT_ID,
+  DEMO_CATALOGO_SHOWCASE,
+  CRONOGRAMA_DEMO_SHOWCASE
+} from '../lib/demoFieldData';
+import {
+  convertQty,
+  convertUnitLabel,
+  localizeChapter,
+  localizeCrew,
+  localizeActivity
+} from '../lib/units';
 
 // =============================================================================
 // CATÁLOGO BASE DEL CRONOGRAMA 4D (MEZZANINE 3 NIVELES - BARRANQUILLA)
@@ -27,7 +41,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-01",
     wbs: "1.1",
     nombre: "Localización, trazado y replanteo",
-    capitulo: "🏗️ PRELIMINARES",
+    capitulo: "PRELIMINARES",
     inicio: "2026-10-15",
     fin: "2026-10-20",
     duracionDias: 5,
@@ -41,7 +55,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-02",
     wbs: "1.2",
     nombre: "Demolición y retiro de material (plantillas, muros)",
-    capitulo: "🏗️ PRELIMINARES",
+    capitulo: "PRELIMINARES",
     inicio: "2026-10-18",
     fin: "2026-10-26",
     duracionDias: 8,
@@ -55,7 +69,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-03",
     wbs: "2.1",
     nombre: "Construcción de plantilla de concreto",
-    capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA",
+    capitulo: "CIMENTACIÓN Y ESTRUCTURA",
     inicio: "2026-10-25",
     fin: "2026-11-03",
     duracionDias: 9,
@@ -69,7 +83,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-04",
     wbs: "2.2",
     nombre: "Concreto en zapatas y cimentación",
-    capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA",
+    capitulo: "CIMENTACIÓN Y ESTRUCTURA",
     inicio: "2026-10-28",
     fin: "2026-11-08",
     duracionDias: 11,
@@ -83,7 +97,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-05",
     wbs: "2.3",
     nombre: "Concreto en vigas de amarre y aéreas",
-    capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA",
+    capitulo: "CIMENTACIÓN Y ESTRUCTURA",
     inicio: "2026-11-04",
     fin: "2026-11-15",
     duracionDias: 11,
@@ -97,7 +111,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-06",
     wbs: "2.4",
     nombre: "Concreto en columnas estructurales",
-    capitulo: "🏗️ CIMENTACIÓN Y ESTRUCTURA",
+    capitulo: "CIMENTACIÓN Y ESTRUCTURA",
     inicio: "2026-11-08",
     fin: "2026-11-20",
     duracionDias: 12,
@@ -111,7 +125,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-07",
     wbs: "3.1",
     nombre: "Muros en mampostería de bloques de concreto",
-    capitulo: "🧱 MAMPOSTERÍA Y CERRAMIENTOS",
+    capitulo: "MAMPOSTERÍA Y CERRAMIENTOS",
     inicio: "2026-11-16",
     fin: "2026-12-05",
     duracionDias: 19,
@@ -125,7 +139,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-08",
     wbs: "4.1",
     nombre: "Montaje de cubierta en Eternit",
-    capitulo: "🏠 CUBIERTAS",
+    capitulo: "CUBIERTAS",
     inicio: "2026-11-25",
     fin: "2026-12-10",
     duracionDias: 15,
@@ -139,7 +153,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-09",
     wbs: "5.1",
     nombre: "Red de tubería hidrosanitaria PVC",
-    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    capitulo: "CARPINTERÍA E INSTALACIONES",
     inicio: "2026-11-28",
     fin: "2026-12-12",
     duracionDias: 14,
@@ -153,7 +167,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-10",
     wbs: "6.1",
     nombre: "Pañete y mortero de revoco en muros",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-12-04",
     fin: "2026-12-22",
     duracionDias: 18,
@@ -167,7 +181,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-11",
     wbs: "6.2",
     nombre: "Instalación de cielo raso",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-12-12",
     fin: "2026-12-28",
     duracionDias: 16,
@@ -181,7 +195,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-12",
     wbs: "6.3",
     nombre: "Instalación de piso cerámico / enchape",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-12-18",
     fin: "2027-01-05",
     duracionDias: 18,
@@ -195,7 +209,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-13",
     wbs: "6.4",
     nombre: "Estuco y pintura vinílica en muros",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-12-26",
     fin: "2027-01-10",
     duracionDias: 15,
@@ -209,7 +223,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-14",
     wbs: "6.5",
     nombre: "Instalación de guardaescobas",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2027-01-02",
     fin: "2027-01-08",
     duracionDias: 6,
@@ -223,7 +237,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-15",
     wbs: "7.1",
     nombre: "Instalación de puertas y ventanas",
-    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    capitulo: "CARPINTERÍA E INSTALACIONES",
     inicio: "2027-01-04",
     fin: "2027-01-12",
     duracionDias: 8,
@@ -237,7 +251,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-16",
     wbs: "7.2",
     nombre: "Instalación de puertas interiores y baño",
-    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    capitulo: "CARPINTERÍA E INSTALACIONES",
     inicio: "2027-01-06",
     fin: "2027-01-12",
     duracionDias: 6,
@@ -251,7 +265,7 @@ export const CRONOGRAMA_BASE = [
     id: "ACT-17",
     wbs: "7.3",
     nombre: "Instalación de aparatos sanitarios y lavaplatos",
-    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    capitulo: "CARPINTERÍA E INSTALACIONES",
     inicio: "2027-01-08",
     fin: "2027-01-14",
     duracionDias: 6,
@@ -271,7 +285,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-1.1",
     wbs: "1.1",
     nombre: "Muros en mampostería de bloques de concreto",
-    capitulo: "🧱 MAMPOSTERÍA Y CERRAMIENTOS",
+    capitulo: "MAMPOSTERÍA Y CERRAMIENTOS",
     inicio: "2026-11-02",
     fin: "2026-11-16",
     duracionDias: 14,
@@ -286,7 +300,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-1.2",
     wbs: "1.2",
     nombre: "Pañete y mortero de revoco en muros",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-11-10",
     fin: "2026-11-26",
     duracionDias: 16,
@@ -301,7 +315,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-2.1",
     wbs: "2.1",
     nombre: "Plantilla de concreto e=7cm (Casa Mendoza)",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-11-14",
     fin: "2026-11-26",
     duracionDias: 12,
@@ -316,7 +330,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-2.2",
     wbs: "2.2",
     nombre: "Instalación de piso cerámico / enchape",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-11-22",
     fin: "2026-12-07",
     duracionDias: 15,
@@ -331,7 +345,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-2.3",
     wbs: "2.3",
     nombre: "Enchape de pared cerámica / porcelanato (Cocina/Baño)",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-11-25",
     fin: "2026-12-06",
     duracionDias: 11,
@@ -346,7 +360,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-3.1",
     wbs: "3.1",
     nombre: "Instalación de cielo raso",
-    capitulo: "☁️ CIELOS RASOS Y AISLAMIENTO",
+    capitulo: "CIELOS RASOS Y AISLAMIENTO",
     inicio: "2026-11-28",
     fin: "2026-12-12",
     duracionDias: 14,
@@ -361,7 +375,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-3.2",
     wbs: "3.2",
     nombre: "Instalación de aislamiento termoacústico Frescasa Eco 2-1/2\"",
-    capitulo: "☁️ CIELOS RASOS Y AISLAMIENTO",
+    capitulo: "CIELOS RASOS Y AISLAMIENTO",
     inicio: "2026-11-30",
     fin: "2026-12-13",
     duracionDias: 13,
@@ -376,7 +390,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-4.1",
     wbs: "4.1",
     nombre: "Estuco y pintura vinílica en muros",
-    capitulo: "🎨 ACABADOS Y REVESTIMIENTOS",
+    capitulo: "ACABADOS Y REVESTIMIENTOS",
     inicio: "2026-12-04",
     fin: "2026-12-19",
     duracionDias: 15,
@@ -391,7 +405,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-5.1",
     wbs: "5.1",
     nombre: "Instalación de puertas interiores y baño",
-    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    capitulo: "CARPINTERÍA E INSTALACIONES",
     inicio: "2026-12-10",
     fin: "2026-12-18",
     duracionDias: 8,
@@ -406,7 +420,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-5.2",
     wbs: "5.2",
     nombre: "Instalación de puertas y ventanas",
-    capitulo: "🚪 CARPINTERÍA E INSTALACIONES",
+    capitulo: "CARPINTERÍA E INSTALACIONES",
     inicio: "2026-12-12",
     fin: "2026-12-20",
     duracionDias: 8,
@@ -421,7 +435,7 @@ export const CRONOGRAMA_CASA_MENDOZA = [
     id: "CM-6.1",
     wbs: "6.1",
     nombre: "Montaje de cubierta en Eternit",
-    capitulo: "🏠 CUBIERTAS",
+    capitulo: "CUBIERTAS",
     inicio: "2026-11-18",
     fin: "2026-12-03",
     duracionDias: 15,
@@ -434,20 +448,67 @@ export const CRONOGRAMA_CASA_MENDOZA = [
   }
 ];
 
-export default function TabCronograma({ registros = [], proyectoActivo = 'mezzanine' }) {
+export default function TabCronograma({ registros = [], proyectoActivo = 'mezzanine', isDemo = false }) {
+  const { lang, formatQty, unitLabel } = useAppPreferences();
+  const demoMode = isDemo || proyectoActivo === DEMO_SHOWCASE_PROJECT_ID;
+
   const [filtroTexto, setFiltroTexto] = useState('');
   const [filtroCapitulo, setFiltroCapitulo] = useState('todos');
   const [filtroEstado, setFiltroEstado] = useState('todos');
   const [selectedActividad, setSelectedActividad] = useState(null);
 
-  const cronogramaSource = proyectoActivo === 'casa_mendoza' ? CRONOGRAMA_CASA_MENDOZA : CRONOGRAMA_BASE;
+  const cronogramaSource = useMemo(() => {
+    if (demoMode) {
+      const normKey = (s) =>
+        String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      return CRONOGRAMA_DEMO_SHOWCASE.filter((t) => !t.esResumen).map((t) => {
+        const catMatch = DEMO_CATALOGO_SHOWCASE.find((c) =>
+          (t.matchKeywords || []).some((k) => normKey(c.id).includes(normKey(k)))
+        );
+        const duracionDias = Math.max(
+          1,
+          Math.round((new Date(t.fin).getTime() - new Date(t.inicio).getTime()) / (1000 * 60 * 60 * 24))
+        );
+        return {
+          id: t.id,
+          wbs: t.wbs,
+          nombre: t.actividad,
+          capitulo: t.fase,
+          inicio: t.inicio,
+          fin: t.fin,
+          duracionDias,
+          meta: catMatch?.cantidadPresupuesto || 100,
+          unidad: catMatch?.unidad || 'und',
+          pesoPct: t.peso,
+          rutaCritica: Boolean(t.critica),
+          responsable: 'Northbridge Field Crew',
+          matchKeys: t.matchKeywords || [],
+        };
+      });
+    }
+    return proyectoActivo === 'casa_mendoza' ? CRONOGRAMA_CASA_MENDOZA : CRONOGRAMA_BASE;
+  }, [demoMode, proyectoActivo]);
 
   // Fecha actual de referencia de obra
   const fechaHoy = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   // Fechas globales del proyecto
-  const fechaInicioGlobal = proyectoActivo === 'casa_mendoza' ? "2026-11-02" : "2026-10-15";
-  const fechaFinGlobal = proyectoActivo === 'casa_mendoza' ? "2026-12-22" : "2027-01-15";
+  const fechaInicioGlobal = demoMode
+    ? "2026-10-24"
+    : proyectoActivo === 'casa_mendoza'
+    ? "2026-11-02"
+    : "2026-10-15";
+  const fechaFinGlobal = demoMode
+    ? "2026-12-01"
+    : proyectoActivo === 'casa_mendoza'
+    ? "2026-12-22"
+    : "2027-01-15";
+
+  const fechaFinLabel = demoMode
+    ? (lang === 'en' ? 'Dec 01, 2026' : '01 Dic 2026')
+    : proyectoActivo === 'casa_mendoza'
+    ? (lang === 'en' ? 'Dec 22, 2026' : '22 Dic 2026')
+    : (lang === 'en' ? 'Jan 15, 2027' : '15 Ene 2027');
 
   // Calcular el progreso real a partir de la bitácora
   const cronogramaConDatos = useMemo(() => {
@@ -468,7 +529,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
 
       const ejecutado = registros.reduce((acc, reg) => {
         const raw = String(reg.actividad || '');
-        if (raw.toLowerCase().includes('bim_takeoff')) return acc;
+        if (!demoMode && raw.toLowerCase().includes('bim_takeoff')) return acc;
         const regNorm = norm(raw);
         if (isCieloItem && (regNorm.includes('frescasa') || regNorm.includes('aislamiento'))) {
           return acc;
@@ -477,7 +538,8 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
           return acc;
         }
         const matches = regNorm.includes(targetNorm) || keys.some((k) => k && regNorm.includes(k));
-        return matches ? acc + (parseFloat(reg.cantidad) || 0) : acc;
+        const qtyVal = parseFloat(reg.cantidad ?? reg.cantidad_ejecutada ?? 0) || 0;
+        return matches ? acc + qtyVal : acc;
       }, 0);
       const pctReal = item.meta > 0 ? (ejecutado / item.meta) * 100 : 0;
 
@@ -499,29 +561,29 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
       // Desviación y estado de semáforo
       const desviacion = pctReal - pctProgramado;
       let estado = 'por_iniciar';
-      let estadoLabel = 'Por Iniciar';
+      let estadoLabel = lang === 'en' ? 'Not Started' : 'Por Iniciar';
       let colorClass = 'bg-slate-100 text-slate-700 border-slate-300';
       let dotColor = 'bg-slate-400';
 
       if (pctReal >= 100) {
         estado = 'completada';
-        estadoLabel = 'Completada';
+        estadoLabel = lang === 'en' ? 'Completed' : 'Completada';
         colorClass = 'bg-emerald-50 text-emerald-800 border-emerald-300';
         dotColor = 'bg-emerald-500';
       } else if (pctReal > 0 || pctProgramado > 0) {
         if (desviacion >= -5) {
           estado = 'en_tiempo';
-          estadoLabel = 'Al Día / En Tiempo';
+          estadoLabel = lang === 'en' ? 'On Schedule' : 'Al Día / En Tiempo';
           colorClass = 'bg-slate-200 text-slate-900 border-slate-400';
           dotColor = 'bg-slate-700';
         } else if (desviacion >= -15) {
           estado = 'en_atencion';
-          estadoLabel = 'Alerta Moderada';
+          estadoLabel = lang === 'en' ? 'Moderate Alert' : 'Alerta Moderada';
           colorClass = 'bg-amber-50 text-amber-800 border-amber-300';
           dotColor = 'bg-amber-500';
         } else {
           estado = 'retrasada';
-          estadoLabel = 'Atrasada (Ruta Crítica)';
+          estadoLabel = lang === 'en' ? 'Delayed (Critical)' : 'Atrasada (Ruta Crítica)';
           colorClass = 'bg-rose-50 text-rose-800 border-rose-300';
           dotColor = 'bg-rose-600 animate-pulse';
         }
@@ -529,6 +591,11 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
 
       return {
         ...item,
+        nombreDisp: localizeActivity(item.nombre, lang),
+        capituloDisp: localizeChapter(item.capitulo, lang),
+        responsableDisp: demoMode
+          ? (lang === 'en' ? 'Northbridge Field Crew' : 'Cuadrilla de Campo Northbridge')
+          : localizeCrew(item.responsable, lang),
         ejecutado,
         pctReal,
         pctProgramado,
@@ -539,7 +606,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
         dotColor
       };
     });
-  }, [cronogramaSource, registros, fechaHoy]);
+  }, [cronogramaSource, registros, fechaHoy, demoMode, lang]);
 
   // KPIs Generales del Proyecto
   const kpis = useMemo(() => {
@@ -586,12 +653,17 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
 
   // Filtrado de actividades
   const actividadesFiltradas = useMemo(() => {
+    const q = filtroTexto.toLowerCase();
     return cronogramaConDatos.filter((item) => {
-      const matchTexto = item.nombre.toLowerCase().includes(filtroTexto.toLowerCase()) ||
-                          item.wbs.toLowerCase().includes(filtroTexto.toLowerCase()) ||
-                          item.responsable.toLowerCase().includes(filtroTexto.toLowerCase());
+      const matchTexto =
+        !q ||
+        item.nombre.toLowerCase().includes(q) ||
+        item.nombreDisp.toLowerCase().includes(q) ||
+        item.wbs.toLowerCase().includes(q) ||
+        item.responsable.toLowerCase().includes(q) ||
+        item.responsableDisp.toLowerCase().includes(q);
       const matchCap = filtroCapitulo === 'todos' || item.capitulo === filtroCapitulo;
-      const matchEst = filtroEstado === 'todos' || 
+      const matchEst = filtroEstado === 'todos' ||
                         (filtroEstado === 'critica' && item.rutaCritica) ||
                         item.estado === filtroEstado;
       return matchTexto && matchCap && matchEst;
@@ -600,28 +672,30 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
 
   // Función para exportar cronograma
   const exportarCronogramaCSV = () => {
-    const headers = ["WBS", "Actividad", "Capitulo", "Inicio", "Fin", "Duracion_Dias", "Meta", "Unidad", "Ejecutado_Real", "Avance_Real_%", "Avance_Prog_%", "Estado", "Ruta_Critica"];
+    const headers = lang === 'en'
+      ? ["WBS", "Activity", "Chapter", "Start", "Finish", "Duration_Days", "Target", "Unit", "Actual_Qty", "Actual_Progress_%", "Planned_Progress_%", "Status", "Critical_Path"]
+      : ["WBS", "Actividad", "Capitulo", "Inicio", "Fin", "Duracion_Dias", "Meta", "Unidad", "Ejecutado_Real", "Avance_Real_%", "Avance_Prog_%", "Estado", "Ruta_Critica"];
     const rows = cronogramaConDatos.map(a => [
       `"${a.wbs}"`,
-      `"${a.nombre}"`,
-      `"${a.capitulo}"`,
+      `"${a.nombreDisp}"`,
+      `"${a.capituloDisp}"`,
       a.inicio,
       a.fin,
       a.duracionDias,
-      a.meta,
-      `"${a.unidad}"`,
-      a.ejecutado.toFixed(2),
+      convertQty(a.meta, a.unidad, lang).toFixed(2),
+      `"${convertUnitLabel(a.unidad, lang)}"`,
+      convertQty(a.ejecutado, a.unidad, lang).toFixed(2),
       a.pctReal.toFixed(2),
       a.pctProgramado.toFixed(2),
       `"${a.estadoLabel}"`,
-      a.rutaCritica ? "SI" : "NO"
+      a.rutaCritica ? (lang === 'en' ? "YES" : "SI") : "NO"
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `JGM_Cronograma_Obra_${fechaHoy}.csv`);
+    link.setAttribute("download", `JGM_Schedule_4D_${fechaHoy}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -638,11 +712,13 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
                 <CalendarDays className="h-5 w-5" />
               </span>
               <h2 className="text-xl font-bold text-slate-900">
-                Cronograma de Obra y Control 4D — {proyectoActivo === 'casa_mendoza' ? '🏡 Remodelación Casa Mendoza' : '🏢 Mezzanine 3 Niveles'}
+                {lang === 'en' ? 'Project Schedule & 4D Control' : 'Cronograma de Obra y Control 4D'} — {demoMode ? 'Northbridge Corporate Hub' : proyectoActivo === 'casa_mendoza' ? 'Remodelación Casa Mendoza' : 'Mezzanine 3 Niveles'}
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Plataforma del Residente de Obra • Sincronización en Tiempo Real con Bitácora y MS Project ({cronogramaSource.length} actividades)
+              {lang === 'en'
+                ? `Field Control Platform • Live Sync with Daily Field Log & MS Project (${cronogramaSource.length} activities)`
+                : `Plataforma del Residente de Obra • Sincronización en Tiempo Real con Bitácora y MS Project (${cronogramaSource.length} actividades)`}
             </p>
           </div>
 
@@ -651,7 +727,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
               onClick={exportarCronogramaCSV}
               className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm"
             >
-              <Download className="h-3.5 w-3.5" /> Exportar Cronograma (CSV)
+              <Download className="h-3.5 w-3.5" /> {lang === 'en' ? 'Export Schedule (CSV)' : 'Exportar Cronograma (CSV)'}
             </button>
           </div>
         </div>
@@ -661,71 +737,79 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
           {/* KPI 1: Avance Real */}
           <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-1">
-              <span>AVANCE FÍSICO REAL</span>
+              <span>{lang === 'en' ? 'ACTUAL PHYSICAL PROGRESS' : 'AVANCE FÍSICO REAL'}</span>
               <TrendingUp className="h-4 w-4 text-emerald-600" />
             </div>
             <div className="text-2xl font-black text-slate-900">
               {kpis.globalReal.toFixed(1)}%
             </div>
             <div className="mt-2 w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-emerald-500 transition-all duration-500" 
+              <div
+                className="h-full bg-emerald-500 transition-all duration-500"
                 style={{ width: `${Math.min(kpis.globalReal, 100)}%` }}
               />
             </div>
             <span className="text-[11px] text-slate-500 mt-1 block">
-              Programado a hoy: <strong>{kpis.globalProg.toFixed(1)}%</strong>
+              {lang === 'en' ? 'Planned to date:' : 'Programado a hoy:'} <strong>{kpis.globalProg.toFixed(1)}%</strong>
             </span>
           </div>
 
           {/* KPI 2: Índice de Desempeño SPI */}
           <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-1">
-              <span>ÍNDICE SPI (4D)</span>
+              <span>{lang === 'en' ? 'SPI INDEX (4D)' : 'ÍNDICE SPI (4D)'}</span>
               <Target className="h-4 w-4 text-slate-700" />
             </div>
             <div className={`text-2xl font-black ${kpis.spi >= 0.98 ? 'text-emerald-700' : kpis.spi >= 0.85 ? 'text-amber-600' : 'text-rose-600'}`}>
               {kpis.spi.toFixed(2)}
             </div>
             <div className="mt-1 text-xs font-semibold text-slate-600">
-              {kpis.spi >= 1.0 ? '⚡ Ritmo óptimo / Al día' : kpis.spi >= 0.88 ? '⚠️ Variación moderada' : '🚨 Requiere plan de choque'}
+              {kpis.spi >= 1.0
+                ? (lang === 'en' ? 'Optimal pace / On track' : 'Ritmo óptimo / Al día')
+                : kpis.spi >= 0.88
+                ? (lang === 'en' ? 'Moderate schedule variance' : 'Variación moderada')
+                : (lang === 'en' ? 'Recovery plan required' : 'Requiere plan de choque')}
             </div>
             <span className="text-[11px] text-slate-500 block">
-              {kpis.globalReal >= kpis.globalProg ? 'Adelanto neto positivo' : `Desvío: ${(kpis.globalReal - kpis.globalProg).toFixed(1)}%`}
+              {kpis.globalReal >= kpis.globalProg
+                ? (lang === 'en' ? 'Positive net schedule lead' : 'Adelanto neto positivo')
+                : `${lang === 'en' ? 'Variance:' : 'Desvío:'} ${(kpis.globalReal - kpis.globalProg).toFixed(1)}%`}
             </span>
           </div>
 
           {/* KPI 3: Plazos y Días */}
           <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-1">
-              <span>PLAZO CONTRACTUAL</span>
+              <span>{lang === 'en' ? 'CONTRACT DURATION' : 'PLAZO CONTRACTUAL'}</span>
               <Clock className="h-4 w-4 text-slate-600" />
             </div>
             <div className="text-2xl font-black text-slate-900">
-              {kpis.diasTranscurridos} <span className="text-sm font-semibold text-slate-500">/ {kpis.duracionTotal} días</span>
+              {kpis.diasTranscurridos} <span className="text-sm font-semibold text-slate-500">/ {kpis.duracionTotal} {lang === 'en' ? 'days' : 'días'}</span>
             </div>
             <div className="mt-1 text-xs font-semibold text-slate-600">
-              Quedan <strong>{kpis.diasRestantes} días</strong> de ejecución
+              {lang === 'en' ? 'Remaining:' : 'Quedan'} <strong>{kpis.diasRestantes} {lang === 'en' ? 'days' : 'días'}</strong> {lang === 'en' ? 'to completion' : 'de ejecución'}
             </div>
             <span className="text-[11px] text-slate-500 block">
-              Término: <strong>15 Ene 2027</strong>
+              {lang === 'en' ? 'Finish:' : 'Término:'} <strong>{fechaFinLabel}</strong>
             </span>
           </div>
 
           {/* KPI 4: Ruta Crítica */}
           <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-1">
-              <span>RUTA CRÍTICA</span>
+              <span>{lang === 'en' ? 'CRITICAL PATH' : 'RUTA CRÍTICA'}</span>
               <Flame className="h-4 w-4 text-rose-600" />
             </div>
             <div className="text-2xl font-black text-slate-900">
-              {kpis.actividadesCriticas} <span className="text-sm font-semibold text-slate-500">activas</span>
+              {kpis.actividadesCriticas} <span className="text-sm font-semibold text-slate-500">{lang === 'en' ? 'active' : 'activas'}</span>
             </div>
             <div className="mt-1 text-xs font-semibold text-rose-700">
-              Monitoreo diario prioritario
+              {lang === 'en' ? 'Daily priority tracking' : 'Monitoreo diario prioritario'}
             </div>
             <span className="text-[11px] text-slate-500 block">
-              Cimentación y Cubierta
+              {demoMode
+                ? (lang === 'en' ? 'Structure, Plaster & Envelope' : 'Estructura, Pañete y Envolvente')
+                : (lang === 'en' ? 'Foundations & Roofing' : 'Cimentación y Cubierta')}
             </span>
           </div>
         </div>
@@ -738,7 +822,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar por actividad, WBS o responsable..."
+              placeholder={lang === 'en' ? 'Search activity, WBS or crew...' : 'Buscar por actividad, WBS o responsable...'}
               value={filtroTexto}
               onChange={(e) => setFiltroTexto(e.target.value)}
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 text-xs focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800"
@@ -751,9 +835,9 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
               onChange={(e) => setFiltroCapitulo(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:border-slate-800 focus:outline-none"
             >
-              <option value="todos">Todos los Capítulos</option>
+              <option value="todos">{lang === 'en' ? 'All WBS Chapters' : 'Todos los Capítulos'}</option>
               {capitulos.filter(c => c !== 'todos').map(c => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>{localizeChapter(c, lang)}</option>
               ))}
             </select>
           </div>
@@ -764,13 +848,13 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
               onChange={(e) => setFiltroEstado(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:border-slate-800 focus:outline-none"
             >
-              <option value="todos">Todos los Estados</option>
-              <option value="critica">🔥 En Ruta Crítica</option>
-              <option value="en_tiempo">🟢 Al Día / En Tiempo</option>
-              <option value="en_atencion">🟡 Alerta Moderada</option>
-              <option value="retrasada">🔴 Atrasada</option>
-              <option value="completada">✅ Completada</option>
-              <option value="por_iniciar">⚪ Por Iniciar</option>
+              <option value="todos">{lang === 'en' ? 'All Schedule Statuses' : 'Todos los Estados'}</option>
+              <option value="critica">{lang === 'en' ? 'Critical Path Only' : 'En Ruta Crítica'}</option>
+              <option value="en_tiempo">{lang === 'en' ? 'On Schedule / On Track' : 'Al Día / En Tiempo'}</option>
+              <option value="en_atencion">{lang === 'en' ? 'Moderate Alert' : 'Alerta Moderada'}</option>
+              <option value="retrasada">{lang === 'en' ? 'Delayed' : 'Atrasada'}</option>
+              <option value="completada">{lang === 'en' ? 'Completed' : 'Completada'}</option>
+              <option value="por_iniciar">{lang === 'en' ? 'Not Started' : 'Por Iniciar'}</option>
             </select>
           </div>
         </div>
@@ -778,15 +862,17 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
 
       {/* 4. TABLA INTERACTIVA DE GANTT / CRONOGRAMA */}
       <div className="rounded-2xl steel-card overflow-hidden">
-        <div className="p-4 bg-slate-900 text-white flex justify-between items-center">
+        <div className="p-4 bg-slate-900 text-white flex flex-wrap justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-emerald-400" />
             <span className="text-xs font-bold uppercase tracking-wider">
-              Desglose WBS • Avance Real vs Programado ({actividadesFiltradas.length} actividades)
+              {lang === 'en'
+                ? `WBS Breakdown • Actual vs Planned Progress (${actividadesFiltradas.length} activities)`
+                : `Desglose WBS • Avance Real vs Programado (${actividadesFiltradas.length} actividades)`}
             </span>
           </div>
           <span className="text-[11px] text-slate-300">
-            Línea base: MEZZANINE 3 NIVELES - BARRANQUILLA
+            {lang === 'en' ? 'Baseline:' : 'Línea base:'} {demoMode ? 'NORTHBRIDGE CORPORATE HUB • ISO 19650' : proyectoActivo === 'casa_mendoza' ? 'REMODELACIÓN CASA MENDOZA' : 'MEZZANINE 3 NIVELES - BARRANQUILLA'}
           </span>
         </div>
 
@@ -795,25 +881,25 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
             <thead className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200">
               <tr>
                 <th className="py-3 px-4">WBS</th>
-                <th className="py-3 px-4">Actividad Constructiva</th>
-                <th className="py-3 px-4">Fechas (Inicio - Fin)</th>
-                <th className="py-3 px-4 text-center">Duración</th>
-                <th className="py-3 px-4 text-right">Ejecutado / Meta</th>
-                <th className="py-3 px-4 text-center">Avance 4D (Real vs Prog)</th>
-                <th className="py-3 px-4 text-center">Semáforo</th>
+                <th className="py-3 px-4">{lang === 'en' ? 'Construction Activity' : 'Actividad Constructiva'}</th>
+                <th className="py-3 px-4">{lang === 'en' ? 'Dates (Start - Finish)' : 'Fechas (Inicio - Fin)'}</th>
+                <th className="py-3 px-4 text-center">{lang === 'en' ? 'Duration' : 'Duración'}</th>
+                <th className="py-3 px-4 text-right">{lang === 'en' ? 'Built / Target' : 'Ejecutado / Meta'}</th>
+                <th className="py-3 px-4 text-center">{lang === 'en' ? '4D Progress (Actual vs Plan)' : 'Avance 4D (Real vs Prog)'}</th>
+                <th className="py-3 px-4 text-center">{lang === 'en' ? 'Status' : 'Semáforo'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {actividadesFiltradas.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="py-8 text-center text-slate-400">
-                    No se encontraron actividades con los filtros seleccionados.
+                    {lang === 'en' ? 'No activities matched the selected filters.' : 'No se encontraron actividades con los filtros seleccionados.'}
                   </td>
                 </tr>
               ) : (
                 actividadesFiltradas.map((act) => (
-                  <tr 
-                    key={act.id} 
+                  <tr
+                    key={act.id}
                     onClick={() => setSelectedActividad(act)}
                     className="hover:bg-slate-50/80 cursor-pointer transition"
                   >
@@ -822,7 +908,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
                       <div className="flex items-center gap-1.5">
                         <span>{act.wbs}</span>
                         {act.rutaCritica && (
-                          <span title="Ruta Crítica">
+                          <span title={lang === 'en' ? 'Critical Path' : 'Ruta Crítica'}>
                             <Flame className="h-3 w-3 text-rose-600" />
                           </span>
                         )}
@@ -831,14 +917,14 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
 
                     {/* Nombre y Capítulo */}
                     <td className="py-3 px-4">
-                      <div className="font-bold text-slate-900">{act.nombre}</div>
-                      <div className="text-[11px] text-slate-500">{act.capitulo} • {act.responsable}</div>
+                      <div className="font-bold text-slate-900">{act.nombreDisp}</div>
+                      <div className="text-[11px] text-slate-500">{act.capituloDisp} • {act.responsableDisp}</div>
                     </td>
 
                     {/* Fechas */}
                     <td className="py-3 px-4 whitespace-nowrap text-[11px]">
                       <div className="font-semibold text-slate-800">{act.inicio}</div>
-                      <div className="text-slate-400">al {act.fin}</div>
+                      <div className="text-slate-400">{lang === 'en' ? 'to' : 'al'} {act.fin}</div>
                     </td>
 
                     {/* Duración */}
@@ -849,32 +935,32 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
                     {/* Ejecutado / Meta */}
                     <td className="py-3 px-4 text-right">
                       <div className="font-bold text-slate-900">
-                        {act.ejecutado.toFixed(2)} {act.unidad}
+                        {formatQty(act.ejecutado, act.unidad, 2)} {unitLabel(act.unidad)}
                       </div>
                       <div className="text-[11px] text-slate-500">
-                        de {act.meta.toFixed(2)} {act.unidad}
+                        {lang === 'en' ? 'of' : 'de'} {formatQty(act.meta, act.unidad, 2)} {unitLabel(act.unidad)}
                       </div>
                     </td>
 
                     {/* Barra de Progreso 4D */}
                     <td className="py-3 px-4 w-48">
                       <div className="flex justify-between text-[11px] font-bold mb-1">
-                        <span className="text-emerald-700">Real: {act.pctReal.toFixed(1)}%</span>
-                        <span className="text-slate-500">Prog: {act.pctProgramado.toFixed(1)}%</span>
+                        <span className="text-emerald-700">{lang === 'en' ? 'Actual:' : 'Real:'} {act.pctReal.toFixed(1)}%</span>
+                        <span className="text-slate-500">{lang === 'en' ? 'Plan:' : 'Prog:'} {act.pctProgramado.toFixed(1)}%</span>
                       </div>
                       <div className="relative w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
                         {/* Barra Programada (Gris guía) */}
-                        <div 
-                          className="absolute top-0 bottom-0 bg-slate-400/40 rounded-full" 
-                          style={{ width: `${Math.min(act.pctProgramado, 100)}%` }} 
+                        <div
+                          className="absolute top-0 bottom-0 bg-slate-400/40 rounded-full"
+                          style={{ width: `${Math.min(act.pctProgramado, 100)}%` }}
                         />
                         {/* Barra Real (Color vivo) */}
-                        <div 
+                        <div
                           className={`relative h-full rounded-full transition-all duration-300 ${
-                            act.pctReal >= 100 
-                              ? 'bg-emerald-500' 
-                              : act.pctReal >= act.pctProgramado 
-                              ? 'bg-slate-800' 
+                            act.pctReal >= 100
+                              ? 'bg-emerald-500'
+                              : act.pctReal >= act.pctProgramado
+                              ? 'bg-slate-800'
                               : 'bg-amber-500'
                           }`}
                           style={{ width: `${Math.min(act.pctReal, 100)}%` }}
@@ -904,53 +990,60 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
             <div className="flex justify-between items-start pb-3 border-b border-slate-100 mb-4">
               <div>
                 <span className="text-xs font-bold text-emerald-600 uppercase">WBS {selectedActividad.wbs}</span>
-                <h3 className="text-lg font-black text-slate-900">{selectedActividad.nombre}</h3>
-                <p className="text-xs text-slate-500">{selectedActividad.capitulo}</p>
+                <h3 className="text-lg font-black text-slate-900">{selectedActividad.nombreDisp}</h3>
+                <p className="text-xs text-slate-500">{selectedActividad.capituloDisp}</p>
               </div>
               <button
                 onClick={() => setSelectedActividad(null)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                aria-label={lang === 'en' ? 'Close' : 'Cerrar'}
               >
-                ✕
+                <X className="h-4 w-4" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <div>
-                  <span className="text-slate-500 block">Fecha Inicio:</span>
+                  <span className="text-slate-500 block">{lang === 'en' ? 'Start Date:' : 'Fecha Inicio:'}</span>
                   <strong className="text-slate-900">{selectedActividad.inicio}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Fecha Terminación:</span>
+                  <span className="text-slate-500 block">{lang === 'en' ? 'Finish Date:' : 'Fecha Terminación:'}</span>
                   <strong className="text-slate-900">{selectedActividad.fin}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Duración Contractual:</span>
-                  <strong className="text-slate-900">{selectedActividad.duracionDias} días calendario</strong>
+                  <span className="text-slate-500 block">{lang === 'en' ? 'Contract Duration:' : 'Duración Contractual:'}</span>
+                  <strong className="text-slate-900">{selectedActividad.duracionDias} {lang === 'en' ? 'calendar days' : 'días calendario'}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Ruta Crítica:</span>
+                  <span className="text-slate-500 block">{lang === 'en' ? 'Critical Path:' : 'Ruta Crítica:'}</span>
                   <strong className={selectedActividad.rutaCritica ? 'text-rose-600 font-bold' : 'text-slate-700'}>
-                    {selectedActividad.rutaCritica ? '🔥 SÍ (Holgura Cero)' : 'NO (Con Holgura)'}
+                    {selectedActividad.rutaCritica
+                      ? (lang === 'en' ? 'YES (Zero Float)' : 'SÍ (Holgura Cero)')
+                      : (lang === 'en' ? 'NO (With Float)' : 'NO (Con Holgura)')}
                   </strong>
                 </div>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <span className="text-slate-500 block mb-1">Responsable en Obra:</span>
-                <strong className="text-slate-900 text-sm">{selectedActividad.responsable}</strong>
-                <span className="text-slate-500 block mt-2 mb-1">Incidencia en el Presupuesto (Peso):</span>
-                <strong className="text-slate-900">{selectedActividad.pesoPct}% del total de obra</strong>
+                <span className="text-slate-500 block mb-1">{lang === 'en' ? 'Assigned Field Crew:' : 'Responsable en Obra:'}</span>
+                <strong className="text-slate-900 text-sm">{selectedActividad.responsableDisp}</strong>
+                <span className="text-slate-500 block mt-2 mb-1">{lang === 'en' ? 'Schedule Weight:' : 'Incidencia en el Presupuesto (Peso):'}</span>
+                <strong className="text-slate-900">{selectedActividad.pesoPct}% {lang === 'en' ? 'of project total' : 'del total de obra'}</strong>
               </div>
 
               <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-emerald-800">Control de Cantidades:</span>
+                  <span className="font-bold text-emerald-800">{lang === 'en' ? 'Quantity Tracking:' : 'Control de Cantidades:'}</span>
                   <span className="font-extrabold text-emerald-900">{selectedActividad.pctReal.toFixed(1)}%</span>
                 </div>
                 <p className="text-emerald-700 text-[11px]">
-                  Se han registrado <strong>{selectedActividad.ejecutado.toFixed(2)} {selectedActividad.unidad}</strong> de una meta contratada de <strong>{selectedActividad.meta.toFixed(2)} {selectedActividad.unidad}</strong>.
+                  {lang === 'en' ? (
+                    <>Logged <strong>{formatQty(selectedActividad.ejecutado, selectedActividad.unidad, 2)} {unitLabel(selectedActividad.unidad)}</strong> of contracted target <strong>{formatQty(selectedActividad.meta, selectedActividad.unidad, 2)} {unitLabel(selectedActividad.unidad)}</strong>.</>
+                  ) : (
+                    <>Se han registrado <strong>{formatQty(selectedActividad.ejecutado, selectedActividad.unidad, 2)} {unitLabel(selectedActividad.unidad)}</strong> de una meta contratada de <strong>{formatQty(selectedActividad.meta, selectedActividad.unidad, 2)} {unitLabel(selectedActividad.unidad)}</strong>.</>
+                  )}
                 </p>
               </div>
             </div>
@@ -960,7 +1053,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'mezzan
                 onClick={() => setSelectedActividad(null)}
                 className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800"
               >
-                Cerrar Ficha
+                {lang === 'en' ? 'Close Sheet' : 'Cerrar Ficha'}
               </button>
             </div>
           </div>

@@ -1,32 +1,53 @@
 'use client';
 
 import React from 'react';
-import { 
-  X, 
-  Download, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Sun, 
-  CloudRain, 
-  Cloud, 
-  HardHat, 
-  CheckCircle2, 
-  FileText 
+import {
+  X,
+  Download,
+  Calendar,
+  Sun,
+  CloudRain,
+  Cloud,
+  HardHat,
+  FileText,
 } from 'lucide-react';
+import { useAppPreferences } from '../lib/i18n';
+import {
+  localizeActivity,
+  localizeWeather,
+  localizeCrew,
+  localizeRoomName,
+  localizeBitacoraObservacion,
+} from '../lib/units';
 
-export default function ModalEvidenciaFoto({ evidencia, onClose }) {
+export default function ModalEvidenciaFoto({ evidencia, isDemo = false, proyectoInfo = null, onClose }) {
+  const { lang, formatQty, unitLabel } = useAppPreferences();
+
   if (!evidencia) return null;
 
   const descargarFoto = () => {
     if (!evidencia.foto) return;
     const link = document.createElement('a');
     link.href = evidencia.foto;
-    link.download = `JGM_Evidencia_${evidencia.actividad.replace(/\s+/g, '_')}_${evidencia.fecha}.jpg`;
+    link.download = `JGM_Evidence_${String(evidencia.actividad || 'activity')
+      .replace(/\s+/g, '_')
+      .slice(0, 40)}_${evidencia.fecha}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+
+  const climaRaw = String(evidencia.clima || 'Soleado');
+  const esLluvia = climaRaw.toLowerCase().includes('lluv') || climaRaw.toLowerCase().includes('rain');
+  const esNublado = climaRaw.toLowerCase().includes('nubl') || climaRaw.toLowerCase().includes('cloud');
+
+  const footerText = isDemo
+    ? lang === 'en'
+      ? "Northbridge Capital Partners • JGM ConTech Engineering (ISO 19650)"
+      : "Northbridge Capital Partners • Ingeniería JGM ConTech (ISO 19650)"
+    : proyectoInfo
+    ? `${proyectoInfo.subtitulo1Valor} • ${proyectoInfo.subtitulo2Valor}`
+    : 'INGENDES S.A.S. • Interventoría DOLMEN S.A.';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-3 md:p-6 backdrop-blur-md">
@@ -40,10 +61,10 @@ export default function ModalEvidenciaFoto({ evidencia, onClose }) {
             </div>
             <div>
               <h3 className="text-sm font-bold text-white leading-tight">
-                Evidencia Fotográfica de Campo
+                {lang === 'en' ? 'Field Photographic Evidence' : 'Evidencia Fotográfica de Campo'}
               </h3>
               <p className="text-[11px] text-slate-400">
-                Registro oficial de bitácora • JGM ConTech
+                {lang === 'en' ? 'Official Field Log Record • JGM ConTech' : 'Registro oficial de bitácora • JGM ConTech'}
               </p>
             </div>
           </div>
@@ -54,7 +75,7 @@ export default function ModalEvidenciaFoto({ evidencia, onClose }) {
                 onClick={descargarFoto}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 px-3 py-1.5 text-xs font-bold text-slate-200 transition"
               >
-                <Download className="h-3.5 w-3.5" /> Descargar
+                <Download className="h-3.5 w-3.5" /> {lang === 'en' ? 'Download' : 'Descargar'}
               </button>
             )}
             <button
@@ -70,17 +91,19 @@ export default function ModalEvidenciaFoto({ evidencia, onClose }) {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
           
           {/* FOTO EN ALTA RESOLUCIÓN */}
-          <div className="rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center min-h-[300px] max-h-[55vh]">
+          <div className="rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center min-h-[280px] max-h-[55vh]">
             {evidencia.foto ? (
               <img
                 src={evidencia.foto}
-                alt={evidencia.actividad}
+                alt={localizeActivity(evidencia.actividad, lang)}
                 className="w-full h-full max-h-[55vh] object-contain"
               />
             ) : (
               <div className="text-center p-8 text-slate-500">
                 <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="text-xs">Este registro no tiene fotografía adjunta.</p>
+                <p className="text-xs">
+                  {lang === 'en' ? 'No attached photo for this entry.' : 'Este registro no tiene fotografía adjunta.'}
+                </p>
               </div>
             )}
           </div>
@@ -89,37 +112,59 @@ export default function ModalEvidenciaFoto({ evidencia, onClose }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
               <div>
-                <span className="text-slate-400 block text-[11px] font-bold uppercase">Actividad de Obra</span>
-                <strong className="text-slate-900 text-sm">{evidencia.actividad}</strong>
+                <span className="text-slate-400 block text-[11px] font-bold uppercase">
+                  {lang === 'en' ? 'Work Activity' : 'Actividad de Obra'}
+                </span>
+                <strong className="text-slate-900 text-sm">
+                  {localizeActivity(evidencia.actividad, lang)}
+                </strong>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-                <span className="text-slate-500">Cantidad Ejecutada:</span>
+                <span className="text-slate-500">
+                  {lang === 'en' ? 'Executed Quantity:' : 'Cantidad Ejecutada:'}
+                </span>
                 <strong className="text-emerald-700 text-sm font-black">
-                  {Number(evidencia.cantidad).toFixed(2)} {evidencia.unidad}
+                  {formatQty(evidencia.cantidad, evidencia.unidad)} {unitLabel(evidencia.unidad)}
                 </strong>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-500">Desperdicio Estimado:</span>
+                <span className="text-slate-500">
+                  {lang === 'en' ? 'Estimated Waste:' : 'Desperdicio Estimado:'}
+                </span>
                 <strong className="text-slate-800 font-bold">{evidencia.desperdicio || 0}%</strong>
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-slate-400 text-[11px] font-bold uppercase">Fecha de Ejecución</span>
+                <span className="text-slate-400 text-[11px] font-bold uppercase">
+                  {lang === 'en' ? 'Execution Date' : 'Fecha de Ejecución'}
+                </span>
                 <span className="inline-flex items-center gap-1 font-bold text-slate-900">
                   <Calendar className="h-3.5 w-3.5 text-slate-500" /> {evidencia.fecha}
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px] font-bold uppercase">Ubicación / Frente</span>
-                <span className="text-slate-800 font-semibold">{evidencia.ubicacion || 'Cimentación / Estructura'}</span>
+                <span className="text-slate-400 block text-[11px] font-bold uppercase">
+                  {lang === 'en' ? 'Location / Work Front' : 'Ubicación / Frente'}
+                </span>
+                <span className="text-slate-800 font-semibold">
+                  {localizeRoomName(evidencia.ubicacion || (lang === 'en' ? 'Main Structural Front' : 'Frente Principal'), lang)}
+                </span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-                <span className="text-slate-500">Condición Climática:</span>
+                <span className="text-slate-500">
+                  {lang === 'en' ? 'Weather Condition:' : 'Condición Climática:'}
+                </span>
                 <span className="inline-flex items-center gap-1 font-bold text-slate-800">
-                  {evidencia.clima === 'Lluvioso' ? <CloudRain className="h-3.5 w-3.5 text-sky-600" /> : <Sun className="h-3.5 w-3.5 text-amber-500" />}
-                  {evidencia.clima || 'Soleado'}
+                  {esLluvia ? (
+                    <CloudRain className="h-3.5 w-3.5 text-sky-600" />
+                  ) : esNublado ? (
+                    <Cloud className="h-3.5 w-3.5 text-slate-500" />
+                  ) : (
+                    <Sun className="h-3.5 w-3.5 text-amber-500" />
+                  )}
+                  {localizeWeather(climaRaw, lang)}
                 </span>
               </div>
             </div>
@@ -130,15 +175,19 @@ export default function ModalEvidenciaFoto({ evidencia, onClose }) {
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
               {evidencia.cuadrilla && (
                 <div>
-                  <span className="text-slate-400 block text-[11px] font-bold uppercase">Cuadrilla Asignada</span>
-                  <p className="text-slate-800 font-medium">{evidencia.cuadrilla}</p>
+                  <span className="text-slate-400 block text-[11px] font-bold uppercase">
+                    {lang === 'en' ? 'Assigned Crew' : 'Cuadrilla Asignada'}
+                  </span>
+                  <p className="text-slate-800 font-medium">{localizeCrew(evidencia.cuadrilla, lang)}</p>
                 </div>
               )}
               {evidencia.observaciones && (
-                <div className={evidencia.cuadrilla ? "pt-2 border-t border-slate-200" : ""}>
-                  <span className="text-slate-400 block text-[11px] font-bold uppercase">Observaciones Técnicas</span>
+                <div className={evidencia.cuadrilla ? 'pt-2 border-t border-slate-200' : ''}>
+                  <span className="text-slate-400 block text-[11px] font-bold uppercase">
+                    {lang === 'en' ? 'Technical Observations' : 'Observaciones Técnicas'}
+                  </span>
                   <p className="text-slate-700 font-medium leading-relaxed italic">
-                    "{evidencia.observaciones}"
+                    "{localizeBitacoraObservacion(evidencia.observaciones, lang)}"
                   </p>
                 </div>
               )}
@@ -149,14 +198,12 @@ export default function ModalEvidenciaFoto({ evidencia, onClose }) {
 
         {/* FOOTER */}
         <div className="p-3 bg-slate-100 border-t border-slate-200 flex justify-between items-center text-xs">
-          <span className="text-slate-500 text-[11px]">
-            INGENDES S.A.S. • Interventoría DOLMEN S.A.
-          </span>
+          <span className="text-slate-500 text-[11px]">{footerText}</span>
           <button
             onClick={onClose}
             className="rounded-lg bg-slate-900 px-4 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition"
           >
-            Cerrar Evidencia
+            {lang === 'en' ? 'Close Evidence' : 'Cerrar Evidencia'}
           </button>
         </div>
 

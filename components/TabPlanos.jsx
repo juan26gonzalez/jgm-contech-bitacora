@@ -25,6 +25,13 @@ import {
   Info
 } from 'lucide-react';
 
+import { useAppPreferences } from '../lib/i18n';
+import {
+  DEMO_SHOWCASE_PROJECT_ID,
+  DEMO_PLANOS_SHOWCASE
+} from '../lib/demoFieldData';
+import { localizeTerm } from '../lib/units';
+
 // =============================================================================
 // REPOSITORIO DE PLANOS OFICIALES (MEZZANINE 3 NIVELES - BARRANQUILLA)
 // Aprobados para Construcción por Interventoría DOLMEN S.A. & INGENDES S.A.S.
@@ -35,7 +42,6 @@ const PLANOS_OFICIALES = [
     codigo: "E-01",
     titulo: "Planta de Cimentación, Zapatas, Pedestales y Cortes Generales",
     disciplina: "Estructural",
-    icono: "🏗️",
     revision: "Rev. 03 (Oficial)",
     escala: "1:50",
     fecha: "16/01/2025",
@@ -51,7 +57,6 @@ const PLANOS_OFICIALES = [
     codigo: "E-02",
     titulo: "Detalles Estructurales 2 - Cortes de Zapatas y Vigas de Enlace",
     disciplina: "Estructural",
-    icono: "🏗️",
     revision: "Rev. 03 (Oficial)",
     escala: "1:20 / 1:50",
     fecha: "16/01/2025",
@@ -67,7 +72,6 @@ const PLANOS_OFICIALES = [
     codigo: "E-03",
     titulo: "Detalles Estructurales 1 - Planta General y Despiece de Pedestales",
     disciplina: "Estructural",
-    icono: "🏗️",
     revision: "Rev. 03 (Oficial)",
     escala: "1:10 / 1:50",
     fecha: "16/01/2025",
@@ -83,7 +87,6 @@ const PLANOS_OFICIALES = [
     codigo: "E-04",
     titulo: "Plantas Estructurales - Entrepiso Nivel +3.00 y Nivel +6.30 (Mezzanine)",
     disciplina: "Estructural",
-    icono: "🏢",
     revision: "Rev. 03 (Oficial)",
     escala: "1:50",
     fecha: "16/01/2025",
@@ -99,7 +102,6 @@ const PLANOS_OFICIALES = [
     codigo: "E-05",
     titulo: "Plantas Estructurales - Cubierta y Arriostramientos Superiores",
     disciplina: "Estructural",
-    icono: "🏠",
     revision: "Rev. 03 (Oficial)",
     escala: "1:50",
     fecha: "16/01/2025",
@@ -115,7 +117,6 @@ const PLANOS_OFICIALES = [
     codigo: "E-06",
     titulo: "Detalles de Conexión - Uniones Viga-Columna, Pernos y Placas Base",
     disciplina: "Estructural",
-    icono: "⚙️",
     revision: "Rev. 03 (Oficial)",
     escala: "1:10 / 1:20",
     fecha: "16/01/2025",
@@ -131,12 +132,11 @@ const PLANOS_OFICIALES = [
     codigo: "E-07",
     titulo: "Detalles de Escalera [MODIFICADO EN OBRA - NO APLICAR]",
     disciplina: "Estructural",
-    icono: "⚠️",
     revision: "Modificado en Obra",
     escala: "1:25",
     fecha: "16/01/2025",
     responsable: "Diseño Inicial (Modificado en Ejecución)",
-    descripcion: "⚠️ NOTA DEL RESIDENTE: Este plano no se ejecutó conforme al diseño original. La escalera física fue modificada y ejecutada con un diseño alternativo en obra.",
+    descripcion: "NOTA DEL RESIDENTE: Este plano no se ejecutó conforme al diseño original. La escalera física fue modificada y ejecutada con un diseño alternativo en obra.",
     archivoImg: "/planos/E-07-escalera-modificada.webp",
     archivoThumb: "/planos/E-07-escalera-modificada_thumb.webp",
     archivoPdf: "/planos/E-07-escalera-modificada.pdf",
@@ -148,7 +148,6 @@ const PLANOS_OFICIALES = [
     codigo: "ARQ-01",
     titulo: "Planta Arquitectónica General - Mezzanine y Oficinas",
     disciplina: "Arquitectónico",
-    icono: "🏛️",
     revision: "Rev. 02 (Aprobado)",
     escala: "1:75",
     fecha: "14/10/2026",
@@ -162,7 +161,6 @@ const PLANOS_OFICIALES = [
     codigo: "HID-01",
     titulo: "Redes Hidrosanitarias y Desagües de Aguas Lluvias",
     disciplina: "Hidrosanitario",
-    icono: "💧",
     revision: "Rev. 01 (Vigente)",
     escala: "1:50",
     fecha: "18/10/2026",
@@ -176,7 +174,6 @@ const PLANOS_OFICIALES = [
     codigo: "ELE-01",
     titulo: "Redes Eléctricas, Iluminación LED y Tomas de Fuerza",
     disciplina: "Eléctrico",
-    icono: "⚡",
     revision: "Rev. 01 (Vigente)",
     escala: "1:50",
     fecha: "20/10/2026",
@@ -190,7 +187,6 @@ const PLANOS_OFICIALES = [
     codigo: "CM-01",
     titulo: "Planta Arquitectónica General - Casa Mendoza 1.1",
     disciplina: "Revit BIM (Casa Mendoza)",
-    icono: "🏡",
     revision: "Revit 2027 (Oficial)",
     escala: "1:50",
     fecha: "Noviembre 2026",
@@ -203,17 +199,50 @@ const PLANOS_OFICIALES = [
   }
 ];
 
-export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
+const mapDemoPlano = (p) => ({
+  id: p.id,
+  codigo: p.codigo,
+  titulo: p.nombre,
+  titulo_en: p.nombre_en,
+  disciplina:
+    p.disciplina === 'ARQUITECTURA'
+      ? 'Arquitectónico'
+      : p.disciplina === 'ESTRUCTURAS'
+      ? 'Estructural'
+      : 'Cubierta / Envolvente',
+  revision: p.version,
+  escala: p.escala,
+  fecha: p.fecha,
+  responsable: p.notaCalidad || "Owner's Representative • ISO 19650",
+  descripcion: p.descripcion,
+  descripcion_en: p.descripcion_en,
+  archivoImg: p.url,
+  archivoThumb: p.url,
+  esModificado: false
+});
+
+const DISC_EN_LABELS = {
+  Todas: 'All Sheets',
+  Estructural: 'Structural',
+  Arquitectónico: 'Architectural',
+  Hidrosanitario: 'Plumbing / MEP',
+  Eléctrico: 'Electrical',
+  'Cubierta / Envolvente': 'Roofing & Envelope',
+  Acabados: 'Finishes',
+  'Revit BIM (Casa Mendoza)': 'Revit BIM'
+};
+
+export default function TabPlanos({ proyectoActivo = 'mezzanine', isDemo = false }) {
+  const { lang } = useAppPreferences();
+  const demoMode = isDemo || proyectoActivo === DEMO_SHOWCASE_PROJECT_ID;
+
   const [planos, setPlanos] = useState(PLANOS_OFICIALES);
+  const [demoPlanos, setDemoPlanos] = useState(() => DEMO_PLANOS_SHOWCASE.map(mapDemoPlano));
   const [filtroTexto, setFiltroTexto] = useState('');
   const [disciplinaActiva, setDisciplinaActiva] = useState(
-    proyectoActivo === 'casa_mendoza' ? 'Revit BIM (Casa Mendoza)' : 'Todas'
+    !demoMode && proyectoActivo === 'casa_mendoza' ? 'Revit BIM (Casa Mendoza)' : 'Todas'
   );
 
-  useEffect(() => {
-    setDisciplinaActiva(proyectoActivo === 'casa_mendoza' ? 'Revit BIM (Casa Mendoza)' : 'Todas');
-  }, [proyectoActivo]);
-  
   // Modal de Visor
   const [planoSeleccionado, setPlanoSeleccionado] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -224,14 +253,25 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
   const [nuevoCodigo, setNuevoCodigo] = useState('');
   const [nuevoTitulo, setNuevoTitulo] = useState('');
   const [nuevaDisciplina, setNuevaDisciplina] = useState('Estructural');
-  const [nuevaRevision, setNuevaRevision] = useState('Rev. 01 (Aprobado)');
+  const [nuevaRevision, setNuevaRevision] = useState('Rev. 01 (Approved)');
   const [nuevaEscala, setNuevaEscala] = useState('1:50');
-  const [nuevoResponsable, setNuevoResponsable] = useState('Ing. Juan González / INGENDES');
+  const [nuevoResponsable, setNuevoResponsable] = useState(
+    demoMode ? 'JGM ConTech Engineering Team' : 'Ing. Juan González / INGENDES'
+  );
   const [nuevaDescripcion, setNuevaDescripcion] = useState('');
   const [archivoPreview, setArchivoPreview] = useState(null);
 
-  // Cargar planos personalizados de localStorage si existen
   useEffect(() => {
+    setDisciplinaActiva(
+      !demoMode && proyectoActivo === 'casa_mendoza' ? 'Revit BIM (Casa Mendoza)' : 'Todas'
+    );
+    setNuevoResponsable(demoMode ? 'JGM ConTech Engineering Team' : 'Ing. Juan González / INGENDES');
+    setNuevaRevision(lang === 'en' ? 'Rev. 01 (Approved)' : 'Rev. 01 (Aprobado)');
+  }, [proyectoActivo, demoMode, lang]);
+
+  // Cargar planos personalizados de localStorage si existen (solo sesión real autenticada)
+  useEffect(() => {
+    if (demoMode) return;
     try {
       const guardados = localStorage.getItem('jgm_planos_constructivos_v2');
       if (guardados) {
@@ -243,9 +283,15 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
     } catch (e) {
       console.error('Error cargando planos de localStorage:', e);
     }
-  }, []);
+  }, [demoMode]);
+
+  const activePlanos = demoMode ? demoPlanos : planos;
 
   const guardarPlanosStorage = (nuevosPlanos) => {
+    if (demoMode) {
+      setDemoPlanos(nuevosPlanos);
+      return;
+    }
     setPlanos(nuevosPlanos);
     try {
       localStorage.setItem('jgm_planos_constructivos_v2', JSON.stringify(nuevosPlanos));
@@ -268,36 +314,29 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
   const handleGuardarNuevoPlano = (e) => {
     e.preventDefault();
     if (!nuevoCodigo.trim() || !nuevoTitulo.trim()) {
-      alert('Por favor complete los campos obligatorios: Código y Título.');
+      alert(lang === 'en' ? 'Please complete required fields: Code and Sheet Title.' : 'Por favor complete los campos obligatorios: Código y Título.');
       return;
     }
-
-    const iconoMap = {
-      'Estructural': '🏗️',
-      'Arquitectónico': '🏛️',
-      'Hidrosanitario': '💧',
-      'Eléctrico': '⚡',
-      'Acabados': '🎨'
-    };
 
     const nuevoPlano = {
       id: `PL-${Date.now()}`,
       codigo: nuevoCodigo.trim().toUpperCase(),
       titulo: nuevoTitulo.trim(),
+      titulo_en: nuevoTitulo.trim(),
       disciplina: nuevaDisciplina,
-      icono: iconoMap[nuevaDisciplina] || '📐',
       revision: nuevaRevision.trim(),
       escala: nuevaEscala.trim(),
-      fecha: new Date().toLocaleDateString('es-CO'),
+      fecha: new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'es-CO'),
       responsable: nuevoResponsable.trim(),
-      descripcion: nuevaDescripcion.trim() || 'Plano constructivo incorporado por el residente en campo.',
+      descripcion: nuevaDescripcion.trim() || (lang === 'en' ? 'Field drawing added by site engineer.' : 'Plano constructivo incorporado por el residente en campo.'),
+      descripcion_en: nuevaDescripcion.trim() || 'Field drawing added by site engineer.',
       archivoImg: archivoPreview,
       archivoThumb: archivoPreview,
       archivoUrl: archivoPreview,
       esModificado: false
     };
 
-    const actualizados = [nuevoPlano, ...planos];
+    const actualizados = [nuevoPlano, ...activePlanos];
     guardarPlanosStorage(actualizados);
 
     setNuevoCodigo('');
@@ -305,25 +344,43 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
     setNuevaDescripcion('');
     setArchivoPreview(null);
     setShowModalSubir(false);
-    alert('📐 ¡Nuevo plano agregado exitosamente al repositorio!');
+    alert(lang === 'en' ? 'New sheet successfully added to repository.' : 'Nuevo plano agregado exitosamente al repositorio.');
   };
+
+  const getDiscLabel = (disc) => (lang === 'en' ? DISC_EN_LABELS[disc] || disc : disc);
+  const getTitle = (p) => (lang === 'en' ? p.titulo_en || localizeTerm(p.titulo, 'en') : p.titulo);
+  const getDesc = (p) => (lang === 'en' ? p.descripcion_en || localizeTerm(p.descripcion, 'en') : p.descripcion);
 
   // Filtrado de planos
   const planosFiltrados = useMemo(() => {
-    return planos.filter((p) => {
+    const q = filtroTexto.toLowerCase();
+    return activePlanos.filter((p) => {
       const matchDisc = disciplinaActiva === 'Todas' || p.disciplina === disciplinaActiva;
-      const matchText = p.codigo.toLowerCase().includes(filtroTexto.toLowerCase()) ||
-                        p.titulo.toLowerCase().includes(filtroTexto.toLowerCase()) ||
-                        p.descripcion.toLowerCase().includes(filtroTexto.toLowerCase());
+      const tTitle = (lang === 'en' ? p.titulo_en || localizeTerm(p.titulo, 'en') : p.titulo) || '';
+      const tDesc = (lang === 'en' ? p.descripcion_en || localizeTerm(p.descripcion, 'en') : p.descripcion) || '';
+      const matchText =
+        !q ||
+        p.codigo.toLowerCase().includes(q) ||
+        tTitle.toLowerCase().includes(q) ||
+        tDesc.toLowerCase().includes(q) ||
+        p.titulo.toLowerCase().includes(q);
       return matchDisc && matchText;
     });
-  }, [planos, disciplinaActiva, filtroTexto]);
+  }, [activePlanos, disciplinaActiva, filtroTexto, lang]);
 
-  const disciplinas = ['Todas', 'Estructural', 'Arquitectónico', 'Hidrosanitario', 'Eléctrico'];
+  const disciplinas = demoMode
+    ? ['Todas', 'Estructural', 'Arquitectónico', 'Cubierta / Envolvente']
+    : ['Todas', 'Estructural', 'Arquitectónico', 'Hidrosanitario', 'Eléctrico'];
+
+  const headerProjectName = demoMode
+    ? 'Northbridge Corporate Hub'
+    : proyectoActivo === 'casa_mendoza'
+    ? 'Remodelación Casa Mendoza'
+    : 'Proyecto Dolmen';
 
   return (
     <div className="space-y-6">
-      
+
       {/* 1. CABECERA DEL REPOSITORIO DE PLANOS */}
       <div className="rounded-2xl steel-card p-5 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
@@ -334,31 +391,51 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
               </span>
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
-                  Planos Constructivos Oficiales (Proyecto Dolmen)
+                  {demoMode
+                    ? (lang === 'en'
+                        ? 'Northbridge Corporate Hub — ISO 19650 Blueprints & IFC Sheets'
+                        : 'Northbridge Corporate Hub — Planos Constructivos ISO 19650 & IFC')
+                    : proyectoActivo === 'casa_mendoza'
+                    ? (lang === 'en'
+                        ? 'Approved Revit Architectural Sheets (Casa Mendoza)'
+                        : 'Planos Constructivos Oficiales (Casa Mendoza)')
+                    : (lang === 'en'
+                        ? 'Official Issued-for-Construction Drawings (Dolmen Project)'
+                        : 'Planos Constructivos Oficiales (Proyecto Dolmen)')}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Oficina 3 Niveles - Sede Administrativa • Interventoría DOLMEN S.A. & INGENDES S.A.S.
+                  {demoMode
+                    ? (lang === 'en'
+                        ? "Owner's Representative • OpenBIM IFC4 Record Drawings (Demo Sandbox)"
+                        : 'Supervisión Técnica • Planos Récord OpenBIM IFC4 (Demo Sandbox)')
+                    : proyectoActivo === 'casa_mendoza'
+                    ? (lang === 'en'
+                        ? 'Casa Mendoza 1.1.rvt • Issued for Construction'
+                        : 'Remodelación Casa Mendoza • Modelo Maestro Revit')
+                    : 'Oficina 3 Niveles - Sede Administrativa • Interventoría DOLMEN S.A. & INGENDES S.A.S.'}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <a
-              href="/planos/PROYECTO_DOLMEN_PLANOS_COMPLETOS.pdf"
-              download="PROYECTO_DOLMEN_PLANOS_COMPLETOS.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white px-3.5 py-2 text-xs font-bold transition shadow-sm"
-            >
-              <FolderDown className="h-4 w-4" /> Descargar Todo el Juego (PDF 13.6 MB)
-            </a>
+            {!demoMode && proyectoActivo !== 'casa_mendoza' && (
+              <a
+                href="/planos/PROYECTO_DOLMEN_PLANOS_COMPLETOS.pdf"
+                download="PROYECTO_DOLMEN_PLANOS_COMPLETOS.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white px-3.5 py-2 text-xs font-bold transition shadow-sm"
+              >
+                <FolderDown className="h-4 w-4" /> {lang === 'en' ? 'Download Full Set (PDF 13.6 MB)' : 'Descargar Todo el Juego (PDF 13.6 MB)'}
+              </a>
+            )}
 
             <button
               onClick={() => setShowModalSubir(true)}
               className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-slate-800 transition shadow-sm"
             >
-              <Plus className="h-4 w-4" /> Agregar Plano
+              <Plus className="h-4 w-4" /> {lang === 'en' ? 'Add Drawing' : 'Agregar Plano'}
             </button>
           </div>
         </div>
@@ -375,11 +452,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {disc === 'Estructural' && '🏗️ '}
-              {disc === 'Arquitectónico' && '🏛️ '}
-              {disc === 'Hidrosanitario' && '💧 '}
-              {disc === 'Eléctrico' && '⚡ '}
-              {disc} ({disc === 'Todas' ? planos.length : planos.filter(p => p.disciplina === disc).length})
+              {getDiscLabel(disc)} ({disc === 'Todas' ? activePlanos.length : activePlanos.filter(p => p.disciplina === disc).length})
             </button>
           ))}
         </div>
@@ -391,7 +464,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar por código (ej. E-01, E-04), título o especificación..."
+            placeholder={lang === 'en' ? 'Search by sheet code (e.g. NB-ARQ-01), title or spec...' : 'Buscar por código (ej. E-01, NB-ARQ-01), título o especificación...'}
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:border-slate-800 focus:outline-none"
@@ -404,8 +477,8 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
         {planosFiltrados.length === 0 ? (
           <div className="col-span-full rounded-2xl steel-card p-12 text-center">
             <Compass className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-slate-700">No se encontraron planos</h3>
-            <p className="text-xs text-slate-500 mt-1">Prueba con otra palabra clave o agrega un plano nuevo.</p>
+            <h3 className="text-base font-bold text-slate-700">{lang === 'en' ? 'No drawings found' : 'No se encontraron planos'}</h3>
+            <p className="text-xs text-slate-500 mt-1">{lang === 'en' ? 'Try another search keyword or upload a new sheet.' : 'Prueba con otra palabra clave o agrega un plano nuevo.'}</p>
           </div>
         ) : (
           planosFiltrados.map((plano) => (
@@ -417,7 +490,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
             >
               <div>
                 {/* VISTA PREVIA / MINIATURA DEL PLANO */}
-                <div 
+                <div
                   onClick={() => {
                     setPlanoSeleccionado(plano);
                     setZoomLevel(1);
@@ -428,14 +501,14 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                   {plano.archivoThumb || plano.archivoImg ? (
                     <img
                       src={plano.archivoThumb || plano.archivoImg}
-                      alt={plano.titulo}
+                      alt={getTitle(plano)}
                       className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-cyan-400 p-4">
                       <Compass className="h-10 w-10 mb-2 opacity-60" />
                       <span className="text-xs font-mono font-bold text-white">{plano.codigo}</span>
-                      <span className="text-[10px] text-cyan-300">Vista esquemática</span>
+                      <span className="text-[10px] text-cyan-300">{lang === 'en' ? 'Schematic View' : 'Vista esquemática'}</span>
                     </div>
                   )}
 
@@ -445,14 +518,14 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                       {plano.codigo}
                     </span>
                     {plano.esModificado && (
-                      <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white font-bold text-[10px] shadow">
-                        ⚠️ Modificado en Obra
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white font-bold text-[10px] shadow inline-flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" /> {lang === 'en' ? 'Field Modified' : 'Modificado en Obra'}
                       </span>
                     )}
                   </div>
 
                   <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5">
-                    <Eye className="h-4 w-4" /> Inspeccionar Plano
+                    <Eye className="h-4 w-4" /> {lang === 'en' ? 'Inspect Drawing' : 'Inspeccionar Plano'}
                   </div>
                 </div>
 
@@ -460,32 +533,33 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                   {/* Título y Disciplina */}
                   <div className="flex justify-between items-start gap-2 mb-1.5">
                     <h3 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
-                      {plano.titulo}
+                      {getTitle(plano)}
                     </h3>
                   </div>
 
                   {plano.esModificado && (
-                    <div className="mb-2 p-2 rounded-lg bg-amber-100/70 border border-amber-200 text-[10px] font-bold text-amber-900 leading-tight">
-                      ⚠️ Ignorar escalera: Se ejecutó con modificación en obra.
+                    <div className="mb-2 p-2 rounded-lg bg-amber-100/70 border border-amber-200 text-[10px] font-bold text-amber-900 leading-tight flex items-start gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                      <span>{lang === 'en' ? 'Stair detail superseded by field modification.' : 'Ignorar escalera: Se ejecutó con modificación en obra.'}</span>
                     </div>
                   )}
 
                   <p className="text-[11px] text-slate-500 line-clamp-2 mb-3 leading-relaxed">
-                    {plano.descripcion}
+                    {getDesc(plano)}
                   </p>
 
                   {/* Ficha Técnica */}
                   <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100">
                     <div>
-                      <span className="text-slate-400 block font-semibold">Escala:</span>
+                      <span className="text-slate-400 block font-semibold">{lang === 'en' ? 'Scale:' : 'Escala:'}</span>
                       <strong className="text-slate-700">{plano.escala}</strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block font-semibold">Fecha:</span>
+                      <span className="text-slate-400 block font-semibold">{lang === 'en' ? 'Date:' : 'Fecha:'}</span>
                       <strong className="text-slate-700">{plano.fecha}</strong>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-slate-400 block font-semibold">Responsable:</span>
+                      <span className="text-slate-400 block font-semibold">{lang === 'en' ? 'Issued / QA:' : 'Responsable:'}</span>
                       <span className="text-slate-700 font-semibold truncate block">{plano.responsable}</span>
                     </div>
                   </div>
@@ -505,7 +579,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                     <Download className="h-3 w-3" /> PDF
                   </a>
                 ) : (
-                  <span className="text-[10px] text-slate-400">CAD Vector</span>
+                  <span className="text-[10px] text-slate-400">{demoMode ? 'IFC / SVG Vector' : 'CAD Vector'}</span>
                 )}
 
                 <button
@@ -516,7 +590,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                   }}
                   className="inline-flex items-center gap-1 rounded-lg bg-slate-900 hover:bg-slate-800 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm"
                 >
-                  <Eye className="h-3.5 w-3.5" /> Abrir Visor
+                  <Eye className="h-3.5 w-3.5" /> {lang === 'en' ? 'Open Viewer' : 'Abrir Visor'}
                 </button>
               </div>
             </div>
@@ -528,7 +602,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
       {planoSeleccionado && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-2 sm:p-4 backdrop-blur-md">
           <div className="w-full max-w-6xl max-h-[96vh] flex flex-col rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden">
-            
+
             {/* BARRA SUPERIOR DEL VISOR */}
             <div className="p-3 sm:p-4 bg-slate-900 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-white">
               <div className="flex items-center gap-2.5">
@@ -537,10 +611,10 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                 </span>
                 <div>
                   <h3 className="text-xs sm:text-sm font-bold text-white leading-tight">
-                    {planoSeleccionado.titulo}
+                    {getTitle(planoSeleccionado)}
                   </h3>
                   <p className="text-[10px] sm:text-[11px] text-slate-400">
-                    Proyecto Dolmen • Escala {planoSeleccionado.escala} • {planoSeleccionado.revision}
+                    {headerProjectName} • {lang === 'en' ? 'Scale' : 'Escala'} {planoSeleccionado.escala} • {planoSeleccionado.revision}
                   </p>
                 </div>
               </div>
@@ -549,28 +623,28 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 <button
                   onClick={() => setZoomLevel(prev => Math.min(prev + 0.35, 4.0))}
-                  title="Acercar (Zoom In)"
+                  title={lang === 'en' ? 'Zoom In' : 'Acercar (Zoom In)'}
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
                 >
                   <ZoomIn className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setZoomLevel(prev => Math.max(prev - 0.35, 0.75))}
-                  title="Alejar (Zoom Out)"
+                  title={lang === 'en' ? 'Zoom Out' : 'Alejar (Zoom Out)'}
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
                 >
                   <ZoomOut className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setRotacion(prev => (prev + 90) % 360)}
-                  title="Girar 90°"
+                  title={lang === 'en' ? 'Rotate 90°' : 'Girar 90°'}
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
                 >
                   <RotateCw className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => { setZoomLevel(1); setRotacion(0); }}
-                  title="Restablecer vista a tamaño original"
+                  title={lang === 'en' ? 'Reset Zoom' : 'Restablecer vista a tamaño original'}
                   className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-slate-300 transition"
                 >
                   {Math.round(zoomLevel * 100)}%
@@ -591,7 +665,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                 <button
                   onClick={() => setPlanoSeleccionado(null)}
                   className="ml-1 p-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition"
-                  title="Cerrar visor"
+                  title={lang === 'en' ? 'Close viewer' : 'Cerrar visor'}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -603,30 +677,32 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
               <div className="bg-amber-500 text-slate-950 px-4 py-2 text-xs font-bold flex items-center gap-2 shadow-inner">
                 <AlertTriangle className="h-4 w-4 shrink-0" />
                 <span>
-                  <strong>AVISO DE RESIDENCIA:</strong> Este plano de escalera fue modificado durante la ejecución y se ejecutó de otra forma según instrucciones en obra. Se mantiene únicamente como registro histórico.
+                  {lang === 'en'
+                    ? <><strong>SITE NOTICE:</strong> This stair drawing was superseded during construction and built to an alternative field detail. Retained for record purposes only.</>
+                    : <><strong>AVISO DE RESIDENCIA:</strong> Este plano de escalera fue modificado durante la ejecución y se ejecutó de otra forma según instrucciones en obra. Se mantiene únicamente como registro histórico.</>}
                 </span>
               </div>
             )}
 
             {/* ÁREA DE VISUALIZACIÓN EN ALTA DEFINICIÓN */}
             <div className="flex-1 overflow-auto p-4 bg-slate-950 flex items-center justify-center min-h-[480px]">
-              <div 
+              <div
                 className="transition-transform duration-150 origin-center max-w-full"
-                style={{ 
+                style={{
                   transform: `scale(${zoomLevel}) rotate(${rotacion}deg)`,
                 }}
               >
                 {planoSeleccionado.archivoImg ? (
                   <img
                     src={planoSeleccionado.archivoImg}
-                    alt={planoSeleccionado.titulo}
+                    alt={getTitle(planoSeleccionado)}
                     className="max-h-[78vh] w-auto object-contain rounded-lg shadow-2xl border border-slate-700 cursor-grab active:cursor-grabbing"
                   />
                 ) : (
                   <div className="p-8 text-center text-cyan-400">
                     <Compass className="h-16 w-16 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm font-bold text-white">{planoSeleccionado.titulo}</p>
-                    <p className="text-xs text-slate-400">{planoSeleccionado.descripcion}</p>
+                    <p className="text-sm font-bold text-white">{getTitle(planoSeleccionado)}</p>
+                    <p className="text-xs text-slate-400">{getDesc(planoSeleccionado)}</p>
                   </div>
                 )}
               </div>
@@ -635,13 +711,15 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
             {/* BARRA INFERIOR DEL VISOR */}
             <div className="p-3 bg-slate-900 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-slate-400">
               <span className="text-[11px] text-center sm:text-left">
-                🔍 Usa los botones de zoom para inspeccionar detalles constructivos, armaduras y cotas milimétricas.
+                {lang === 'en'
+                  ? 'Use the zoom controls to inspect construction details, rebar schedules, and tolerances.'
+                  : 'Usa los botones de zoom para inspeccionar detalles constructivos, armaduras y cotas milimétricas.'}
               </span>
               <button
                 onClick={() => setPlanoSeleccionado(null)}
                 className="w-full sm:w-auto rounded-lg bg-slate-800 hover:bg-slate-700 px-4 py-1.5 text-xs font-bold text-white transition"
               >
-                Cerrar Visor
+                {lang === 'en' ? 'Close Viewer' : 'Cerrar Visor'}
               </button>
             </div>
 
@@ -655,9 +733,9 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
           <div className="w-full max-w-lg rounded-2xl steel-card p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start pb-3 border-b border-slate-100 mb-4">
               <div>
-                <h3 className="text-lg font-black text-slate-900">Insertar Nuevo Plano Constructivo</h3>
+                <h3 className="text-lg font-black text-slate-900">{lang === 'en' ? 'Upload Construction Drawing' : 'Insertar Nuevo Plano Constructivo'}</h3>
                 <p className="text-xs text-slate-500">
-                  Agrega un nuevo plano al repositorio de obra del proyecto
+                  {lang === 'en' ? 'Add a new sheet to the project drawing repository' : 'Agrega un nuevo plano al repositorio de obra del proyecto'}
                 </p>
               </div>
               <button
@@ -672,12 +750,12 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                    Código de Plano *
+                    {lang === 'en' ? 'Sheet Code *' : 'Código de Plano *'}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="Ej. EST-03 o ARQ-03"
+                    placeholder={lang === 'en' ? 'e.g. STR-03 or ARC-03' : 'Ej. EST-03 o ARQ-03'}
                     value={nuevoCodigo}
                     onChange={(e) => setNuevoCodigo(e.target.value)}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold uppercase focus:border-slate-800 focus:outline-none"
@@ -686,30 +764,30 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                    Disciplina *
+                    {lang === 'en' ? 'Discipline *' : 'Disciplina *'}
                   </label>
                   <select
                     value={nuevaDisciplina}
                     onChange={(e) => setNuevaDisciplina(e.target.value)}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
                   >
-                    <option value="Estructural">🏗️ Estructural</option>
-                    <option value="Arquitectónico">🏛️ Arquitectónico</option>
-                    <option value="Hidrosanitario">💧 Hidrosanitario</option>
-                    <option value="Eléctrico">⚡ Eléctrico</option>
-                    <option value="Acabados">🎨 Acabados</option>
+                    <option value="Estructural">{getDiscLabel('Estructural')}</option>
+                    <option value="Arquitectónico">{getDiscLabel('Arquitectónico')}</option>
+                    <option value="Hidrosanitario">{getDiscLabel('Hidrosanitario')}</option>
+                    <option value="Eléctrico">{getDiscLabel('Eléctrico')}</option>
+                    <option value="Acabados">{getDiscLabel('Acabados')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Título del Plano *
+                  {lang === 'en' ? 'Drawing Title *' : 'Título del Plano *'}
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ej. Planta de Cimentación y Despiece de Vigas"
+                  placeholder={lang === 'en' ? 'e.g. Foundation Plan & Grade Beam Schedule' : 'Ej. Planta de Cimentación y Despiece de Vigas'}
                   value={nuevoTitulo}
                   onChange={(e) => setNuevoTitulo(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
@@ -719,7 +797,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                    Revisión
+                    {lang === 'en' ? 'Revision' : 'Revisión'}
                   </label>
                   <input
                     type="text"
@@ -730,7 +808,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                    Escala
+                    {lang === 'en' ? 'Scale' : 'Escala'}
                   </label>
                   <input
                     type="text"
@@ -743,7 +821,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
 
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Responsable Técnico / Diseñador
+                  {lang === 'en' ? 'Technical Lead / Designer' : 'Responsable Técnico / Diseñador'}
                 </label>
                 <input
                   type="text"
@@ -755,11 +833,11 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
 
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Descripción o Notas Técnicas
+                  {lang === 'en' ? 'Technical Notes / Spec' : 'Descripción o Notas Técnicas'}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Describe los ejes, elementos constructivos o especificaciones..."
+                  placeholder={lang === 'en' ? 'Describe grid lines, structural details, or specs...' : 'Describe los ejes, elementos constructivos o especificaciones...'}
                   value={nuevaDescripcion}
                   onChange={(e) => setNuevaDescripcion(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-slate-800 focus:outline-none"
@@ -769,12 +847,12 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
               {/* Subir archivo imagen o PDF del plano */}
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
-                  Archivo del Plano (Imagen / Escaneo)
+                  {lang === 'en' ? 'Drawing Image File (Scan / PNG / JPG)' : 'Archivo del Plano (Imagen / Escaneo)'}
                 </label>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-slate-300 hover:bg-slate-50 cursor-pointer text-xs font-semibold text-slate-600 transition">
                     <Upload className="h-4 w-4 text-slate-400" />
-                    <span>Seleccionar archivo...</span>
+                    <span>{lang === 'en' ? 'Select file...' : 'Seleccionar archivo...'}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -784,7 +862,7 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                   </label>
                   {archivoPreview && (
                     <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                      <CheckCircle2 className="h-4 w-4" /> Archivo cargado
+                      <CheckCircle2 className="h-4 w-4" /> {lang === 'en' ? 'File loaded' : 'Archivo cargado'}
                     </span>
                   )}
                 </div>
@@ -796,13 +874,13 @@ export default function TabPlanos({ proyectoActivo = 'mezzanine' }) {
                   onClick={() => setShowModalSubir(false)}
                   className="px-4 py-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
                 >
-                  Cancelar
+                  {lang === 'en' ? 'Cancel' : 'Cancelar'}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 rounded-lg bg-slate-900 text-xs font-bold text-white hover:bg-slate-800 transition shadow-sm"
                 >
-                  Guardar Plano en Repositorio
+                  {lang === 'en' ? 'Save Sheet to Repository' : 'Guardar Plano en Repositorio'}
                 </button>
               </div>
             </form>
