@@ -268,7 +268,7 @@ export default function ModuloSstCampo({
   const projectTitle = proyectoInfo?.nombre || 'Proyecto Activo';
   const contractorLine = isDemo
     ? proyectoInfo?.subtitulo1Valor || 'Northbridge Capital Partners'
-    : `${proyectoInfo?.subtitulo1Valor || ''} / ${proyectoInfo?.subtitulo2Valor || ''}`;
+    : `${proyectoInfo?.subtitulo1Label || 'Contratista'}: ${proyectoInfo?.subtitulo1Valor || ''} • ${proyectoInfo?.subtitulo2Label || 'Interventoría'}: ${proyectoInfo?.subtitulo2Valor || ''}`;
 
   const [sstState, setSstState] = useState(() =>
     loadFieldSstState(proyectoActivo, projectTitle, isDemo)
@@ -704,7 +704,7 @@ export default function ModuloSstCampo({
         bodyHtml,
         footerNote: isDemo
           ? 'JGM ConTech Showcase • Demo Sandbox (No PII)'
-          : `${proyectoInfo?.subtitulo1Valor || 'Contratista'} • Control Diario SST`,
+          : `${proyectoInfo?.id === 'casa_mendoza' ? proyectoInfo?.subtitulo2Valor : proyectoInfo?.subtitulo1Valor || 'INGENDES S.A.S.'} • Control Diario SST`,
         lang,
       });
       if (!opened) notify(isEn ? 'Allow pop-ups to print PTAR.' : 'Permite ventanas emergentes para imprimir el PTAR.');
@@ -768,7 +768,7 @@ export default function ModuloSstCampo({
       bodyHtml,
       footerNote: isDemo
         ? 'JGM ConTech Showcase • Demo Sandbox (No PII)'
-        : `${proyectoInfo?.subtitulo1Valor || 'Contratista'} • Control Diario SST`,
+        : `${proyectoInfo?.id === 'casa_mendoza' ? proyectoInfo?.subtitulo2Valor : proyectoInfo?.subtitulo1Valor || 'INGENDES S.A.S.'} • Control Diario SST`,
       lang,
     });
     if (!opened) notify(isEn ? 'Allow pop-ups to print HSE dossier.' : 'Permite ventanas emergentes para imprimir el informe.');

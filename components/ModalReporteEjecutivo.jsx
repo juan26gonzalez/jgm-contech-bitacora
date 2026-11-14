@@ -147,8 +147,8 @@ export default function ModalReporteEjecutivo({
       ? 'ISO 19650 Official Format • Northbridge Capital Partners & JGM ConTech'
       : 'Formato Oficial ISO 19650 • Northbridge Capital Partners & JGM ConTech'
     : proyectoInfo
-    ? `${proyectoInfo.subtitulo2Valor} • ${proyectoInfo.subtitulo1Valor}`
-    : 'Formato Oficial de Interventoría & Ingeniería';
+    ? `${proyectoInfo.subtitulo1Label}: ${proyectoInfo.subtitulo1Valor} • ${proyectoInfo.subtitulo2Label}: ${proyectoInfo.subtitulo2Valor}`
+    : 'Contratista: INGENDES S.A.S. • Interventoría: DOLMEN S.A.';
 
   const metaProyecto = isDemo
     ? 'NORTHBRIDGE CORPORATE HUB (BIM 5D)'
@@ -440,16 +440,26 @@ export default function ModalReporteEjecutivo({
                     ? 'PROJECT DIRECTOR / LEAD ENGINEER'
                     : 'DIRECCIÓN DE PROYECTO / INGENIERÍA'
                   : lang === 'en'
-                  ? 'RESIDENT PROJECT ENGINEER'
+                  ? 'CONTRACTOR / RESIDENT ENGINEER'
                   : 'INGENIERO RESIDENTE DE OBRA'}
               </p>
               <p className="text-slate-600 font-semibold">
                 {isDemo
                   ? 'JGM ConTech Engineering Team'
-                  : proyectoInfo?.subtitulo2Valor || 'Dirección Técnica de Obra'}
+                  : proyectoInfo?.id === 'casa_mendoza'
+                  ? proyectoInfo?.subtitulo2Valor || 'DIRECCIÓN DE OBRA CIVIL'
+                  : proyectoInfo?.subtitulo1Valor || 'INGENDES S.A.S.'}
               </p>
               <p className="text-[10px] text-slate-400">
-                {isDemo ? 'JGM ConTech Showcase Platform' : 'Control Técnico de Obra'}
+                {isDemo
+                  ? 'JGM ConTech Showcase Platform'
+                  : proyectoInfo?.id === 'casa_mendoza'
+                  ? lang === 'en'
+                    ? 'Technical Site Management'
+                    : 'Control Técnico de Obra'
+                  : lang === 'en'
+                  ? 'General Contractor • Site Engineering'
+                  : 'Contratista • Control Técnico de Obra'}
               </p>
             </div>
 
@@ -460,6 +470,10 @@ export default function ModalReporteEjecutivo({
                   ? lang === 'en'
                     ? "OWNER'S REPRESENTATIVE"
                     : 'REPRESENTANTE DEL CONTRATANTE'
+                  : proyectoInfo?.id === 'casa_mendoza'
+                  ? lang === 'en'
+                    ? 'CLIENT / PROJECT OWNER'
+                    : 'CONTRATANTE / SUPERVISOR'
                   : lang === 'en'
                   ? 'TECHNICAL SUPERVISION / QA LEAD'
                   : 'INTERVENTOR TÉCNICO DE OBRA'}
@@ -467,10 +481,12 @@ export default function ModalReporteEjecutivo({
               <p className="text-slate-600 font-semibold">
                 {isDemo
                   ? 'Northbridge Capital Partners'
-                  : proyectoInfo?.subtitulo1Valor || 'Supervisión Delegada'}
+                  : proyectoInfo?.id === 'casa_mendoza'
+                  ? proyectoInfo?.subtitulo1Valor || 'FAMILIA MENDOZA'
+                  : proyectoInfo?.subtitulo2Valor || 'DOLMEN S.A.'}
               </p>
               <p className="text-[10px] text-slate-400">
-                {lang === 'en' ? 'Approval & Audit' : 'Supervisión y Aprobación'}
+                {lang === 'en' ? 'Supervision & Approval' : 'Interventoría • Supervisión y Aprobación'}
               </p>
             </div>
           </div>
