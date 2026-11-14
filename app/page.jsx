@@ -42,7 +42,8 @@ import {
   Building2,
   ExternalLink,
   User,
-  Clock
+  Clock,
+  ShieldCheck
 } from 'lucide-react';
 import { useAppPreferences } from '../lib/i18n';
 import {
@@ -69,6 +70,7 @@ import ModuloCalidadConcreto from '../components/ModuloCalidadConcreto';
 import ModuloMixersRemisiones from '../components/ModuloMixersRemisiones';
 import ModuloComparativaCantidades from '../components/ModuloComparativaCantidades';
 import ModuloAlmacenMateriales from '../components/ModuloAlmacenMateriales';
+import ModuloSstCampo from '../components/ModuloSstCampo';
 import CopilotoVozIA from '../components/CopilotoVozIA';
 import ModalEvidenciaFoto from '../components/ModalEvidenciaFoto';
 import ModalReporteEjecutivo from '../components/ModalReporteEjecutivo';
@@ -1372,6 +1374,22 @@ export default function Home() {
             {lang === 'en' ? 'Kardex & Crib' : 'Bodega & Pañol'}
           </span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('sst')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === 'sst'
+              ? 'steel-btn-primary text-white shadow-sm'
+              : 'steel-card text-slate-700 hover:text-slate-950'
+          }`}
+        >
+          <ShieldCheck className="h-4 w-4 text-emerald-400" />
+          <span>{lang === 'en' ? 'Field Safety (HSE)' : 'Seguridad & SST'}</span>
+          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-emerald-100 text-emerald-900">
+            {lang === 'en' ? 'PTAR / OSHA' : 'PTAR / Res. 4272'}
+          </span>
+        </button>
       </div>
 
       {/* VISTA 1: BITÁCORA DE CAPTURA */}
@@ -2201,6 +2219,15 @@ export default function Home() {
       {/* VISTA 7: ALMACÉN DE MATERIALES EN OBRA Y CONTROL KARDEX */}
       {activeTab === 'almacen' && (
         <ModuloAlmacenMateriales isDemo={isDemo} />
+      )}
+
+      {/* VISTA 8: SEGURIDAD Y SALUD EN EL TRABAJO EN CAMPO (SST / HSE) */}
+      {activeTab === 'sst' && (
+        <ModuloSstCampo
+          proyectoActivo={proyectoActivo}
+          proyectoInfo={proyectoActualInfo}
+          isDemo={isDemo}
+        />
       )}
 
       {/* MODAL DE EVIDENCIA FOTOGRÁFICA */}
