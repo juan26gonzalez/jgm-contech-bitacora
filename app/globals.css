@@ -154,6 +154,32 @@ html[data-theme="dark"] .steel-card textarea {
   color: #f8fafc;
 }
 
+html[data-theme="dark"] select option {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .steel-card .hover\:bg-slate-200\/70:hover,
+html[data-theme="dark"] .steel-card .hover\:bg-slate-50:hover,
+html[data-theme="dark"] .steel-subcard .hover\:bg-slate-200\/70:hover {
+  background-color: rgba(51, 65, 85, 0.72) !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .steel-subcard .text-slate-900,
+html[data-theme="dark"] .steel-subcard .text-slate-800 {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .steel-subcard .text-slate-700,
+html[data-theme="dark"] .steel-subcard .text-slate-600 {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .steel-subcard .text-slate-500 {
+  color: #94a3b8;
+}
+
 html[data-theme="dark"] .steel-card .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
 html[data-theme="dark"] .steel-card .border-slate-200,
 html[data-theme="dark"] .steel-card .border-slate-300 {

@@ -2,49 +2,29 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { 
-  HardHat, 
-  Cloud, 
-  Layers, 
-  Radio, 
-  LogOut, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Calendar, 
-  MapPin, 
-  Ruler, 
-  Send, 
-  RefreshCw, 
-  Download, 
-  Printer, 
-  Search, 
-  Sun, 
-  Moon,
-  CloudRain, 
-  Users, 
+import {
+  HardHat,
+  Layers,
+  AlertTriangle,
+  CheckCircle2,
+  Calendar,
+  MapPin,
+  Ruler,
+  Send,
+  RefreshCw,
+  Download,
+  Printer,
+  Search,
+  Sun,
   FileText,
-  Lock,
   WifiOff,
   ChevronDown,
   ChevronUp,
-  CalendarDays,
-  Compass,
   Camera,
-  Upload,
   X,
-  FlaskConical,
-  Truck,
-  Mic,
-  Sparkles,
-  BarChart3,
-  Boxes,
-  Globe,
-  Building2,
-  ExternalLink,
-  User,
   Clock,
-  ShieldCheck
 } from 'lucide-react';
+import BitacoraShellHeader from '../components/BitacoraShellHeader';
 import { useAppPreferences } from '../lib/i18n';
 import {
   convertInputToMetric,
@@ -175,13 +155,6 @@ const MAP_DEMO_INITIAL_RECORDS = () =>
 export default function Home() {
   const {
     lang,
-    setLang,
-    currency,
-    setCurrency,
-    darkTheme,
-    toggleTheme,
-    rates,
-    fxLive,
     formatQty,
     unitLabel,
   } = useAppPreferences();
@@ -222,6 +195,7 @@ export default function Home() {
   const [loadingRegistros, setLoadingRegistros] = useState(false);
   const [filtroTexto, setFiltroTexto] = useState('');
   const [filtroFecha, setFiltroFecha] = useState('todos'); // 'todos', 'hoy', 'semana'
+  const [filtroSoloFotos, setFiltroSoloFotos] = useState(false);
 
   // Red y Modo Offline
   const [isOnline, setIsOnline] = useState(true);
@@ -967,11 +941,19 @@ export default function Home() {
       if (filtroFecha === 'hoy') return item.fecha === hoyStr;
       if (filtroFecha === 'semana') {
         const diff = (new Date() - new Date(item.fecha)) / (1000 * 60 * 60 * 24);
-        return diff <= 7;
+        if (diff > 7) return false;
+      }
+      if (filtroSoloFotos) {
+        const ev =
+          evidenciasFotos[item.id] ||
+          evidenciasFotos[String(item.id)] ||
+          evidenciasFotos[item.created_at];
+        const hasPhoto = Boolean(item.foto || ev?.foto || ev?.fotoSrc);
+        if (!hasPhoto) return false;
       }
       return true;
     });
-  }, [registrosDelProyecto, offlineQueue, proyectoActivo, filtroTexto, filtroFecha, isDemo, lang]);
+  }, [registrosDelProyecto, offlineQueue, proyectoActivo, filtroTexto, filtroFecha, filtroSoloFotos, evidenciasFotos, isDemo, lang]);
 
   const exportarCSV = () => {
     if (registrosDelProyecto.length === 0) {
@@ -1024,13 +1006,20 @@ export default function Home() {
     );
   }
 
-  const fxTooltip = fxLive
-    ? `Live FX • 1 USD = $${rates.USD.toLocaleString('es-CO')} COP | 1 EUR = $${rates.EUR.toLocaleString('es-CO')} COP`
-    : `Ref FX • 1 USD = $${rates.USD.toLocaleString('es-CO')} COP | 1 EUR = $${rates.EUR.toLocaleString('es-CO')} COP`;
+  const hoyStrTelemetry = new Date().toISOString().split('T')[0];
+  const hoyRegistrosCount = registrosDelProyecto.filter((r) => r.fecha === hoyStrTelemetry).length;
+  const totalFotosCount = registrosDelProyecto.filter((r) => {
+    const ev = evidenciasFotos[r.id] || evidenciasFotos[String(r.id)] || evidenciasFotos[r.created_at];
+    return Boolean(r.foto || ev?.foto || ev?.fotoSrc);
+  }).length;
+  const wbsActivasCount = Math.min(
+    actividadesDisponiblesProyecto.length,
+    Object.keys(mapaAcumulados).length
+  );
 
-  // VISTA 2: APLICACIÓN PRINCIPAL (REACT + TAILWIND CSS)
+  // VISTA 2: APLICACIÓN PRINCIPAL (REACT + TAILWIND CSS — ANCHO COMPLETO WORKSTATION)
   return (
-    <main className="container mx-auto px-4 py-8 max-w-4xl">
+    <main className="w-full max-w-[1680px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
       
       {/* BANNER OFFLINE */}
       {(!isOnline || offlineQueue.length > 0) && !isDemo && (
@@ -1063,340 +1052,32 @@ export default function Home() {
         </p>
       </div>
 
-      {/* TARJETA DE CABECERA Y ESTADO DEL PROYECTO */}
-      <div className="rounded-2xl steel-card p-5 border-t-8 border-t-slate-900 mb-5 no-print">
-        
-        {/* BARRA SUPERIOR DE ESTADO, PREFERENCIAS GLOBALES Y USUARIO */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-300/80">
-          <div className="flex items-center gap-3">
-            <img
-              src="/logo-mark.png"
-              alt="JGM ConTech"
-              className="w-11 h-11 rounded-xl border border-slate-300 shadow-md shrink-0"
-            />
-            <div>
-              <h1 className="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">
-                JGM ConTech
-              </h1>
-              <p className="text-xs font-semibold text-slate-600">
-                {lang === 'en'
-                  ? 'Civil Field Operations & QA Capture'
-                  : 'Gestión de Obra Civil & Captura en Campo'}
-              </p>
-            </div>
-          </div>
+      {/* CABECERA EJECUTIVA + NAVEGACIÓN JERÁRQUICA DE 4 PILARES */}
+      <BitacoraShellHeader
+        activeTab={activeTab}
+        onChangeTab={setActiveTab}
+        isDemo={isDemo}
+        proyectoActivo={proyectoActivo}
+        proyectoActualInfo={proyectoActualInfo}
+        onCambiarProyecto={handleCambiarProyecto}
+        userEmail={user?.email}
+        onLogout={handleLogout}
+        isOnline={isOnline}
+        offlineQueueCount={offlineQueue.length}
+        onSyncOffline={sincronizarColaOffline}
+        totalRegistros={registrosDelProyecto.length}
+        hoyRegistros={hoyRegistrosCount}
+        totalFotos={totalFotosCount}
+        wbsActivasCount={wbsActivasCount}
+        totalCatalogoCount={actividadesDisponiblesProyecto.length}
+        estamparGPS={estamparGPS}
+      />
 
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <a
-              href="https://jagm2000-jgmcontech.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full steel-btn-primary px-3 py-1 text-xs font-bold"
-              title={lang === 'en' ? 'Open BIM 5D Management Control Center' : 'Abrir Centro de Control Gerencial BIM 5D'}
-            >
-              <Building2 className="h-3.5 w-3.5" />
-              <span>{lang === 'en' ? 'BIM 5D Mgmt App' : 'App Gerencia BIM'}</span>
-              <ExternalLink className="h-3 w-3" />
-            </a>
-
-            {/* Switcher ES / EN */}
-            <div
-              className="inline-flex items-center rounded-full bg-slate-200/80 border border-slate-300 p-0.5 text-[11px] font-black"
-              title={lang === 'en' ? 'Language & Imperial Units' : 'Idioma y Sistema Métrico'}
-            >
-              <Globe className="h-3.5 w-3.5 text-slate-600 mx-1.5" />
-              <button
-                type="button"
-                onClick={() => setLang('es')}
-                className={`px-2 py-0.5 rounded-full transition ${
-                  lang === 'es' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                ES
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang('en')}
-                className={`px-2 py-0.5 rounded-full transition ${
-                  lang === 'en' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                EN
-              </button>
-            </div>
-
-            {/* Switcher Divisa COP / USD / EUR con FX */}
-            <div
-              className="inline-flex items-center rounded-full bg-slate-200/80 border border-slate-300 p-0.5 text-[11px] font-black"
-              title={fxTooltip}
-            >
-              {['COP', 'USD', 'EUR'].map((curr) => (
-                <button
-                  key={curr}
-                  type="button"
-                  onClick={() => setCurrency(curr)}
-                  className={`px-2 py-0.5 rounded-full transition ${
-                    currency === curr
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {curr}
-                </button>
-              ))}
-            </div>
-
-            {/* Toggle Tema Oscuro / Claro */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              title={darkTheme ? (lang === 'en' ? 'Light theme' : 'Tema claro') : (lang === 'en' ? 'Dark theme' : 'Tema oscuro')}
-              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white p-1.5 text-slate-700 hover:bg-slate-100 transition"
-            >
-              {darkTheme ? <Sun className="h-3.5 w-3.5 text-amber-500" /> : <Moon className="h-3.5 w-3.5" />}
-            </button>
-
-            {isDemo ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black text-amber-800 border border-amber-300">
-                <Sparkles className="h-3.5 w-3.5" />
-                {lang === 'en' ? 'DEMO (READ-ONLY)' : 'DEMO (SOLO LECTURA)'}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
-                <Cloud className="h-3.5 w-3.5" /> Supabase
-              </span>
-            )}
-
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">
-              <User className="h-3.5 w-3.5 text-slate-500" />
-              {isDemo ? 'demo-guest' : user.email?.split('@')[0]}
-            </span>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              {isDemo
-                ? lang === 'en'
-                  ? 'Sign In'
-                  : 'Ingresar'
-                : lang === 'en'
-                ? 'Sign Out'
-                : 'Salir'}
-            </button>
-          </div>
-        </div>
-
-        {/* SELECTOR DE PROYECTO ACTIVO EN CAMPO */}
-        <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 bg-slate-200/70 border border-slate-300/80 rounded-xl p-2">
-          <div className="flex items-center gap-2 px-1">
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-700">
-              {lang === 'en' ? 'Active Project:' : 'Proyecto en Curso:'}
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {isDemo ? (
-              <button
-                type="button"
-                className="px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 steel-btn-primary text-white shadow-sm"
-              >
-                <Building2 className="h-3.5 w-3.5 text-emerald-400" />
-                <span>{PROYECTO_DEMO_CONFIG.nombre}</span>
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => handleCambiarProyecto('mezzanine')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
-                    proyectoActivo === 'mezzanine'
-                      ? 'steel-btn-primary text-white shadow-sm'
-                      : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-slate-50'
-                  }`}
-                >
-                  <Building2 className="h-3.5 w-3.5" />
-                  <span>Mezzanine 3 Niveles</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleCambiarProyecto('casa_mendoza')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 ${
-                    proyectoActivo === 'casa_mendoza'
-                      ? 'bg-emerald-700 text-white shadow-sm border border-emerald-800'
-                      : 'bg-white/90 text-slate-700 border border-slate-300 hover:bg-emerald-50 hover:text-emerald-800'
-                  }`}
-                >
-                  <Layers className="h-3.5 w-3.5" />
-                  <span>Casa Mendoza (BIM)</span>
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* ETIQUETA DEL PROYECTO (Cápsula Gunmetal CNC) */}
-        <div className="mt-3 rounded-xl steel-panel-dark p-3.5 text-xs text-slate-200 flex flex-wrap justify-between items-center gap-2">
-          <div>
-            {lang === 'en' ? 'Project:' : 'Proyecto:'}{' '}
-            <strong className="text-white">{proyectoActualInfo.tituloBanner}</strong>
-          </div>
-          <div className="text-slate-300">
-            {proyectoActualInfo.subtitulo1Label}:{' '}
-            <strong className="text-white">{proyectoActualInfo.subtitulo1Valor}</strong> |{' '}
-            {proyectoActualInfo.subtitulo2Label}:{' '}
-            <strong className="text-white">{proyectoActualInfo.subtitulo2Valor}</strong>
-          </div>
-        </div>
-      </div>
-
-      {/* PESTAÑAS PRINCIPALES DE NAVEGACIÓN (SIN EMOJIS) */}
-      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3 overflow-x-auto no-print">
-        <button
-          type="button"
-          onClick={() => setActiveTab('bitacora')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'bitacora'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <FileText className="h-4 w-4 text-emerald-400" />
-          <span>{lang === 'en' ? 'Field Log' : 'Bitácora de Campo'}</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-            activeTab === 'bitacora' ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-600'
-          }`}>
-            {registrosDelProyecto.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('cronograma')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'cronograma'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <CalendarDays className="h-4 w-4 text-emerald-400" />
-          <span>{lang === 'en' ? '4D Schedule' : 'Cronograma de Obra (4D)'}</span>
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700">
-            {lang === 'en' ? 'Critical Path' : 'Ruta Crítica'}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('planos')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'planos'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <Compass className="h-4 w-4 text-cyan-400" />
-          <span>{lang === 'en' ? 'Drawings & IFC' : 'Planos Constructivos'}</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-            activeTab === 'planos' ? 'bg-slate-800 text-slate-200' : 'bg-slate-200 text-slate-700'
-          }`}>
-            {isDemo
-              ? lang === 'en'
-                ? '3 IFC Sheets'
-                : '3 Planos IFC'
-              : lang === 'en'
-              ? '7 Approved'
-              : '7 Aprobados'}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('calidad')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'calidad'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <FlaskConical className="h-4 w-4 text-sky-400" />
-          <span>{lang === 'en' ? 'Concrete QA & Breaks' : 'Calidad & Cilindros'}</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
-            {lang === 'en' ? 'ASTM / NSR-10' : 'NSR-10'}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('mixers')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'mixers'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <Truck className="h-4 w-4 text-amber-400" />
-          <span>{lang === 'en' ? 'Ready-Mix Tickets' : 'Mixers & Remisiones'}</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-amber-100 text-amber-900">
-            {lang === 'en' ? 'ASTM C94' : 'NTC 3318'}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('cantidades')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'cantidades'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <BarChart3 className="h-4 w-4 text-indigo-400" />
-          <span>{lang === 'en' ? 'Contract Quantities' : 'Cantidades de Obra'}</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
-            {lang === 'en' ? 'BOQ vs Actual' : 'Contratado vs Ejecutado'}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('almacen')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'almacen'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <Boxes className="h-4 w-4 text-teal-400" />
-          <span>{lang === 'en' ? 'Warehouse & Tools' : 'Almacén, Insumos & Herramientas'}</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-slate-200 text-slate-900">
-            {lang === 'en' ? 'Kardex & Crib' : 'Bodega & Pañol'}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('sst')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-            activeTab === 'sst'
-              ? 'steel-btn-primary text-white shadow-sm'
-              : 'steel-card text-slate-700 hover:text-slate-950'
-          }`}
-        >
-          <ShieldCheck className="h-4 w-4 text-emerald-400" />
-          <span>{lang === 'en' ? 'Field Safety (HSE)' : 'Seguridad & SST'}</span>
-          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-black bg-emerald-100 text-emerald-900">
-            {lang === 'en' ? 'PTAR / OSHA' : 'PTAR / Res. 4272'}
-          </span>
-        </button>
-      </div>
-
-      {/* VISTA 1: BITÁCORA DE CAPTURA */}
+      {/* VISTA 1: BITÁCORA DE CAPTURA (WORKSTATION DUAL-COLUMN ANCHO COMPLETO) */}
       {activeTab === 'bitacora' && (
-        <>
-          {/* TARJETA PRINCIPAL DEL FORMULARIO */}
-          <div className="rounded-2xl steel-card p-6 mb-6 no-print">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+          {/* COLUMNA IZQUIERDA (5 COLS EN DESKTOP): ESTACIÓN DE CAPTURA RÁPIDA */}
+          <div className="xl:col-span-5 rounded-2xl steel-card p-5 sm:p-6 no-print">
             
             <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
@@ -1864,8 +1545,8 @@ export default function Home() {
 
       </div>
 
-      {/* TARJETA DE REGISTROS EN VIVO */}
-      <div className="rounded-2xl steel-card p-6">
+      {/* COLUMNA DERECHA (7 COLS EN DESKTOP): HISTORIAL EN VIVO Y EXPORTES */}
+      <div className="xl:col-span-7 rounded-2xl steel-card p-5 sm:p-6">
         
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100 no-print">
           <div>
@@ -1933,7 +1614,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {[
               { id: 'todos', label: lang === 'en' ? 'All' : 'Todos' },
               { id: 'hoy', label: lang === 'en' ? 'Today' : 'Hoy' },
@@ -1941,6 +1622,7 @@ export default function Home() {
             ].map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
                 onClick={() => setFiltroFecha(tipo.id)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
                   filtroFecha === tipo.id
@@ -1951,6 +1633,19 @@ export default function Home() {
                 {tipo.label}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setFiltroSoloFotos((v) => !v)}
+              className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-bold transition border ${
+                filtroSoloFotos
+                  ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
+                  : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+              }`}
+              title={lang === 'en' ? 'Show only entries with photo evidence' : 'Mostrar solo registros con evidencia fotográfica'}
+            >
+              <Camera className="h-3.5 w-3.5" />
+              <span>{lang === 'en' ? 'With Photo' : 'Con Foto'}</span>
+            </button>
           </div>
         </div>
 
@@ -2188,7 +1883,7 @@ export default function Home() {
         </div>
 
       </div>
-      </>
+      </div>
       )}
 
       {/* VISTA 2: CRONOGRAMA DE OBRA (4D) */}
