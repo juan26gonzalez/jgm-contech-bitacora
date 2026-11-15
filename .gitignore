@@ -1,0 +1,27 @@
+node_modules
+.next
+out
+.env
+.env.*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.pem
+
+# Seguridad, Propiedad Intelectual y Planos Privados (Nunca subir a GitHub)
+public/planos/
+*.dwg
+*.dxf
+*.rvt
+*.rfa
+*.rte
+*.ifc
+*.pdf
+*.xlsx
+*.xlsm
+*firma*
+*certificacion*
+*cedula*
+legacy_backup/
