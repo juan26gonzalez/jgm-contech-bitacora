@@ -25,6 +25,7 @@ import {
   Clock,
 } from 'lucide-react';
 import BitacoraShellHeader from '../components/BitacoraShellHeader';
+import BitacoraSidebar from '../components/BitacoraSidebar';
 import { useAppPreferences } from '../lib/i18n';
 import {
   convertInputToMetric,
@@ -168,6 +169,23 @@ export default function Home() {
 
   // Pestaña Activa ('bitacora', 'cronograma', 'planos')
   const [activeTab, setActiveTab] = useState('bitacora');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const renderActivityLabel = (rawText) => {
+    const localized = localizeActivity(rawText, lang);
+    const match = localized.match(/^\[(BIM_TAKEOFF|MSPROJECT_SYNC)\]\s*(.*)$/i);
+    if (!match) return <span>{localized}</span>;
+    const tag = match[1].toUpperCase() === 'MSPROJECT_SYNC' ? '4D' : 'BIM';
+    return (
+      <span>
+        <span className="inline-block mr-1.5 align-middle px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600 font-mono text-[9.5px] font-bold uppercase tracking-wider">
+          {tag}
+        </span>
+        <span className="align-middle">{match[2]}</span>
+      </span>
+    );
+  };
 
   // Estado de Autenticación
   const [user, setUser] = useState(null);
@@ -1041,13 +1059,26 @@ export default function Home() {
     Object.keys(mapaAcumulados).length
   );
 
-  // VISTA 2: APLICACIÓN PRINCIPAL (REACT + TAILWIND CSS — ANCHO COMPLETO WORKSTATION)
+  // VISTA 2: APLICACIÓN PRINCIPAL (SIDEBAR MINIMALISTA + WORKSTATION ANCHO COMPLETO)
   return (
-    <main className="w-full max-w-[1680px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <div className="min-h-screen flex bg-transparent">
+      <BitacoraSidebar
+        activeTab={activeTab}
+        onChangeTab={setActiveTab}
+        isDemo={isDemo}
+        proyectoActivo={proyectoActivo}
+        onCambiarProyecto={handleCambiarProyecto}
+        totalRegistros={registrosDelProyecto.length}
+        mobileOpen={mobileMenuOpen}
+        onCloseMobile={() => setMobileMenuOpen(false)}
+        collapsed={sidebarCollapsed}
+      />
+
+      <main className="flex-1 min-w-0 p-4 sm:p-5 lg:p-6 max-w-[1440px] mx-auto w-full space-y-4">
       
       {/* BANNER OFFLINE */}
       {(!isOnline || offlineQueue.length > 0) && !isDemo && (
-        <div className="mb-4 flex items-center justify-between rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs font-semibold text-amber-800 shadow-sm no-print">
+        <div className="flex items-center justify-between rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs font-semibold text-amber-800 no-print">
           <div className="flex items-center gap-2">
             <WifiOff className="h-4 w-4" />
             <span>
@@ -1076,7 +1107,7 @@ export default function Home() {
         </p>
       </div>
 
-      {/* CABECERA EJECUTIVA + NAVEGACIÓN JERÁRQUICA DE 4 PILARES */}
+      {/* CABECERA MINIMALISTA */}
       <BitacoraShellHeader
         activeTab={activeTab}
         onChangeTab={setActiveTab}
@@ -1095,23 +1126,26 @@ export default function Home() {
         wbsActivasCount={wbsActivasCount}
         totalCatalogoCount={actividadesDisponiblesProyecto.length}
         estamparGPS={estamparGPS}
+        onOpenMenuMobile={() => setMobileMenuOpen(true)}
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebarDesktop={() => setSidebarCollapsed((prev) => !prev)}
       />
 
       {/* VISTA 1: BITÁCORA DE CAPTURA (WORKSTATION DUAL-COLUMN ANCHO COMPLETO) */}
       {activeTab === 'bitacora' && (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
           {/* COLUMNA IZQUIERDA (5 COLS EN DESKTOP): ESTACIÓN DE CAPTURA RÁPIDA */}
-          <div className="xl:col-span-5 rounded-2xl steel-card p-5 sm:p-6 no-print">
+          <div className="xl:col-span-5 rounded-2xl steel-card p-5 no-print">
             
-            <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between gap-2 mb-3.5 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-slate-800" />
-                <h2 className="text-base font-bold text-slate-900">
+                <FileText className="h-4 w-4 text-slate-700" />
+                <h2 className="text-sm font-bold text-slate-900">
                   {lang === 'en' ? 'Daily Field Progress Capture' : 'Captura Diaria de Avance en Campo'}
                 </h2>
               </div>
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                {lang === 'en' ? 'Imperial Units (US)' : 'Sistema Métrico (SI)'}
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">
+                {lang === 'en' ? 'Imperial (US)' : 'Métrico (SI)'}
               </span>
             </div>
 
@@ -1569,11 +1603,11 @@ export default function Home() {
       </div>
 
       {/* COLUMNA DERECHA (7 COLS EN DESKTOP): HISTORIAL EN VIVO Y EXPORTES */}
-      <div className="xl:col-span-7 rounded-2xl steel-card p-5 sm:p-6">
+      <div className="xl:col-span-7 rounded-2xl steel-card p-5">
         
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100 no-print">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3.5 pb-3 border-b border-slate-100 no-print">
           <div>
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <FileText className="h-4 w-4 text-emerald-600" />
               <span>
                 {isDemo
@@ -1585,41 +1619,42 @@ export default function Home() {
                   : `Registros en la Nube (${registrosFiltrados.length})`}
               </span>
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               {isDemo
                 ? lang === 'en'
-                  ? 'ISO 19650 local interactive showcase dataset'
-                  : 'Historial local interactivo del proyecto showcase ISO 19650'
+                  ? 'ISO 19650 local interactive showcase'
+                  : 'Historial local interactivo ISO 19650'
                 : lang === 'en'
-                ? 'Real-time history synced in PostgreSQL'
-                : 'Historial sincronizado en PostgreSQL'}
+                ? 'Synced in PostgreSQL'
+                : 'Sincronizado en PostgreSQL'}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => cargarRegistros()}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+              title={lang === 'en' ? 'Reload' : 'Recargar'}
+              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition"
             >
               <RefreshCw className="h-3.5 w-3.5" /> {lang === 'en' ? 'Reload' : 'Recargar'}
             </button>
             <button
               onClick={() => setShowReporteModal(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm"
+              className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1.5 text-[11px] font-semibold text-white transition"
             >
-              <FileText className="h-3.5 w-3.5" /> {lang === 'en' ? 'Executive Report (PDF)' : 'Informe Ejecutivo (PDF)'}
+              <FileText className="h-3.5 w-3.5" /> {lang === 'en' ? 'Report PDF' : 'Informe PDF'}
             </button>
             <button
               onClick={exportarCSV}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition"
             >
-              <Download className="h-3.5 w-3.5" /> {lang === 'en' ? 'Export CSV' : 'Exportar CSV'}
+              <Download className="h-3.5 w-3.5" /> CSV
             </button>
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition"
+              className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 transition"
             >
-              <Printer className="h-3.5 w-3.5" /> {lang === 'en' ? 'Print Log' : 'Imprimir Acta'}
+              <Printer className="h-3.5 w-3.5" /> {lang === 'en' ? 'Print' : 'Imprimir'}
             </button>
           </div>
         </div>
@@ -1714,7 +1749,7 @@ export default function Home() {
                   {/* Actividad */}
                   <div>
                     <h3 className="text-xs font-bold text-slate-900 leading-snug">
-                      {localizeActivity(item.actividad, lang)}
+                      {renderActivityLabel(item.actividad)}
                     </h3>
                     {item.observaciones && (
                       <p className="text-[11px] text-slate-500 mt-1">
@@ -1794,13 +1829,13 @@ export default function Home() {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-700 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
               <tr>
-                <th className="py-2.5 px-3">{lang === 'en' ? 'Date' : 'Fecha'}</th>
-                <th className="py-2.5 px-3">{lang === 'en' ? 'Work Activity' : 'Actividad de Obra'}</th>
-                <th className="py-2.5 px-3">{lang === 'en' ? 'Unit' : 'Unidad'}</th>
-                <th className="py-2.5 px-3 text-right">{lang === 'en' ? 'Net Qty' : 'Cant. Neta'}</th>
-                <th className="py-2.5 px-3 text-center">{lang === 'en' ? 'Waste (%)' : 'Desp (%)'}</th>
-                <th className="py-2.5 px-3 text-center">{lang === 'en' ? 'Evidence' : 'Evidencia'}</th>
-                <th className="py-2.5 px-3 text-center">{lang === 'en' ? 'Status' : 'Estado'}</th>
+                <th className="py-2.5 px-2.5 whitespace-nowrap">{lang === 'en' ? 'Date' : 'Fecha'}</th>
+                <th className="py-2.5 px-2.5">{lang === 'en' ? 'Work Activity' : 'Actividad de Obra'}</th>
+                <th className="py-2.5 px-2 whitespace-nowrap">{lang === 'en' ? 'Unit' : 'Und'}</th>
+                <th className="py-2.5 px-2.5 text-right whitespace-nowrap">{lang === 'en' ? 'Net Qty' : 'Cant.'}</th>
+                <th className="py-2.5 px-2 text-center whitespace-nowrap">{lang === 'en' ? 'Waste' : 'Desp.'}</th>
+                <th className="py-2.5 px-2.5 text-center whitespace-nowrap">{lang === 'en' ? 'Evidence' : 'Evidencia'}</th>
+                <th className="py-2.5 px-2.5 text-center whitespace-nowrap">{lang === 'en' ? 'Status' : 'Estado'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -1824,29 +1859,29 @@ export default function Home() {
 
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/70 transition">
-                      <td className="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">
+                      <td className="py-2.5 px-2.5 font-semibold text-slate-900 whitespace-nowrap">
                         {item.fecha || '-'}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-800 font-medium">
-                        <div>{localizeActivity(item.actividad, lang)}</div>
+                      <td className="py-2.5 px-2.5 text-slate-800 font-medium">
+                        <div>{renderActivityLabel(item.actividad)}</div>
                         {item.observaciones && (
                           <div className="text-[11px] text-slate-500 mt-0.5">
                             {localizeBitacoraObservacion(item.observaciones, lang)}
                           </div>
                         )}
                       </td>
-                      <td className="py-2.5 px-3">
-                        <span className="rounded bg-slate-200/80 border border-slate-300 px-1.5 py-0.5 font-bold text-slate-800 text-[10px]">
+                      <td className="py-2.5 px-2 whitespace-nowrap">
+                        <span className="rounded bg-slate-100 border border-slate-200 px-1.5 py-0.5 font-bold text-slate-700 text-[10px]">
                           {unitLabel(item.unidad)}
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 text-right font-black text-slate-900">
+                      <td className="py-2.5 px-2.5 text-right font-bold text-slate-900 whitespace-nowrap tabular-nums">
                         {formatQty(item.cantidad, item.unidad)}
                       </td>
-                      <td className="py-2.5 px-3 text-center text-slate-500">
+                      <td className="py-2.5 px-2 text-center text-slate-500 whitespace-nowrap">
                         {item.desperdicio || 0}%
                       </td>
-                      <td className="py-2.5 px-3 text-center">
+                      <td className="py-2.5 px-2.5 text-center whitespace-nowrap">
                         {tieneFoto ? (
                           <button
                             type="button"
@@ -1857,13 +1892,13 @@ export default function Home() {
                                 foto: fotoUrl
                               });
                             }}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200 transition"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-[10px] border border-emerald-200 transition whitespace-nowrap"
                           >
-                            <Camera className="h-3 w-3" /> {lang === 'en' ? 'View Photo' : 'Ver Foto'}
+                            <Camera className="h-3 w-3 shrink-0" /> {lang === 'en' ? 'View' : 'Ver Foto'}
                           </button>
                         ) : (
-                          <label className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-dashed border-slate-300 hover:bg-slate-50 text-slate-500 font-semibold text-[10px] cursor-pointer transition">
-                            <Camera className="h-3 w-3" /> {lang === 'en' ? '+ Photo' : '+ Foto'}
+                          <label className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-dashed border-slate-300 hover:bg-slate-50 text-slate-500 font-semibold text-[10px] cursor-pointer transition whitespace-nowrap">
+                            <Camera className="h-3 w-3 shrink-0" /> {lang === 'en' ? '+ Photo' : '+ Foto'}
                             <input
                               type="file"
                               accept="image/*"
@@ -1874,14 +1909,14 @@ export default function Home() {
                           </label>
                         )}
                       </td>
-                      <td className="py-2.5 px-3 text-center">
+                      <td className="py-2.5 px-2.5 text-center whitespace-nowrap">
                         {item.isOffline ? (
-                          <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                            <Clock className="h-3 w-3" /> Offline
+                          <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 whitespace-nowrap">
+                            <Clock className="h-3 w-3 shrink-0" /> Offline
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                            <CheckCircle2 className="h-3 w-3" /> {isDemo ? (lang === 'en' ? 'Demo QA' : 'Demo OK') : lang === 'en' ? 'Synced' : 'Nube OK'}
+                          <span className="inline-flex items-center gap-1 rounded bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 whitespace-nowrap">
+                            <CheckCircle2 className="h-3 w-3 shrink-0" /> {isDemo ? (lang === 'en' ? 'Demo OK' : 'Demo OK') : lang === 'en' ? 'Synced' : 'Nube OK'}
                           </span>
                         )}
                       </td>
@@ -1969,7 +2004,7 @@ export default function Home() {
         />
       )}
 
-      <footer className="mt-8 text-center text-xs text-slate-400 no-print">
+      <footer className="mt-6 text-center text-[11px] text-slate-400 no-print">
         {isDemo
           ? lang === 'en'
             ? 'JGM ConTech • ISO 19650 BIM 4D/5D Field Operations Showcase'
@@ -1979,6 +2014,7 @@ export default function Home() {
           : 'JGM ConTech • Sistema de Control de Obra Civil'}
       </footer>
 
-    </main>
+      </main>
+    </div>
   );
 }
