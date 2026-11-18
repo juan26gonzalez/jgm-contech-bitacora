@@ -70,9 +70,9 @@ const REGLAS_ACTIVIDADES = [
     desperdicio: 5,
   },
   {
-    claves: ['cubierta', 'upvc', 'pag', 'correas', 'teja', 'roof', 'roofing'],
+    claves: ['cubierta', 'pendiente', 'losa', 'alfajia', 'bajante', 'pvc', 'impermeabilizacion', 'roof', 'roofing'],
     actividad: 'Montaje de cubierta en Eternit',
-    demoActividad: '[BIM_TAKEOFF] Montaje de cubierta UPVC termoacústica y correas perfil PAG C150',
+    demoActividad: '[BIM_TAKEOFF] Losa cubierta concreto f\'c=24 MPa e=12cm, pendiente 1% e impermeabilización',
     unidad: 'm²',
     desperdicio: 5,
   },

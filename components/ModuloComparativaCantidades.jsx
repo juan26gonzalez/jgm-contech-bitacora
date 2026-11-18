@@ -65,7 +65,7 @@ const ITEMS_PROTOTIPO_RESIDENCIAL = [
 
 const ITEMS_DEMO_SHOWCASE = DEMO_CATALOGO_SHOWCASE.map((c, idx) => ({
   item: `1.${idx + 1}`.replace(/^1\.(\d+)$/, (_, n) => {
-    const codes = ['1.1', '1.2', '2.1', '2.2', '3.1', '4.1', '5.1', '5.2', '6.1'];
+    const codes = ['1.1', '1.2', '2.1', '2.2', '3.1', '4.1', '5.1', '5.2', '6.1', '6.2', '6.3'];
     return codes[Number(n) - 1] || `1.${n}`;
   }),
   exactId: c.id,
