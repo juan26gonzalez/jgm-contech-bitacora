@@ -500,8 +500,10 @@ const LOC_EN_MAP = {
   'Bodega Acabados B2': 'Finishes Bay B2',
   'Pañol Equipos': 'Central Tool Crib',
   'Pañol Central - Estante A': 'Central Tool Crib - Bay A',
-  'Lobby Principal': 'Main Lobby',
-  'Oficina Norte': 'North Office'
+  'Sala': 'Living Room (L1)',
+  'Comedor': 'Dining Room (L1)',
+  'Habitación Principal': 'Primary Bedroom (L2)',
+  'Balcón': 'Front Balcony (L2)'
 };
 
 const translateLoc = (val, lang) => {
@@ -624,7 +626,7 @@ export default function ModuloAlmacenMateriales({ proyectoActivo = 'proto_corpor
   const [cantidadMov, setCantidadMov] = useState('');
   const [remisionDoc, setRemisionDoc] = useState('');
   const [responsableMov, setResponsableMov] = useState(
-    demoMode ? 'Northbridge Warehouse Lead' : 'Dirección Técnica de Obra'
+    demoMode ? 'Almacén Showcase Pórtico 2N' : 'Dirección Técnica de Obra'
   );
   const [origenDestinoMov, setOrigenDestinoMov] = useState('');
   const [observacionesMov, setObservacionesMov] = useState('');
@@ -638,7 +640,7 @@ export default function ModuloAlmacenMateriales({ proyectoActivo = 'proto_corpor
     demoMode ? 'Líder Acabados #1' : 'Oficial Estructura A'
   );
   const [frenteHerr, setFrenteHerr] = useState(
-    demoMode ? 'Lobby Principal' : 'Nivel +3.00 Entrepiso'
+    demoMode ? 'Sala' : 'Nivel +3.00 Entrepiso'
   );
   const [estadoRetornoHerr, setEstadoRetornoHerr] = useState('disponible');
   const [observacionesHerr, setObservacionesHerr] = useState('');
@@ -655,7 +657,7 @@ export default function ModuloAlmacenMateriales({ proyectoActivo = 'proto_corpor
   useEffect(() => {
     setResponsableMov(
       demoMode
-        ? (lang === 'en' ? 'Northbridge Warehouse Lead' : 'Almacenista Showcase')
+        ? (lang === 'en' ? 'Pórtico 2N Warehouse Lead' : 'Almacenista Showcase')
         : 'Dirección Técnica de Obra'
     );
     setResponsableHerr(
@@ -665,7 +667,7 @@ export default function ModuloAlmacenMateriales({ proyectoActivo = 'proto_corpor
     );
     setFrenteHerr(
       demoMode
-        ? (lang === 'en' ? 'Main Lobby' : 'Lobby Principal')
+        ? (lang === 'en' ? 'Living Room (L1)' : 'Sala')
         : 'Nivel +3.00 Entrepiso'
     );
   }, [demoMode, lang]);
@@ -2049,7 +2051,7 @@ export default function ModuloAlmacenMateriales({ proyectoActivo = 'proto_corpor
                         demoMode
                           ? (tipoMovimiento === 'entrada'
                               ? (lang === 'en' ? 'e.g. Allied Building Supply' : 'Ej. Distribuidora Norte S.A.')
-                              : (lang === 'en' ? 'e.g. Main Lobby / Zone A' : 'Ej. Lobby Principal / Zona A'))
+                              : (lang === 'en' ? 'e.g. Living Room (L1) / Balcony' : 'Ej. Sala / Balcón N2'))
                           : (tipoMovimiento === 'entrada' ? 'Distribuidora Norte' : 'Nivel +3.00 Entrepiso')
                       }
                       className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs"
@@ -2184,7 +2186,7 @@ export default function ModuloAlmacenMateriales({ proyectoActivo = 'proto_corpor
                     onChange={(e) => setFrenteHerr(e.target.value)}
                     placeholder={
                       demoMode
-                        ? (lang === 'en' ? 'e.g. Main Lobby' : 'Ej. Lobby Principal')
+                        ? (lang === 'en' ? 'e.g. Living Room (L1)' : 'Ej. Sala / Balcón')
                         : 'Ej. Nivel +3.00 Entrepiso'
                     }
                     className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium"

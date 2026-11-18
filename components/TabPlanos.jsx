@@ -232,17 +232,13 @@ export default function TabPlanos({ proyectoActivo = 'proto_corporativo', isDemo
     });
   }, [activePlanos, disciplinaActiva, filtroTexto, lang]);
 
-  const disciplinas = demoMode
-    ? ['Todas', 'Estructural', 'Arquitectónico', 'Cubierta / Envolvente']
-    : proyectoActivo === 'proto_residencial'
-    ? ['Todas', 'Arquitectónico', 'Estructural', 'Cubierta / Envolvente']
-    : ['Todas', 'Estructural', 'Arquitectónico', 'Hidrosanitario', 'Eléctrico'];
+  const disciplinas = ['Todas', 'Estructural', 'Arquitectónico'];
 
   const headerProjectName = demoMode
-    ? 'Northbridge Corporate Hub'
+    ? 'Residencial Pórtico 2N + Balcón'
     : proyectoActivo === 'proto_residencial'
-    ? 'Vivienda Prototipo BIM 1.1'
-    : 'Edificio Modelo 3 Niveles';
+    ? 'Residencial Pórtico 2N — BIM 5D'
+    : 'Pórtico Estructural 2 Niveles';
 
   return (
     <div className="space-y-6">
@@ -257,26 +253,14 @@ export default function TabPlanos({ proyectoActivo = 'proto_corporativo', isDemo
               </span>
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
-                  {demoMode
-                    ? (lang === 'en'
-                        ? 'Northbridge Corporate Hub — ISO 19650 Blueprints & IFC Sheets'
-                        : 'Northbridge Corporate Hub — Planos Constructivos ISO 19650 & IFC')
-                    : proyectoActivo === 'proto_residencial'
-                    ? (lang === 'en'
-                        ? 'Residential BIM Prototype Sheets (Local & Vector Viewer)'
-                        : 'Planos Prototipo BIM (Visor Vectorial y Carga Local)')
-                    : (lang === 'en'
-                        ? 'Corporate Prototype Construction Sheets (Vector & Local Viewer)'
-                        : 'Planos Prototipo Edificio 3 Niveles (Vector & Visor Local)')}
+                  {lang === 'en'
+                    ? '2-Storey RC Frame & Balcony — Architectural & Rebar CAD Sheets'
+                    : 'Pórtico 2 Niveles + Balcón — Planos Arquitectónicos y Despiece Acero'}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {demoMode
-                    ? (lang === 'en'
-                        ? "Owner's Representative • OpenBIM IFC4 Record Drawings (Demo Sandbox)"
-                        : 'Supervisión Técnica • Planos Récord OpenBIM IFC4 (Demo Sandbox)')
-                    : (lang === 'en'
-                        ? 'In-browser Vector CAD Preview & Private IndexedDB Storage (No files uploaded to GitHub)'
-                        : 'Planos vectoriales prototipo en navegador + Carga privada local (IndexedDB sin subir archivos a GitHub)')}
+                  {lang === 'en'
+                    ? 'Synced 1:1 with the 3D BIM model (Plan L1/L2, Footings, Pedestals, Columns, Beams, Slabs & Stair)'
+                    : 'Sincronizados 1:1 con el modelo 3D BIM (Planta 1 y 2, Cimentación, Columnas, Vigas, Losas y Escalera c/ refuerzo)'}
                 </p>
               </div>
             </div>
@@ -316,7 +300,7 @@ export default function TabPlanos({ proyectoActivo = 'proto_corporativo', isDemo
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder={lang === 'en' ? 'Search by sheet code (e.g. EST-01, NB-ARQ-01), title or spec...' : 'Buscar por código (ej. EST-01, NB-ARQ-01), título o especificación...'}
+            placeholder={lang === 'en' ? 'Search by sheet code (e.g. ARQ-01, EST-01..04), title or rebar spec...' : 'Buscar por código (ej. ARQ-01, ARQ-02, EST-01..EST-04), título o refuerzo...'}
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:border-slate-800 focus:outline-none"
@@ -437,6 +421,14 @@ export default function TabPlanos({ proyectoActivo = 'proto_corporativo', isDemo
                     >
                       <Download className="h-3 w-3" /> PDF
                     </a>
+                  ) : plano.archivoImg ? (
+                    <a
+                      href={plano.archivoImg}
+                      download={`${plano.codigo}_PORTICO2N.svg`}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-slate-900 transition"
+                    >
+                      <Download className="h-3 w-3" /> SVG Vector
+                    </a>
                   ) : (
                     <span className="text-[10px] text-slate-400">IFC / SVG Vector</span>
                   )}
@@ -520,7 +512,7 @@ export default function TabPlanos({ proyectoActivo = 'proto_corporativo', isDemo
                   {Math.round(zoomLevel * 100)}%
                 </button>
 
-                {planoSeleccionado.archivoPdf && (
+                {planoSeleccionado.archivoPdf ? (
                   <a
                     href={planoSeleccionado.archivoPdf}
                     download={`${planoSeleccionado.codigo}_${planoSeleccionado.titulo}.pdf`}
@@ -530,7 +522,15 @@ export default function TabPlanos({ proyectoActivo = 'proto_corporativo', isDemo
                   >
                     <Download className="h-3.5 w-3.5" /> PDF
                   </a>
-                )}
+                ) : planoSeleccionado.archivoImg ? (
+                  <a
+                    href={planoSeleccionado.archivoImg}
+                    download={`${planoSeleccionado.codigo}_PORTICO2N.svg`}
+                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1.5 text-xs font-bold text-white transition shadow-sm"
+                  >
+                    <Download className="h-3.5 w-3.5" /> SVG Vector
+                  </a>
+                ) : null}
 
                 <button
                   onClick={() => setPlanoSeleccionado(null)}

@@ -489,8 +489,8 @@ export default function Home() {
         nombre: PROYECTO_DEMO_CONFIG.nombre,
         tituloBanner:
           lang === 'en'
-            ? 'NORTHBRIDGE CORPORATE HUB — ISO 19650 BIM 5D SHOWCASE'
-            : 'NORTHBRIDGE CORPORATE HUB — SHOWCASE BIM 5D (DEMO)',
+            ? '2-STOREY RC FRAME RESIDENCE + BALCONY — ISO 19650 BIM 5D'
+            : 'RESIDENCIAL PÓRTICO 2 NIVELES + BALCÓN — SHOWCASE BIM 5D',
         subtitulo1Label: lang === 'en' ? 'Client' : 'Contratante',
         subtitulo1Valor: PROYECTO_DEMO_CONFIG.cliente,
         subtitulo2Label: lang === 'en' ? 'Engineering' : 'Ingeniería',
@@ -1191,12 +1191,14 @@ export default function Home() {
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800"
               >
                 {isDemo ? (
-                  <optgroup label={lang === 'en' ? 'NORTHBRIDGE HUB — BIM ZONES' : 'NORTHBRIDGE HUB — ZONAS BIM'}>
+                  <optgroup label={lang === 'en' ? 'PÓRTICO 2N + BALCONY — BIM ZONES' : 'PÓRTICO 2N + BALCÓN — ZONAS BIM'}>
                     <option value="Zona A — Pórticos & Cimentación">{localizeRoomName('Zona A — Pórticos & Cimentación', lang)}</option>
                     <option value="Zona B — Envolvente & Acabados">{localizeRoomName('Zona B — Envolvente & Acabados', lang)}</option>
-                    <option value="Lobby Principal">{localizeRoomName('Lobby Principal', lang)}</option>
-                    <option value="Oficina Norte">{localizeRoomName('Oficina Norte', lang)}</option>
-                    <option value="Sala de Juntas">{localizeRoomName('Sala de Juntas', lang)}</option>
+                    <option value="Sala">{localizeRoomName('Sala', lang)}</option>
+                    <option value="Comedor">{localizeRoomName('Comedor', lang)}</option>
+                    <option value="Cocina">{localizeRoomName('Cocina', lang)}</option>
+                    <option value="Habitación Principal">{localizeRoomName('Habitación Principal', lang)}</option>
+                    <option value="Balcón">{localizeRoomName('Balcón', lang)}</option>
                     <option value="Zona C — Cubierta & Carpintería">{localizeRoomName('Zona C — Cubierta & Carpintería', lang)}</option>
                     <option value="Zona General — Obra Completa">{localizeRoomName('Zona General — Obra Completa', lang)}</option>
                   </optgroup>

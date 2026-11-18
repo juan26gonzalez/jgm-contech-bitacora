@@ -60,7 +60,7 @@ const ITEMS_PROTOTIPO_RESIDENCIAL = [
   { item: "4.1", capitulo: "4. ACABADOS Y PINTURA", actividad: "Estuco plástico y pintura vinílica en muros", unidad: "m²", contratado: 455.78, matchKeys: ["estuco", "pintura", "vinilica"] },
   { item: "5.1", capitulo: "5. CARPINTERÍA", actividad: "Suministro e instalación de puertas interiores y acceso", unidad: "und", contratado: 7.0, matchKeys: ["puertas interiores", "puertas"] },
   { item: "5.2", capitulo: "5. CARPINTERÍA", actividad: "Suministro e instalación de ventanería aluminio y vidrio", unidad: "und", contratado: 8.0, matchKeys: ["ventanas", "ventaneria", "puertas y ventanas"] },
-  { item: "6.1", capitulo: "6. CUBIERTA", actividad: "Montaje de cubierta en teja Eternit y caballetes", unidad: "m²", contratado: 132.05, matchKeys: ["cubierta", "eternit", "teja"] },
+  { item: "6.1", capitulo: "6. CUBIERTA", actividad: "Montaje de cubierta termoacústica y caballetes", unidad: "m²", contratado: 132.05, matchKeys: ["cubierta", "upvc", "pag", "teja"] },
 ];
 
 const ITEMS_DEMO_SHOWCASE = DEMO_CATALOGO_SHOWCASE.map((c, idx) => ({
@@ -224,7 +224,7 @@ export default function ModuloComparativaCantidades({
   };
 
   const projectBadgeLabel = esDemoProj
-    ? 'Northbridge Hub (Demo)'
+    ? 'Pórtico 2N + Balcón (Demo)'
     : proyectoActivo === 'proto_residencial'
     ? 'Vivienda Prototipo'
     : 'Edificio Modelo 3 Niveles';

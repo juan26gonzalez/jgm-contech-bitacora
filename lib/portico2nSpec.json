@@ -1,0 +1,300 @@
+{
+  "meta": {
+    "id": "PORTICO-2N",
+    "version": "1.0",
+    "name": "Vivienda Pórtico 2 Niveles con Balcón",
+    "nameEn": "2-Storey RC Moment-Frame House with Balcony",
+    "units": "m",
+    "axesNote": "Coordenadas 3D: x = Este (ejes 1-2-3), z = Sur / Fachada (ejes A-B-C, C = frente), y = altura. En planta el frente (eje C) se dibuja abajo.",
+    "disclaimer": "Modelo y planos prototipo con fines de portafolio. No aptos para construcción sin memoria de cálculo firmada (NSR-10 Título A.1.5).",
+    "disclaimerEn": "Prototype model and sheets for portfolio purposes. Not for construction without a signed structural calculation report."
+  },
+  "materials": {
+    "concreteFoundation": { "es": "Concreto f'c = 21 MPa (3,000 psi)", "en": "Concrete f'c = 3,000 psi (21 MPa)" },
+    "concreteFrame": { "es": "Concreto f'c = 24 MPa (3,500 psi)", "en": "Concrete f'c = 3,500 psi (24 MPa)" },
+    "steel": { "es": "Acero corrugado fy = 420 MPa (Grado 60) NTC 2289", "en": "Deformed rebar fy = 60 ksi (Grade 60) ASTM A706" },
+    "masonry": { "es": "Bloque de concreto No. 12 (12×20×40 cm) + mortero 1:4", "en": "CMU block No. 12 (12×20×40 cm) + 1:4 mortar" },
+    "roofSheet": { "es": "Teja UPVC termoacústica trapezoidal e = 2.5 mm", "en": "Trapezoidal thermo-acoustic UPVC roof sheet t = 2.5 mm" },
+    "purlin": { "es": "Correa perfil PAG C 150×50×2.0 mm (ASTM A1011)", "en": "Cold-formed PAG C-purlin 150×50×2.0 mm (ASTM A1011)" },
+    "covers": { "footing": 0.075, "gradeBeam": 0.05, "column": 0.04, "beam": 0.04, "slab": 0.025, "stair": 0.025 }
+  },
+  "grid": {
+    "x": [
+      { "id": "1", "pos": -4.0 },
+      { "id": "2", "pos": 0.0 },
+      { "id": "3", "pos": 4.0 }
+    ],
+    "z": [
+      { "id": "A", "pos": -3.5 },
+      { "id": "B", "pos": 0.0 },
+      { "id": "C", "pos": 3.5 }
+    ]
+  },
+  "levels": {
+    "footingBottom": -1.5,
+    "footingTop": -1.1,
+    "pedestalTop": -0.45,
+    "gradeBeamTop": -0.1,
+    "npt1": 0.0,
+    "beam2Bottom": 2.6,
+    "slab2Bottom": 2.88,
+    "npt2": 3.0,
+    "ceiling2": 5.4,
+    "eaveBeamBottom": 5.5,
+    "eave": 5.8,
+    "ridge": 6.6
+  },
+  "footings": {
+    "types": {
+      "Z-1": { "b": 1.2, "h": 0.4, "bar": "#4", "spacing": 0.15, "nBars": 8 },
+      "Z-2": { "b": 1.4, "h": 0.4, "bar": "#4", "spacing": 0.15, "nBars": 9 },
+      "Z-3": { "b": 1.6, "h": 0.4, "bar": "#5", "spacing": 0.15, "nBars": 10 }
+    },
+    "items": [
+      { "id": "Z1", "type": "Z-1", "x": -4.0, "z": -3.5, "gx": "1", "gz": "A" },
+      { "id": "Z2", "type": "Z-2", "x": 0.0, "z": -3.5, "gx": "2", "gz": "A" },
+      { "id": "Z3", "type": "Z-1", "x": 4.0, "z": -3.5, "gx": "3", "gz": "A" },
+      { "id": "Z4", "type": "Z-2", "x": -4.0, "z": 0.0, "gx": "1", "gz": "B" },
+      { "id": "Z5", "type": "Z-3", "x": 0.0, "z": 0.0, "gx": "2", "gz": "B" },
+      { "id": "Z6", "type": "Z-2", "x": 4.0, "z": 0.0, "gx": "3", "gz": "B" },
+      { "id": "Z7", "type": "Z-1", "x": -4.0, "z": 3.5, "gx": "1", "gz": "C" },
+      { "id": "Z8", "type": "Z-2", "x": 0.0, "z": 3.5, "gx": "2", "gz": "C" },
+      { "id": "Z9", "type": "Z-1", "x": 4.0, "z": 3.5, "gx": "3", "gz": "C" }
+    ]
+  },
+  "pedestal": {
+    "b": 0.4,
+    "longBars": 8,
+    "longBar": "#4",
+    "tieBar": "#3",
+    "tieSpacing": 0.1,
+    "dowelHook": 0.25
+  },
+  "columns": {
+    "type": "C-1",
+    "b": 0.3,
+    "longBars": 8,
+    "longBar": "#4",
+    "tieBar": "#3",
+    "lo": 0.5,
+    "tieSpacingLo": 0.1,
+    "tieSpacingMid": 0.2,
+    "items": [
+      { "id": "C1", "x": -4.0, "z": -3.5, "gx": "1", "gz": "A", "top": 5.8 },
+      { "id": "C2", "x": 0.0, "z": -3.5, "gx": "2", "gz": "A", "top": 5.8 },
+      { "id": "C3", "x": 4.0, "z": -3.5, "gx": "3", "gz": "A", "top": 5.8 },
+      { "id": "C4", "x": -4.0, "z": 0.0, "gx": "1", "gz": "B", "top": 6.6 },
+      { "id": "C5", "x": 0.0, "z": 0.0, "gx": "2", "gz": "B", "top": 6.6 },
+      { "id": "C6", "x": 4.0, "z": 0.0, "gx": "3", "gz": "B", "top": 6.6 },
+      { "id": "C7", "x": -4.0, "z": 3.5, "gx": "1", "gz": "C", "top": 5.8 },
+      { "id": "C8", "x": 0.0, "z": 3.5, "gx": "2", "gz": "C", "top": 5.8 },
+      { "id": "C9", "x": 4.0, "z": 3.5, "gx": "3", "gz": "C", "top": 5.8 }
+    ]
+  },
+  "beamTypes": {
+    "VC": {
+      "b": 0.3,
+      "h": 0.35,
+      "top": [2, "#5"],
+      "bottom": [2, "#5"],
+      "extraTop": null,
+      "tieBar": "#3",
+      "lo": 0.7,
+      "tieSpacingLo": 0.1,
+      "tieSpacingMid": 0.15,
+      "cover": 0.05,
+      "labelEs": "Viga de cimentación 30×35",
+      "labelEn": "Grade beam 30×35"
+    },
+    "VE": {
+      "b": 0.3,
+      "h": 0.4,
+      "top": [2, "#5"],
+      "bottom": [3, "#4"],
+      "extraTop": [1, "#5", 1.4],
+      "tieBar": "#3",
+      "lo": 0.8,
+      "tieSpacingLo": 0.09,
+      "tieSpacingMid": 0.15,
+      "cover": 0.04,
+      "labelEs": "Viga aérea de entrepiso 30×40",
+      "labelEn": "Floor beam 30×40"
+    },
+    "VCU": {
+      "b": 0.25,
+      "h": 0.3,
+      "top": [2, "#4"],
+      "bottom": [2, "#4"],
+      "extraTop": null,
+      "tieBar": "#3",
+      "lo": 0.6,
+      "tieSpacingLo": 0.07,
+      "tieSpacingMid": 0.13,
+      "cover": 0.04,
+      "labelEs": "Viga de cubierta (corona / cumbrera / inclinada) 25×30",
+      "labelEn": "Roof beam (eave / ridge / rafter) 25×30"
+    }
+  },
+  "beams": [
+    { "id": "VC-A", "type": "VC", "axis": "x", "line": -3.5, "from": -4.15, "to": 4.15, "top": -0.1, "supports": [-4.0, 0.0, 4.0], "gridLine": "A" },
+    { "id": "VC-B", "type": "VC", "axis": "x", "line": 0.0, "from": -4.15, "to": 4.15, "top": -0.1, "supports": [-4.0, 0.0, 4.0], "gridLine": "B" },
+    { "id": "VC-C", "type": "VC", "axis": "x", "line": 3.5, "from": -4.15, "to": 4.15, "top": -0.1, "supports": [-4.0, 0.0, 4.0], "gridLine": "C" },
+    { "id": "VC-1", "type": "VC", "axis": "z", "line": -4.0, "from": -3.65, "to": 3.65, "top": -0.1, "supports": [-3.5, 0.0, 3.5], "gridLine": "1" },
+    { "id": "VC-2", "type": "VC", "axis": "z", "line": 0.0, "from": -3.65, "to": 3.65, "top": -0.1, "supports": [-3.5, 0.0, 3.5], "gridLine": "2" },
+    { "id": "VC-3", "type": "VC", "axis": "z", "line": 4.0, "from": -3.65, "to": 3.65, "top": -0.1, "supports": [-3.5, 0.0, 3.5], "gridLine": "3" },
+    { "id": "VE-A", "type": "VE", "axis": "x", "line": -3.5, "from": -4.15, "to": 4.15, "top": 3.0, "supports": [-4.0, 0.0, 4.0], "gridLine": "A" },
+    { "id": "VE-B", "type": "VE", "axis": "x", "line": 0.0, "from": -4.15, "to": 4.15, "top": 3.0, "supports": [-4.0, 0.0, 4.0], "gridLine": "B" },
+    { "id": "VE-C", "type": "VE", "axis": "x", "line": 3.5, "from": -4.15, "to": 4.15, "top": 3.0, "supports": [-4.0, 0.0, 4.0], "gridLine": "C" },
+    { "id": "VE-1", "type": "VE", "axis": "z", "line": -4.0, "from": -3.65, "to": 3.65, "top": 3.0, "supports": [-3.5, 0.0, 3.5], "gridLine": "1" },
+    { "id": "VE-2", "type": "VE", "axis": "z", "line": 0.0, "from": -3.65, "to": 3.65, "top": 3.0, "supports": [-3.5, 0.0, 3.5], "gridLine": "2" },
+    { "id": "VE-3", "type": "VE", "axis": "z", "line": 4.0, "from": -3.65, "to": 3.65, "top": 3.0, "supports": [-3.5, 0.0, 3.5], "gridLine": "3" },
+    { "id": "VCU-A", "type": "VCU", "axis": "x", "line": -3.5, "from": -4.15, "to": 4.15, "top": 5.8, "supports": [-4.0, 0.0, 4.0], "gridLine": "A" },
+    { "id": "VCU-B", "type": "VCU", "axis": "x", "line": 0.0, "from": -4.15, "to": 4.15, "top": 6.6, "supports": [-4.0, 0.0, 4.0], "gridLine": "B" },
+    { "id": "VCU-C", "type": "VCU", "axis": "x", "line": 3.5, "from": -4.15, "to": 4.15, "top": 5.8, "supports": [-4.0, 0.0, 4.0], "gridLine": "C" }
+  ],
+  "rafters": {
+    "type": "VCU",
+    "lines": [
+      { "id": "VI-1", "x": -4.0, "gridLine": "1" },
+      { "id": "VI-2", "x": 0.0, "gridLine": "2" },
+      { "id": "VI-3", "x": 4.0, "gridLine": "3" }
+    ],
+    "rearEnd": -3.65,
+    "frontEnd": 4.85,
+    "ridgeZ": 0.0,
+    "supportsZ": [-3.5, 0.0, 3.5],
+    "noteEs": "Vigas inclinadas con voladizo frontal de 1.35 m sobre el balcón",
+    "noteEn": "Sloped rafters with a 1.35 m front cantilever over the balcony"
+  },
+  "slabs": {
+    "groundSlab": {
+      "id": "CP-1",
+      "x0": -4.15, "x1": 4.15, "z0": -3.65, "z1": 3.65,
+      "top": 0.0, "thickness": 0.1,
+      "meshEs": "Malla electrosoldada 15×15 cm Ø 5.0 mm sobre recebo compactado",
+      "meshEn": "Welded wire mesh 6\"×6\" Ø 5.0 mm on compacted base",
+      "meshSpacing": 0.15
+    },
+    "floorSlab": {
+      "id": "L-1",
+      "x0": -4.15, "x1": 4.15, "z0": -3.65, "z1": 3.65,
+      "top": 3.0, "thickness": 0.12,
+      "void": { "x0": 0.79, "x1": 3.85, "z0": -3.35, "z1": -1.45 },
+      "bottomBar": "#3", "bottomSpacing": 0.2,
+      "topBar": "#3", "topSpacing": 0.2,
+      "topLengthInterior": 2.0,
+      "topLengthEdge": 1.0
+    },
+    "balcony": {
+      "id": "LV-1",
+      "x0": -4.15, "x1": 4.15, "z0": 3.65, "z1": 4.7,
+      "top": 3.0, "thickness": 0.12,
+      "topBar": "#4", "topSpacing": 0.2, "anchorInside": 1.5,
+      "distBar": "#3", "distSpacing": 0.25
+    }
+  },
+  "stair": {
+    "id": "ESC-1",
+    "type": "U",
+    "width": 0.9,
+    "gap": 0.1,
+    "riser": 0.1667,
+    "tread": 0.27,
+    "risersPerFlight": 9,
+    "waist": 0.12,
+    "flight1": { "x0": 0.79, "x1": 2.95, "z0": -3.35, "z1": -2.45, "y0": 0.0, "y1": 1.5, "dir": 1 },
+    "landing": { "x0": 2.95, "x1": 3.85, "z0": -3.35, "z1": -1.45, "top": 1.5 },
+    "flight2": { "x0": 0.79, "x1": 2.95, "z0": -2.35, "z1": -1.45, "y0": 1.5, "y1": 3.0, "dir": -1 },
+    "mainBar": "#4", "mainSpacing": 0.15,
+    "distBar": "#3", "distSpacing": 0.25
+  },
+  "walls": [
+    { "id": "W1-A1", "level": 1, "x1": -3.85, "z1": -3.5, "x2": -0.15, "z2": -3.5, "ext": true,
+      "openings": [{ "id": "V-3", "kind": "window", "c": 1.85, "w": 1.2, "sill": 1.2, "head": 2.1 }] },
+    { "id": "W1-A2", "level": 1, "x1": 0.15, "z1": -3.5, "x2": 3.85, "z2": -3.5, "ext": true,
+      "openings": [{ "id": "V-4", "kind": "window", "c": 0.85, "w": 0.8, "sill": 1.4, "head": 2.1 }] },
+    { "id": "W1-C1", "level": 1, "x1": -3.85, "z1": 3.5, "x2": -0.15, "z2": 3.5, "ext": true,
+      "openings": [{ "id": "V-1", "kind": "window", "c": 1.85, "w": 2.0, "sill": 0.9, "head": 2.1 }] },
+    { "id": "W1-C2", "level": 1, "x1": 0.15, "z1": 3.5, "x2": 3.85, "z2": 3.5, "ext": true,
+      "openings": [
+        { "id": "P-1", "kind": "door", "c": 0.85, "w": 1.0, "sill": 0.0, "head": 2.1, "main": true },
+        { "id": "V-2", "kind": "window", "c": 2.75, "w": 1.2, "sill": 0.9, "head": 2.1 }
+      ] },
+    { "id": "W1-1a", "level": 1, "x1": -4.0, "z1": -3.35, "x2": -4.0, "z2": -0.15, "ext": true,
+      "openings": [
+        { "id": "V-5", "kind": "window", "c": 0.75, "w": 0.6, "sill": 1.6, "head": 2.1 },
+        { "id": "V-6", "kind": "window", "c": 2.35, "w": 1.0, "sill": 1.2, "head": 2.1 }
+      ] },
+    { "id": "W1-1b", "level": 1, "x1": -4.0, "z1": 0.15, "x2": -4.0, "z2": 3.35, "ext": true,
+      "openings": [{ "id": "V-7", "kind": "window", "c": 1.6, "w": 1.5, "sill": 0.9, "head": 2.1 }] },
+    { "id": "W1-3a", "level": 1, "x1": 4.0, "z1": -3.35, "x2": 4.0, "z2": -0.15, "ext": true, "openings": [] },
+    { "id": "W1-3b", "level": 1, "x1": 4.0, "z1": 0.15, "x2": 4.0, "z2": 3.35, "ext": true,
+      "openings": [{ "id": "V-8", "kind": "window", "c": 1.6, "w": 1.2, "sill": 0.9, "head": 2.1 }] },
+    { "id": "I1-B", "level": 1, "x1": -3.85, "z1": 0.0, "x2": -1.6, "z2": 0.0, "ext": false, "openings": [] },
+    { "id": "I1-2", "level": 1, "x1": 0.0, "z1": -3.35, "x2": 0.0, "z2": -1.45, "ext": false, "openings": [] },
+    { "id": "I1-b1", "level": 1, "x1": -2.35, "z1": -3.35, "x2": -2.35, "z2": -1.85, "ext": false,
+      "openings": [{ "id": "P-2", "kind": "door", "c": 0.75, "w": 0.7, "sill": 0.0, "head": 2.1 }] },
+    { "id": "I1-b2", "level": 1, "x1": -3.85, "z1": -1.85, "x2": -2.35, "z2": -1.85, "ext": false, "openings": [] },
+
+    { "id": "W2-A1", "level": 2, "x1": -3.85, "z1": -3.5, "x2": -0.15, "z2": -3.5, "ext": true,
+      "openings": [
+        { "id": "V-9", "kind": "window", "c": 1.05, "w": 1.2, "sill": 0.9, "head": 2.1 },
+        { "id": "V-10", "kind": "window", "c": 2.9, "w": 0.6, "sill": 1.6, "head": 2.1 }
+      ] },
+    { "id": "W2-A2", "level": 2, "x1": 0.15, "z1": -3.5, "x2": 3.85, "z2": -3.5, "ext": true,
+      "openings": [{ "id": "V-11", "kind": "window", "c": 1.85, "w": 1.2, "sill": 1.0, "head": 2.1 }] },
+    { "id": "W2-C1", "level": 2, "x1": -3.85, "z1": 3.5, "x2": -0.15, "z2": 3.5, "ext": true,
+      "openings": [{ "id": "PV-1", "kind": "balconyDoor", "c": 1.85, "w": 1.6, "sill": 0.0, "head": 2.1 }] },
+    { "id": "W2-C2", "level": 2, "x1": 0.15, "z1": 3.5, "x2": 3.85, "z2": 3.5, "ext": true,
+      "openings": [{ "id": "V-12", "kind": "window", "c": 1.85, "w": 1.5, "sill": 0.9, "head": 2.1 }] },
+    { "id": "W2-1a", "level": 2, "x1": -4.0, "z1": -3.35, "x2": -4.0, "z2": -0.15, "ext": true, "gable": true,
+      "openings": [{ "id": "V-13", "kind": "window", "c": 1.6, "w": 1.0, "sill": 0.9, "head": 2.1 }] },
+    { "id": "W2-1b", "level": 2, "x1": -4.0, "z1": 0.15, "x2": -4.0, "z2": 3.35, "ext": true, "gable": true,
+      "openings": [{ "id": "V-14", "kind": "window", "c": 1.6, "w": 1.2, "sill": 0.9, "head": 2.1 }] },
+    { "id": "W2-3a", "level": 2, "x1": 4.0, "z1": -3.35, "x2": 4.0, "z2": -0.15, "ext": true, "gable": true, "openings": [] },
+    { "id": "W2-3b", "level": 2, "x1": 4.0, "z1": 0.15, "x2": 4.0, "z2": 3.35, "ext": true, "gable": true,
+      "openings": [{ "id": "V-15", "kind": "window", "c": 1.6, "w": 1.0, "sill": 0.9, "head": 2.1 }] },
+    { "id": "I2-B1", "level": 2, "x1": -3.85, "z1": 0.0, "x2": -0.15, "z2": 0.0, "ext": false,
+      "openings": [{ "id": "P-3", "kind": "door", "c": 2.9, "w": 0.8, "sill": 0.0, "head": 2.1 }] },
+    { "id": "I2-B2", "level": 2, "x1": 0.15, "z1": 0.0, "x2": 3.85, "z2": 0.0, "ext": false,
+      "openings": [{ "id": "P-4", "kind": "door", "c": 0.85, "w": 0.8, "sill": 0.0, "head": 2.1 }] },
+    { "id": "I2-2f", "level": 2, "x1": 0.0, "z1": 0.15, "x2": 0.0, "z2": 3.35, "ext": false, "openings": [] },
+    { "id": "I2-2r", "level": 2, "x1": 0.0, "z1": -3.35, "x2": 0.0, "z2": -1.45, "ext": false, "openings": [] },
+    { "id": "I2-h3", "level": 2, "x1": -1.75, "z1": -3.35, "x2": -1.75, "z2": -0.15, "ext": false,
+      "openings": [{ "id": "P-5", "kind": "door", "c": 2.7, "w": 0.7, "sill": 0.0, "head": 2.1 }] },
+    { "id": "I2-bn", "level": 2, "x1": -1.75, "z1": -1.15, "x2": -0.15, "z2": -1.15, "ext": false,
+      "openings": [{ "id": "P-6", "kind": "door", "c": 0.8, "w": 0.7, "sill": 0.0, "head": 2.1 }] }
+  ],
+  "wallThickness": 0.15,
+  "rooms": [
+    { "id": "R1-SALA", "level": 1, "name": "Sala", "nameEn": "Living Room", "rects": [[-3.85, 0.15, -0.15, 3.35]], "label": [-2.0, 1.75] },
+    { "id": "R1-COMEDOR", "level": 1, "name": "Comedor", "nameEn": "Dining Room", "rects": [[0.15, 0.15, 3.85, 3.35]], "label": [2.3, 1.6] },
+    { "id": "R1-COCINA", "level": 1, "name": "Cocina", "nameEn": "Kitchen", "rects": [[-2.35, -3.35, -0.15, -0.15], [-3.85, -1.85, -2.35, -0.15]], "label": [-1.3, -1.9] },
+    { "id": "R1-BANO", "level": 1, "name": "Baño Social", "nameEn": "Powder Room", "rects": [[-3.85, -3.35, -2.35, -1.85]], "label": [-3.1, -2.6] },
+    { "id": "R1-HALL", "level": 1, "name": "Hall Escalera", "nameEn": "Stair Hall", "rects": [[0.15, -3.35, 3.85, -0.15]], "label": [2.0, -0.8] },
+    { "id": "R2-HPPAL", "level": 2, "name": "Habitación Principal", "nameEn": "Master Bedroom", "rects": [[-3.85, 0.15, -0.15, 3.35]], "label": [-2.0, 1.75] },
+    { "id": "R2-HAB2", "level": 2, "name": "Habitación 2", "nameEn": "Bedroom 2", "rects": [[0.15, 0.15, 3.85, 3.35]], "label": [2.0, 1.75] },
+    { "id": "R2-HAB3", "level": 2, "name": "Habitación 3", "nameEn": "Bedroom 3", "rects": [[-3.85, -3.35, -1.75, -0.15]], "label": [-2.8, -1.9] },
+    { "id": "R2-BANO", "level": 2, "name": "Baño 1", "nameEn": "Bathroom 1", "rects": [[-1.75, -3.35, -0.15, -1.15]], "label": [-0.95, -2.3] },
+    { "id": "R2-HALL", "level": 2, "name": "Hall Nivel 2", "nameEn": "Upper Hall", "rects": [[-1.75, -1.15, -0.15, -0.15], [0.15, -1.45, 3.85, -0.15], [0.15, -3.35, 0.79, -1.45]], "label": [2.2, -0.8] },
+    { "id": "R2-BALCON", "level": 2, "name": "Balcón", "nameEn": "Balcony", "rects": [[-4.15, 3.65, 4.15, 4.7]], "label": [0.0, 4.2] }
+  ],
+  "railings": [
+    { "id": "BAR-1", "level": 2, "x1": -4.1, "z1": 4.65, "x2": 4.1, "z2": 4.65, "h": 1.0 },
+    { "id": "BAR-2", "level": 2, "x1": -4.1, "z1": 3.55, "x2": -4.1, "z2": 4.65, "h": 1.0 },
+    { "id": "BAR-3", "level": 2, "x1": 4.1, "z1": 3.55, "x2": 4.1, "z2": 4.65, "h": 1.0 },
+    { "id": "BAR-4", "level": 2, "x1": 0.79, "z1": -1.45, "x2": 3.85, "z2": -1.45, "h": 0.95 },
+    { "id": "BAR-5", "level": 2, "x1": 0.79, "z1": -3.35, "x2": 0.79, "z2": -2.4, "h": 0.95 }
+  ],
+  "roof": {
+    "type": "gable",
+    "ridgeAxis": "x",
+    "slopePct": 22.86,
+    "x0": -4.55, "x1": 4.55,
+    "rearEdge": -4.05, "frontEdge": 4.95,
+    "purlinDepth": 0.15, "purlinFlange": 0.05, "purlinThickness": 0.002,
+    "purlinMaxSpacing": 0.9,
+    "sheetRibPitch": 0.25, "sheetRibHeight": 0.035,
+    "ceiling": { "x0": -3.85, "x1": 3.85, "z0": -3.35, "z1": 3.35, "y": 5.4 }
+  }
+}

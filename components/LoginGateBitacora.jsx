@@ -106,8 +106,8 @@ export default function LoginGateBitacora({
 
             <p className="text-[11px] text-slate-500 text-center leading-relaxed">
               {lang === 'en'
-                ? 'Northbridge Corporate Hub showcase: field logs, ASTM concrete QA, drawings & 4D schedule.'
-                : 'Proyecto Northbridge Corporate Hub: bitácora diaria, cilindros NSR-10, planos y cronograma 4D.'}
+                ? '2-Storey RC Frame + Balcony showcase: field logs, NSR-10 QA, 6 BIM/Rebar sheets & 4D schedule.'
+                : 'Proyecto Pórtico 2 Niveles + Balcón: bitácora, cilindros NSR-10, 6 planos c/ acero y cronograma 4D.'}
             </p>
           </div>
 

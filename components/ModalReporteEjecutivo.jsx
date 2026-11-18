@@ -151,7 +151,7 @@ export default function ModalReporteEjecutivo({
     : 'Contratista: JGM ConTech Engineering • Supervisión Técnica ISO 19650';
 
   const metaProyecto = isDemo
-    ? 'NORTHBRIDGE CORPORATE HUB (BIM 5D)'
+    ? 'RESIDENCIAL PÓRTICO 2N + BALCÓN (BIM 5D)'
     : proyectoInfo?.nombre?.toUpperCase() || 'EDIFICIO MODELO 3 NIVELES';
   const metaUbicacion = isDemo
     ? 'Barranquilla / Miami / Madrid • ISO 19650'

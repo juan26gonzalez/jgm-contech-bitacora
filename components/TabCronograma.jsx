@@ -712,7 +712,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'proto_
                 <CalendarDays className="h-5 w-5" />
               </span>
               <h2 className="text-xl font-bold text-slate-900">
-                {lang === 'en' ? 'Project Schedule & 4D Control' : 'Cronograma de Obra y Control 4D'} — {demoMode ? 'Northbridge Corporate Hub' : proyectoActivo === 'proto_residencial' ? 'Vivienda Prototipo BIM 1.1' : 'Edificio Modelo 3 Niveles'}
+                {lang === 'en' ? 'Project Schedule & 4D Control' : 'Cronograma de Obra y Control 4D'} — {demoMode ? 'Residencial Pórtico 2N + Balcón' : proyectoActivo === 'proto_residencial' ? 'Vivienda Prototipo BIM 1.1' : 'Edificio Modelo 3 Niveles'}
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-1">
@@ -872,7 +872,7 @@ export default function TabCronograma({ registros = [], proyectoActivo = 'proto_
             </span>
           </div>
           <span className="text-[11px] text-slate-300">
-            {lang === 'en' ? 'Baseline:' : 'Línea base:'} {demoMode ? 'NORTHBRIDGE CORPORATE HUB • ISO 19650' : proyectoActivo === 'proto_residencial' ? 'VIVIENDA PROTOTIPO BIM 1.1' : 'EDIFICIO MODELO 3 NIVELES - PROTOTIPO'}
+            {lang === 'en' ? 'Baseline:' : 'Línea base:'} {demoMode ? 'PÓRTICO 2N + BALCÓN • ISO 19650' : proyectoActivo === 'proto_residencial' ? 'VIVIENDA PROTOTIPO BIM 1.1' : 'EDIFICIO MODELO 3 NIVELES - PROTOTIPO'}
           </span>
         </div>
 
